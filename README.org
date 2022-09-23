@@ -1,0 +1,3 @@
+#+TITLE: Little Olaf.
+
+A tiny olaf to explore efficient verified implementations of functional languages in Idris2.
