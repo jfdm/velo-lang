@@ -15,6 +15,7 @@ namespace Velo
   public export
   data AST a = Ref a String
 
+             | Hole a String
              | Zero a
              | Plus a (AST a)
 
@@ -40,6 +41,9 @@ namespace Velo
 map : (a -> b) -> AST a -> AST b
 map f (Ref x str)
   = Ref (f x) str
+
+map f (Hole x str)
+  = Hole (f x) str
 
 map f (Zero x)
   = Zero (f x)
@@ -82,6 +86,7 @@ Functor AST where
 export
 getFC : AST FileContext -> FileContext
 getFC (Ref x str)       = x
+getFC (Hole x str)      = x
 getFC (Zero x)          = x
 getFC (Plus x y)        = x
 getFC (Add x y z)       = x

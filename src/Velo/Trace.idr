@@ -2,9 +2,14 @@ module Velo.Trace
 
 import Text.PrettyPrint.Prettyprinter
 
+import Toolkit.DeBruijn.Context.Item
+import Toolkit.DeBruijn.Context
+import Toolkit.Data.Location
 import Velo.Types
 import Velo.Terms
 import Velo.Values
+
+import Velo.Elaborator
 
 import Velo.Semantics.Reductions
 import Velo.Semantics.Evaluation
@@ -92,3 +97,34 @@ prettyComputation : {ty : Ty}
                          -> Velo ()
 prettyComputation {term = term} (R that val steps)
   = printLn $ vcat (showSteps steps)
+
+
+item : {a : Ty} -> Item a -> Doc ()
+item (I str a)
+  = hcat [ pretty str
+         , Doc.pretty ":"
+         , ty a]
+
+ctxt : Context Ty is -> List (Doc ())
+ctxt [] = []
+ctxt (elem :: rest)
+  = item elem :: ctxt rest
+
+hole : Hole h -> Doc ()
+hole (H fc str t c)
+  = vcat [hcat [pretty (show fc), pretty str]
+         , vcat (ctxt c ++ [Doc.pretty "---", hcat [pretty str, Doc.pretty ":", ty t]])
+         ]
+
+
+holes' : Holes holes -> List (Doc ())
+holes' [] = []
+holes' (elem :: rest)
+  = (vcat [hole elem, Doc.pretty ""]) :: holes' rest
+
+export
+prettyHoles : Holes ss -> Velo ()
+prettyHoles h
+  = printLn $ vcat (holes' h)
+
+-- [ EOF ]

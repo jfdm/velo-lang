@@ -45,6 +45,14 @@ bool =  givesWithLoc "true"  (T)
     <|> givesWithLoc "false" (F)
 
 mutual
+  hole : Rule (AST FileContext)
+  hole
+    = do s <- Toolkit.location
+         symbol "?"
+         h <- name
+         e <- Toolkit.location
+         pure (Hole (newFC s e) h)
+
   nat : Rule (AST FileContext)
   nat = givesWithLoc "zero" Zero
       <|> do s <- Toolkit.location
@@ -123,6 +131,7 @@ mutual
 
   expr : Rule (AST FileContext)
   expr =   ref
+       <|> hole
        <|> nat <|> bool <|> and <|> add
        <|> let_
        <|> app

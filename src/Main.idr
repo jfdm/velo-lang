@@ -35,17 +35,21 @@ mainRug
        ast <- fromFile fname
        putStrLn "# Finished Parsing"
 
-       (ty ** tm) <- elab ast
+       res <- elab ast
        putStrLn "# Finished Type Checking"
 
-       when (justCheck opts)
-         $ exitSuccess
+       case res of
+         Holly h => do prettyHoles h
+                       exitSuccess
+         Closed tm
+           => do when (justCheck opts)
+                   $ exitSuccess
 
-       putStrLn "# Executing"
-       v <- eval tm
-       prettyComputation v
-       putStrLn "# Finished"
-       pure ()
+                 putStrLn "# Executing"
+                 v <- eval tm
+                 prettyComputation v
+                 putStrLn "# Finished"
+                 pure ()
 
 main : IO ()
 main

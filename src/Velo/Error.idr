@@ -43,6 +43,7 @@ namespace Elaborating
   data Error = Mismatch Ty Ty
              | NotBound String
              | FuncExpected Ty
+             | Hole String
              | Err FileContext Elaborating.Error
 
 namespace Evaluating
@@ -53,6 +54,7 @@ namespace Velo
 
   public export
   data Error : Type where
+    Internal : String -> Velo.Error
     Generic : String -> Velo.Error
     Opts    : Options.Error -> Velo.Error
     Lex     : Lexing.Error -> Velo.Error

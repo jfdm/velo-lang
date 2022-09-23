@@ -40,7 +40,8 @@ Show (Evaluating.Error) where
   show OOF = "Out of Fuel"
 
 Show (Elaborating.Error) where
-
+  show (Hole msg)
+    = "Hole eror:\n\t\{show msg}"
   show (Err fc err)
     = unlines [show fc
               , show err]
@@ -61,6 +62,8 @@ Show (Elaborating.Error) where
 
 export
 Show (Velo.Error) where
+  show (Internal err)
+    = "Not supposed to happen:\n\t\{err}"
   show (Generic err)
     = show err
 
