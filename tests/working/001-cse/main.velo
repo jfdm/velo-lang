@@ -1,0 +1,6 @@
+   let a = (inc (inc zero))
+in let b = (add a a)
+in let c = (add a a)
+in let d = (add b c)
+
+in d

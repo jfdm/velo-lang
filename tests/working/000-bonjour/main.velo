@@ -1,0 +1,10 @@
+   let a = zero
+in let b = (inc a)
+in let c = (add a b)
+
+in let d = true
+in let e = false
+in let f = (and d e)
+
+in let foo = (fun x : nat => x)
+in (foo zero)

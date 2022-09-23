@@ -1,0 +1,98 @@
+Running Test
+# Finished Parsing
+# Finished Type Checking
+# Executing
+```
+(apply (fun (apply (fun (apply (fun (apply (fun 0)
+                                           (add 1 0)))
+                               (add 1 1)))
+                   (add 0 0)))
+       (inc (inc zero)))
+```
+### Reduce Application
+```
+(apply (fun (apply (fun (apply (fun 0)
+                               (add 1 0)))
+                   (add (inc (inc zero)) (inc (inc zero)))))
+       (add (inc (inc zero)) (inc (inc zero))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun (apply (fun (apply (fun 0)
+                               (add 1 0)))
+                   (add (inc (inc zero)) (inc (inc zero)))))
+       (add (inc zero) (inc (inc (inc zero)))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun (apply (fun (apply (fun 0)
+                               (add 1 0)))
+                   (add (inc (inc zero)) (inc (inc zero)))))
+       (add zero (inc (inc (inc (inc zero))))))
+```
+### Simplify Application Variable by Reduce Add Left is Zero
+```
+(apply (fun (apply (fun (apply (fun 0)
+                               (add 1 0)))
+                   (add (inc (inc zero)) (inc (inc zero)))))
+       (inc (inc (inc (inc zero)))))
+```
+### Reduce Application
+```
+(apply (fun (apply (fun 0)
+                   (add (inc (inc (inc (inc zero)))) 0)))
+       (add (inc (inc zero)) (inc (inc zero))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun (apply (fun 0)
+                   (add (inc (inc (inc (inc zero)))) 0)))
+       (add (inc zero) (inc (inc (inc zero)))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun (apply (fun 0)
+                   (add (inc (inc (inc (inc zero)))) 0)))
+       (add zero (inc (inc (inc (inc zero))))))
+```
+### Simplify Application Variable by Reduce Add Left is Zero
+```
+(apply (fun (apply (fun 0)
+                   (add (inc (inc (inc (inc zero)))) 0)))
+       (inc (inc (inc (inc zero)))))
+```
+### Reduce Application
+```
+(apply (fun 0)
+       (add (inc (inc (inc (inc zero)))) (inc (inc (inc (inc zero))))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun 0)
+       (add (inc (inc (inc zero))) (inc (inc (inc (inc (inc zero)))))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun 0)
+       (add (inc (inc zero)) (inc (inc (inc (inc (inc (inc zero))))))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun 0)
+       (add (inc zero) (inc (inc (inc (inc (inc (inc (inc zero)))))))))
+```
+### Simplify Application Variable by Rewriting Add
+```
+(apply (fun 0)
+       (add zero (inc (inc (inc (inc (inc (inc (inc (inc zero))))))))))
+```
+### Simplify Application Variable by Reduce Add Left is Zero
+```
+(apply (fun 0)
+       (inc (inc (inc (inc (inc (inc (inc (inc zero)))))))))
+```
+### Reduce Application
+```
+(inc (inc (inc (inc (inc (inc (inc (inc zero))))))))
+```
+# Finished

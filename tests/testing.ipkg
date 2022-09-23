@@ -1,0 +1,17 @@
+-- [ Manifest ]
+--
+-- Testing Manifest
+--
+-- Copyright : (c) Jan de Muijnck-Hughes
+-- License   : see ../LICENSE
+--
+--
+package testing
+
+depends = contrib, test
+
+executable = ola-tests
+
+main = Main
+
+-- [ EOF ]
