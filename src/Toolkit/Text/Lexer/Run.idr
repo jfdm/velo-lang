@@ -57,5 +57,5 @@ lexFile : Lexer a -> String -> IO $ Either LexFail (List (WithBounds a))
 lexFile lexer fname = do
   Right str <- readFile fname | Left err => pure (Left (LIOErr err))
   case lexString lexer str of
-        Left err => pure $ Left (LError (record {location->source = Just fname} err))
+        Left err => pure $ Left (LError ({ location->source := Just fname } err))
         Right toks => pure (Right toks)

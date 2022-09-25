@@ -25,6 +25,6 @@ namespace Toolkit
     location : String -> RuleEmpty state tok Location
     location fname = do
       l <- Toolkit.location
-      pure (record { source = Just fname} l)
+      pure ({ source := Just fname} l)
 
 -- [ EOF ]
