@@ -55,6 +55,7 @@ ${PROJECT}-bench: ${PROJECT} ${PROJECT}-test-build
 clean:
 	$(IDRIS2) --clean ${PROJECT}.ipkg
 	${MAKE} -C tests clean
+	rm -rf build/
 
 clobber: clean
 	$(IDRIS2) --clean ${PROJECT}.ipkg

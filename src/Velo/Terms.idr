@@ -2,6 +2,8 @@ module Velo.Terms
 
 import public Decidable.Equality
 
+import public Toolkit.Data.List.Quantifiers
+
 import public Toolkit.DeBruijn.Context
 import public Toolkit.DeBruijn.Variable
 import public Toolkit.DeBruijn.Renaming
@@ -10,6 +12,18 @@ import public Toolkit.DeBruijn.Substitution
 import Velo.Types
 
 %default total
+
+public export
+data Prim : (args : List Ty)
+         -> (type : Ty)
+         -> Type
+  where
+    Zero  : Prim [] TyNat
+    Plus  : Prim [TyNat] TyNat
+    Add   : Prim [TyNat, TyNat] TyNat
+    True  : Prim [] TyBool
+    False : Prim [] TyBool
+    And   : Prim [TyBool, TyBool] TyBool
 
 public export
 data Term : (ctxt : List Ty)
@@ -28,14 +42,10 @@ data Term : (ctxt : List Ty)
        -> (arg  : Term ctxt         a)
                -> Term ctxt           b
 
-    Zero : Term types TyNat
-    Plus : Term types TyNat -> Term types TyNat
-
-    Add : (l,r : Term types TyNat) -> Term types TyNat
-
-    True,False : Term types TyBool
-
-    And : (l,r : Term types TyBool) -> Term types TyBool
+    Call : {tys : List Ty}
+       -> (op : Prim tys ty)
+       -> (args : All (Term ctxt) tys)
+       -> Term ctxt ty
 
 public export
 Rename Ty Term where
@@ -49,26 +59,8 @@ Rename Ty Term where
     = App (rename f f')
           (rename f a)
 
-  rename f Zero
-    = Zero
-
-  rename f (Plus x)
-    = Plus (rename f x)
-
-
-  rename f (Add l r)
-    = Add (rename f l)
-          (rename f r)
-
-  rename f True
-    = True
-
-  rename f False
-    = False
-
-  rename f (And l r)
-    = And (rename f l)
-          (rename f r)
+  rename f (Call p ts)
+    = Call p (assert_total $ map (rename f) ts)
 
   embed = Var
 
@@ -84,25 +76,7 @@ Substitute Ty Term where
     = App (subst f f')
           (subst f a)
 
-  subst f Zero
-    = Zero
-
-  subst f (Plus x)
-    = Plus (subst f x)
-
-  subst f (Add l r)
-    = Add (subst f l)
-          (subst f r)
-
-
-  subst f True
-    = True
-
-  subst f False
-    = False
-
-  subst f (And l r)
-    = And (subst f l)
-          (subst f r)
+  subst f (Call p ts)
+    = Call p (assert_total $ map (subst f) ts)
 
 -- [ EOF ]

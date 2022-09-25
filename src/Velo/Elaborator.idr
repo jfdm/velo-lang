@@ -163,20 +163,20 @@ data UnHoly : Term i o xs type
     App : UnHoly func f
        -> UnHoly arg  a -> UnHoly (App func arg) (App f a)
 
-    Zero : UnHoly Zero Zero
+    Zero : UnHoly Zero (Call Zero [])
 
-    Plus : UnHoly nat n -> UnHoly (Plus nat) (Plus n)
+    Plus : UnHoly nat n -> UnHoly (Plus nat) (Call Plus [n])
 
     Add : UnHoly left l
        -> UnHoly right r
-       -> UnHoly (Add left right) (Add l r)
+       -> UnHoly (Add left right) (Call Add [l, r])
 
-    True : UnHoly True True
-    False : UnHoly False False
+    True : UnHoly True (Call True [])
+    False : UnHoly False (Call False [])
 
     And : UnHoly left l
        -> UnHoly right r
-       -> UnHoly (And left right) (And l r)
+       -> UnHoly (And left right) (Call And [l, r])
 
 Uninhabited (UnHoly Hole h) where
   uninhabited (Var) impossible
@@ -224,36 +224,36 @@ unHoly (App func arg) with (unHoly func)
     = No (\(App f a ** App pF pA) => no (f ** pF))
 
 unHoly Zero
-  = Yes (Zero ** Zero)
+  = Yes (Call Zero [] ** Zero)
 
 unHoly (Plus x) with (unHoly x)
   unHoly (Plus x) | (Yes ((fst ** snd)))
-    = Yes (Plus fst ** Plus snd)
+    = Yes (Call Plus [fst] ** Plus snd)
   unHoly (Plus x) | (No no)
-    = No (\(Plus x ** Plus s) => no (x ** s))
+    = No (\(Call Plus [x] ** Plus s) => no (x ** s))
 
 unHoly (Add l r) with (unHoly l)
   unHoly (Add l r) | (Yes (l' ** pl)) with (unHoly r)
     unHoly (Add l r) | (Yes (l' ** pl)) | (Yes (r' ** pr))
-      = Yes (Add l' r' ** Add pl pr)
+      = Yes (Call Add [l', r'] ** Add pl pr)
     unHoly (Add l r) | (Yes (l' ** pl)) | (No no)
-      = No (\(Add l r ** Add pl pr) => no (r ** pr))
+      = No (\(Call Add [l, r] ** Add pl pr) => no (r ** pr))
   unHoly (Add l r) | (No no)
-    = No (\(Add l r ** Add pl pr) => no (l ** pl))
+    = No (\(Call Add [l, r] ** Add pl pr) => no (l ** pl))
 
 unHoly True
-  = Yes (True ** True)
+  = Yes (Call True [] ** True)
 unHoly False
-  = Yes (False ** False)
+  = Yes (Call False [] ** False)
 
 unHoly (And l r) with (unHoly l)
   unHoly (And l r) | (Yes (l' ** pl)) with (unHoly r)
     unHoly (And l r) | (Yes (l' ** pl)) | (Yes (r' ** pr))
-      = Yes (And l' r' ** And pl pr)
+      = Yes (Call And [l', r'] ** And pl pr)
     unHoly (And l r) | (Yes (l' ** pl)) | (No no)
-      = No (\(And l r ** And pl pr) => no (r ** pr))
+      = No (\(Call And [l, r] ** And pl pr) => no (r ** pr))
   unHoly (And l r) | (No no)
-    = No (\(And l r ** And pl pr) => no (l ** pl))
+    = No (\(Call And [l, r] ** And pl pr) => no (l ** pl))
 
 
 namespace Closed
