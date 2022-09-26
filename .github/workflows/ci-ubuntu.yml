@@ -1,0 +1,59 @@
+## Adapted from The Frex Project.
+name: Ubuntu
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+########################################################################
+## CONFIGURATION
+########################################################################
+
+env:
+  SCHEME: scheme
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Initialise variables
+        run: |
+          # Only deploy if the build follows from pushing to main
+          echo "$HOME/.idris2/bin" >> $GITHUB_PATH
+
+      # This caching step allows us to save a lot of building time by only
+      # rebuilding Idris2 from boostrap if absolutely necessary
+      - name: Cache Idris2
+        uses: actions/cache@v2
+        id: cache-idris2
+        with:
+          path: |
+            ~/.idris2
+          key: ${{ runner.os }}-idris
+
+      - name: Install Chez
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chezscheme
+
+      - name: Install Idris2
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/idris-lang/idris2
+          cd idris2
+          make bootstrap && make install
+
+      - name: Checkout systemv
+        uses: actions/checkout@v2
+
+      - name: Build LightClick
+        run: make velo
+
+      - name: Run Tests
+        run: make velo-test-run
+
+# -- [ EOF ]
