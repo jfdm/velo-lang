@@ -1,4 +1,4 @@
-#+TITLE: Velo.
+# Velo.
 
 [![Build Status](https://github.com/jfdm/velo-lang/actions/workflows/ci-ubuntu.yml/badge.svg)](https://github.com/jfdm/velo-lang/actions/workflows/ci-ubuntu.yml)
 
