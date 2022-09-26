@@ -150,35 +150,35 @@ mutual
          Refl <- compare (getFC rest) tyE tyG
          pure (R eta tm)
 
-data UnHoly : Term i o xs type
+data Elab : Term i o xs type
            -> Term     xs type
            -> Type
   where
-    Var : UnHoly (Var prf) (Var prf)
-    Fun : UnHoly scope scope'
-       -> UnHoly (Fun scope) (Fun scope')
-    Let : UnHoly val v
-       -> UnHoly scope s
-       -> UnHoly (Let val scope) (App (Fun s) v)
-    App : UnHoly func f
-       -> UnHoly arg  a -> UnHoly (App func arg) (App f a)
+    Var : Elab (Var prf) (Var prf)
+    Fun : Elab scope scope'
+       -> Elab (Fun scope) (Fun scope')
+    Let : Elab val v
+       -> Elab scope s
+       -> Elab (Let val scope) (App (Fun s) v)
+    App : Elab func f
+       -> Elab arg  a -> Elab (App func arg) (App f a)
 
-    Zero : UnHoly Zero (Call Zero [])
+    Zero : Elab Zero (Call Zero [])
 
-    Plus : UnHoly nat n -> UnHoly (Plus nat) (Call Plus [n])
+    Plus : Elab nat n -> Elab (Plus nat) (Call Plus [n])
 
-    Add : UnHoly left l
-       -> UnHoly right r
-       -> UnHoly (Add left right) (Call Add [l, r])
+    Add : Elab left l
+       -> Elab right r
+       -> Elab (Add left right) (Call Add [l, r])
 
-    True : UnHoly True (Call True [])
-    False : UnHoly False (Call False [])
+    True : Elab True (Call True [])
+    False : Elab False (Call False [])
 
-    And : UnHoly left l
-       -> UnHoly right r
-       -> UnHoly (And left right) (Call And [l, r])
+    And : Elab left l
+       -> Elab right r
+       -> Elab (And left right) (Call And [l, r])
 
-Uninhabited (UnHoly Hole h) where
+Uninhabited (Elab Hole h) where
   uninhabited (Var) impossible
   uninhabited (Fun x) impossible
   uninhabited (Let x y) impossible
@@ -190,69 +190,69 @@ Uninhabited (UnHoly Hole h) where
   uninhabited (False) impossible
   uninhabited (And x y) impossible
 
-unHoly : (term : Term i o xs type)
-              -> Dec (DPair (Term xs type) (UnHoly term))
-unHoly (Var prf)
+elab : (term : Term i o xs type)
+            -> Dec (DPair (Term xs type) (Elab term))
+elab (Var prf)
   = Yes (Var prf ** Var)
-unHoly Hole
+elab Hole
   = No (\(tm ** body) => absurd body)
 
-unHoly (Fun body) with (unHoly body)
-  unHoly (Fun body) | (Yes ((fst ** snd)))
+elab (Fun body) with (elab body)
+  elab (Fun body) | (Yes ((fst ** snd)))
     = Yes (Fun fst ** Fun snd)
-  unHoly (Fun body) | (No no)
+  elab (Fun body) | (No no)
     = No (\(Fun b ** Fun body) => no (b ** body))
 
-unHoly (Let val scope) with (unHoly val)
-  unHoly (Let val scope) | (Yes (v ** prfV)) with (unHoly scope)
-    unHoly (Let val scope) | (Yes (v ** prfV)) | (Yes (s ** prfS))
+elab (Let val scope) with (elab val)
+  elab (Let val scope) | (Yes (v ** prfV)) with (elab scope)
+    elab (Let val scope) | (Yes (v ** prfV)) | (Yes (s ** prfS))
       = Yes (App (Fun s) v ** Let prfV prfS)
 
-    unHoly (Let val scope) | (Yes (v ** prfV)) | (No no)
+    elab (Let val scope) | (Yes (v ** prfV)) | (No no)
       = No (\(App (Fun s) v ** Let x sc) => no (s ** sc))
 
-  unHoly (Let val scope) | (No no)
+  elab (Let val scope) | (No no)
     = No (\(App (Fun s) v ** Let x sc) => no (v ** x))
 
-unHoly (App func arg) with (unHoly func)
-  unHoly (App func arg) | (Yes (f ** prfF)) with (unHoly arg)
-    unHoly (App func arg) | (Yes (f ** prfF)) | (Yes (a ** prfA))
+elab (App func arg) with (elab func)
+  elab (App func arg) | (Yes (f ** prfF)) with (elab arg)
+    elab (App func arg) | (Yes (f ** prfF)) | (Yes (a ** prfA))
       = Yes (App f a ** App prfF prfA)
-    unHoly (App func arg) | (Yes (f ** prfF)) | (No no)
+    elab (App func arg) | (Yes (f ** prfF)) | (No no)
       = No (\(App f a ** App pF pA) => no (a ** pA))
-  unHoly (App func arg) | (No no)
+  elab (App func arg) | (No no)
     = No (\(App f a ** App pF pA) => no (f ** pF))
 
-unHoly Zero
+elab Zero
   = Yes (Call Zero [] ** Zero)
 
-unHoly (Plus x) with (unHoly x)
-  unHoly (Plus x) | (Yes ((fst ** snd)))
+elab (Plus x) with (elab x)
+  elab (Plus x) | (Yes ((fst ** snd)))
     = Yes (Call Plus [fst] ** Plus snd)
-  unHoly (Plus x) | (No no)
+  elab (Plus x) | (No no)
     = No (\(Call Plus [x] ** Plus s) => no (x ** s))
 
-unHoly (Add l r) with (unHoly l)
-  unHoly (Add l r) | (Yes (l' ** pl)) with (unHoly r)
-    unHoly (Add l r) | (Yes (l' ** pl)) | (Yes (r' ** pr))
+elab (Add l r) with (elab l)
+  elab (Add l r) | (Yes (l' ** pl)) with (elab r)
+    elab (Add l r) | (Yes (l' ** pl)) | (Yes (r' ** pr))
       = Yes (Call Add [l', r'] ** Add pl pr)
-    unHoly (Add l r) | (Yes (l' ** pl)) | (No no)
+    elab (Add l r) | (Yes (l' ** pl)) | (No no)
       = No (\(Call Add [l, r] ** Add pl pr) => no (r ** pr))
-  unHoly (Add l r) | (No no)
+  elab (Add l r) | (No no)
     = No (\(Call Add [l, r] ** Add pl pr) => no (l ** pl))
 
-unHoly True
+elab True
   = Yes (Call True [] ** True)
-unHoly False
+elab False
   = Yes (Call False [] ** False)
 
-unHoly (And l r) with (unHoly l)
-  unHoly (And l r) | (Yes (l' ** pl)) with (unHoly r)
-    unHoly (And l r) | (Yes (l' ** pl)) | (Yes (r' ** pr))
+elab (And l r) with (elab l)
+  elab (And l r) | (Yes (l' ** pl)) with (elab r)
+    elab (And l r) | (Yes (l' ** pl)) | (Yes (r' ** pr))
       = Yes (Call And [l', r'] ** And pl pr)
-    unHoly (And l r) | (Yes (l' ** pl)) | (No no)
+    elab (And l r) | (Yes (l' ** pl)) | (No no)
       = No (\(Call And [l, r] ** And pl pr) => no (r ** pr))
-  unHoly (And l r) | (No no)
+  elab (And l r) | (No no)
     = No (\(Call And [l, r] ** And pl pr) => no (l ** pl))
 
 
@@ -269,7 +269,7 @@ namespace Closed
            | (_ ** R holes _)
              => pure (Holly holes)
          (tm ** prf) <- embed (Internal "Holes found, should not happen")
-                             (unHoly tm)
+                             (elab tm)
          pure (Closed tm)
 
 -- [ EOF ]
