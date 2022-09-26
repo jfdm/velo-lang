@@ -53,7 +53,7 @@ convert : (src : Maybe String)
        -> (err : ParsingError a)
               -> ParseFailure a
 convert src (Error msg Nothing)
-  = MkParseFail msg (record {source = src} emptyFC)
+  = MkParseFail msg ({ source := src } emptyFC)
 
 convert src (Error msg (Just loc))
   = let s = startBounds loc in

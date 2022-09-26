@@ -8,9 +8,17 @@ module Toolkit.Data.List.Quantifiers
 
 import public Toolkit.Decidable.Informative
 
-import        Data.List.Quantifiers
+import public Data.List.Quantifiers
 
 %default total
+
+namespace Relevant
+
+  export
+  map : ({x : a} -> p x -> q x) ->
+        {xs : List a} -> All p xs -> All q xs
+  map f [] = []
+  map f (px :: pxs) = f px :: map f pxs
 
 namespace Informative
 

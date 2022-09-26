@@ -38,12 +38,12 @@ velo (Fun body)
 velo (App f a)
   = parens (pretty "apply" <++> align (vsep [velo f, velo a]))
 
-velo Zero = pretty "zero"
-velo (Plus x) = group $ parens $ hsep [pretty "inc", velo x]
-velo (Add l r) = group $ parens (hsep [pretty "add", velo l, velo r])
-velo True = pretty "True"
-velo False = pretty "False"
-velo (And l r) = group $ parens (hsep [pretty "and", velo l, velo r])
+velo (Call Zero []) = pretty "zero"
+velo (Call Plus [x]) = group $ parens $ hsep [pretty "inc", velo x]
+velo (Call Add [l, r]) = group $ parens (hsep [pretty "add", velo l, velo r])
+velo (Call True []) = pretty "True"
+velo (Call False []) = pretty "False"
+velo (Call And [l, r]) = group $ parens (hsep [pretty "and", velo l, velo r])
 
 namespace Velo
 
@@ -57,18 +57,18 @@ namespace Velo
 
 
 showRedux : Redux a b -> String
-showRedux (SimplifyAndLeft x) = "Simplify And Left Operand by " ++ showRedux x
-showRedux (SimplifyAndRight x y) = "Simplify And Right Operand by " ++ showRedux y
+showRedux (SimplifyCall And (x !: _)) = "Simplify And Left Operand by " ++ showRedux x
+showRedux (SimplifyCall And (x :: y !: _)) = "Simplify And Right Operand by " ++ showRedux y
 showRedux (ReduceAndTT) = "Reduce And True True"
 showRedux (ReduceAndWF) = "Reduce And Right is False"
 showRedux (ReduceAndFW) = "Reduce And Left is False"
 
-showRedux (SimplifyAddLeft x) = "Simplify Add Left Operand by " ++ showRedux x
-showRedux (SimplifyAddRight x y) = "Simplify Add Right Operand by " ++ showRedux y
+showRedux (SimplifyCall Add (x !: _)) = "Simplify Add Left Operand by " ++ showRedux x
+showRedux (SimplifyCall Add (x :: y !: _)) = "Simplify Add Right Operand by " ++ showRedux y
 showRedux (ReduceAddZW vr) = "Reduce Add Left is Zero"
 showRedux (RewriteEqNatPW vl vr) = "Rewriting Add"
 
-showRedux (SimplifyPlus x) = "Simplify Plus by " ++ showRedux x
+showRedux (SimplifyCall Plus (x !: _)) = "Simplify Plus by " ++ showRedux x
 
 showRedux (SimplifyFuncAppFunc func) = "Simplify Application Function"
 showRedux (SimplifyFuncAppVar value var) = "Simplify Application Variable by " ++ showRedux var

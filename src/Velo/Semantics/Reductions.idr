@@ -8,53 +8,55 @@ import Velo.Values
 
 %default total
 
+data Reduxes : (these, those : All (Term ctxt) tys) -> Type
+data Redux : (this,that : Term ctxt type) -> Type
+
+infixr 7 !:
+
 public export
-data Redux : (this,that : Term ctxt type)
-                       -> Type
+data Reduxes : (these, those : All (Term ctxt) tys)
+            -> Type
   where
 
+    (!:) : (hd : Redux this that)
+        -> (rest : All (Term ctxt) tys)
+        -> Reduxes (this :: rest) (that :: rest)
+
+    (::) : (value : Value hd)
+        -> (tl : Reduxes these those)
+        -> Reduxes (hd :: these) (hd :: those)
+
+public export
+data Redux : (this,that : Term ctxt type)
+          -> Type
+  where
+
+    -- [ Call ]
+    SimplifyCall : (p : Prim tys ty)
+                -> (step : Reduxes these those)
+                -> Redux (Call p these) (Call p those)
+
     -- [ Nats ]
-    SimplifyPlus : (inner : Redux this that)
-                         -> Redux (Plus this) (Plus that)
-
-    SimplifyAddLeft : (left : Redux this that)
-                           -> Redux (Add this right)
-                                    (Add that right)
-
-    SimplifyAddRight : (value : Value left)
-                    -> (right : Redux this that)
-                             -> Redux (Add left this)
-                                      (Add left that)
-
     ReduceAddZW : (value : Value right)
-                        -> Redux (Add Zero right)
+                        -> Redux (Call Add [Call Zero [], right])
                                  right
 
-    RewriteEqNatPW : (valueL : Value (Plus this))
+    RewriteEqNatPW : (valueL : Value (Call Plus [this]))
                   -> (valueR : Value right)
-                            -> Redux (Add (Plus this) right)
-                                     ((Add this (Plus right)))
+                            -> Redux (Call Add [Call Plus [this], right])
+                                     (Call Add [this, Call Plus [right]])
 
 
     -- [ Bool ]
 
-    SimplifyAndLeft : (left : Redux this that)
-                           -> Redux (And this right)
-                                    (And that right)
+    ReduceAndTT : Redux (Call And [Call True [], Call True []])
+                        (Call True [])
 
-    SimplifyAndRight : (value : Value left)
-                    -> (right : Redux this that)
-                             -> Redux (And left this)
-                                      (And left that)
+    ReduceAndWF : Redux (Call And [left, Call False []])
+                        (Call False [])
 
-    ReduceAndTT : Redux (And True True)
-                        True
-
-    ReduceAndWF : Redux (And left False)
-                        False
-
-    ReduceAndFW : Redux (And False right)
-                             False
+    ReduceAndFW : Redux (Call And [Call False [], right])
+                        (Call False [])
 
 
     -- [ STLC ]
@@ -69,9 +71,7 @@ data Redux : (this,that : Term ctxt type)
                                     -> Redux (App func this)
                                              (App func that)
 
-    ReduceFuncApp : {ctxt : List Ty}
-                 -> {type : Ty}
-                 -> {body : Term (ctxt += type) return}
+    ReduceFuncApp : {body : Term (ctxt += type) return}
                  -> {var  : Term  ctxt    type}
                  -> Value var
                           -> Redux (App (Fun body) var)
