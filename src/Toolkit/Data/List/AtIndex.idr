@@ -21,6 +21,12 @@ data AtIndex : (x   :      type)
     There : (later : AtIndex x     rest     idx)
                   -> AtIndex x (y::rest) (S idx)
 
+
+export
+irrelevantAtIndex : (p, q : AtIndex x xs n) -> p === q
+irrelevantAtIndex Here Here = Refl
+irrelevantAtIndex (There p) (There q) = cong There (irrelevantAtIndex p q)
+
 namespace Check
 
   namespace IsAtIndex
