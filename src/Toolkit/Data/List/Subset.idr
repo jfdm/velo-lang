@@ -27,6 +27,10 @@ data Subset : (eq   : a -> b -> Type)
     Skip : (rest : Subset eq xs     ys)
                 -> Subset eq xs (y::ys)
 
+export
+Skips : {zs : SnocList b} -> Subset eq xs ys -> Subset eq xs (zs <>> ys)
+Skips {zs = [<]} rest = rest
+Skips {zs = (sz :< z)} rest = Skips (Skip rest)
 
 public export
 data Error : Type -> Type where
