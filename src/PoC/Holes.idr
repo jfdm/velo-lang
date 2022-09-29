@@ -1,11 +1,13 @@
 module PoC.Holes
 
+import Toolkit.Data.List.Quantifiers
 import Toolkit.Data.List.Pointwise
 import Toolkit.Data.List.Subset
 
 import Toolkit.DeBruijn.Variable
 import Toolkit.DeBruijn.Context
 
+import Decidable.Equality
 import Data.DPair
 
 import Velo.Types
@@ -29,6 +31,24 @@ record Meta where
 
 Thinning : (xs, ys : List a) -> Type
 Thinning = Subset (===)
+
+namespace Raw
+
+  data Check : Type
+  data Synth : Type
+
+
+  public export
+  data Check : Type where
+    Met : String -> Check
+    Lam : String -> Check -> Check
+    Emb : Synth -> Check
+
+  public export
+  data Synth : Type where
+    Var : String -> Synth
+    Cut : Check -> Ty -> Synth
+    App : Synth -> Check -> Synth
 
 namespace Holey
 
@@ -66,6 +86,73 @@ namespace Holey
           Holey ctxt holes2 a ->
           Merged holes holes1 holes2 ->
           Holey ctxt holes b
+
+  isVar : (ctxt : List Ty) ->
+          All (\ _ => String) ctxt ->
+          String ->
+          Maybe (ty : Ty ** IsVar ctxt ty)
+  isVar [] [] nm = Nothing
+  isVar (ty :: tys) (x :: xs) nm = case decEq x nm of
+    Yes Refl => pure (ty ** V 0 Here)
+    No _ => bimap id shift <$> isVar tys xs nm
+
+  steps : {dom : _} -> (holes : List (HoleIn (ctxt += dom))) ->
+          (holes' : _ ** Pointwise (Stepped dom) holes holes')
+  steps [] = ([] ** [])
+  steps (MkHoleIn nm scp ty :: holes)
+    = bimap (MkHoleIn nm (scp :< dom) ty ::) (MkHoleIn ::) (steps holes)
+
+  merge : (holes1, holes2 : List (HoleIn ctxt)) ->
+          Maybe (holes ** Merged holes holes1 holes2)
+  merge [] holes2 = pure (holes2 ** NilL)
+  merge holes1 [] = pure (holes1 ** NilR)
+  merge (MkHoleIn nm1 scp1 ty1 :: holes1) (MkHoleIn nm2 scp2 ty2 :: holes2)
+    = case decEq nm1 nm2 of
+        Yes Refl => case decEq ty1 ty2 of
+          No _ => Nothing
+          Yes Refl => do (holes ** mg) <- merge holes1 holes2
+                         pure (_ :: holes ** Both (MkConflit _ _) mg)
+        No _ => if nm1 < nm2
+          then do (holes ** mg) <- assert_total (merge holes1 (MkHoleIn nm2 scp2 ty2 :: holes2))
+                  pure (_ :: holes ** ConL mg)
+          else do (holes ** mg) <- assert_total (merge (MkHoleIn nm1 scp1 ty1 :: holes1) holes2)
+                  pure (_ :: holes ** ConR mg)
+
+  check : {ctxt : List Ty} ->
+          All (\ _ => String) ctxt ->
+          (ty : Ty) ->
+          Check ->
+          Maybe (holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
+
+  synth : {ctxt : List Ty} ->
+          All (\ _ => String) ctxt ->
+          Synth ->
+          Maybe (ty : Ty ** holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
+
+  check scp ty (Met nm) = Just (_ ** Met nm)
+  check scp ty (Lam x b)
+    = do TyFunc dom cod <- isTyFunc ty
+         (holes ** b) <- check {ctxt = dom :: ctxt} (x :: scp) cod b
+         let (holes ** stepped) = steps holes
+         pure (holes ** Lam stepped b)
+  check scp ty (Emb s)
+    = do (ty' ** holes ** tm) <- synth scp s
+         case decEq ty ty' of
+           Yes Refl => pure (holes ** tm)
+           No _ => Nothing
+
+  synth scp (Var v)
+    = do (ty ** v) <- isVar _ scp v
+         pure (ty ** [] ** Var v)
+  synth scp (Cut t ty)
+    = do (holes ** t) <- check scp ty t
+         pure (ty ** holes ** t)
+  synth scp (App f t)
+    = do (ty ** holes1 ** f) <- synth scp f
+         TyFunc dom cod <- isTyFunc ty
+         (holes2 ** t) <- check scp dom t
+         (holes ** mg) <- merge holes1 holes2
+         pure (cod ** holes ** App f t mg)
 
 namespace WellScoped
 

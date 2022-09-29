@@ -24,6 +24,16 @@ Uninhabited (TyBool = TyFunc x y) where
 Biinjective TyFunc where
   biinjective Refl = (Refl, Refl)
 
+namespace IsTyFunct
+
+  public export
+  data IsTyFunc : Ty -> Type where
+    TyFunc : (a, b : Ty) -> IsTyFunc (TyFunc a b)
+
+  export
+  isTyFunc : (ty : Ty) -> Maybe (IsTyFunc ty)
+  isTyFunc (TyFunc a b) = pure (TyFunc a b)
+  isTyFunc _ = Nothing
 
 decEq : (x,y : Ty) -> Dec (x === y)
 decEq TyNat TyNat
