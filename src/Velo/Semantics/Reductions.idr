@@ -59,22 +59,10 @@ data Redux : (this,that : Term ctxt type)
                         (Call False [])
 
 
-    -- [ STLC ]
-    SimplifyFuncAppFunc : (func : Redux this that)
-                               -> Redux (App this var)
-                                        (App that var)
-
-    SimplifyFuncAppVar : {this, that : Term ctxt type}
-                      -> {func       : Term ctxt (TyFunc type return)}
-                      -> (value      : Value func)
-                      -> (var        : Redux this that)
-                                    -> Redux (App func this)
-                                             (App func that)
-
     ReduceFuncApp : {body : Term (ctxt += type) return}
                  -> {var  : Term  ctxt    type}
                  -> Value var
-                          -> Redux (App (Fun body) var)
+                          -> Redux (Call App [Fun body, var])
                                    (Single.subst var body)
 
 public export

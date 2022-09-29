@@ -37,7 +37,9 @@ data Progress : (term : Term Nil type)
                       -> Progress this
 
 export
-compute : ComputePrim op
+compute : {tys : List Ty}
+       -> {0 op : Prim tys ty}
+       -> ComputePrim op
        -> {args : All (Term Nil) tys}
        -> Values args
        -> Progress (Call op args)
@@ -56,6 +58,10 @@ compute And [b, c] = case b of
     Call Plus _ impossible
   Call Zero _ impossible
   Call Plus _ impossible
+
+compute App [f, t] = case f of
+  Fun => Step (ReduceFuncApp t)
+  Call _ _ impossible
 
 export
 call : {tys : _}
@@ -90,18 +96,6 @@ progress (Var (V _ (There later))) impossible
 progress (Fun body)
   = Done Fun
 
-progress (App f arg) with (progress f)
-  progress (App f arg) | (Done val) with (progress arg)
-    progress (App (Fun body) arg) | (Done Fun) | (Done val)
-      = Step (ReduceFuncApp val)
-
-    progress (App f arg) | (Done val) | (Step step)
-      = Step (SimplifyFuncAppVar val step)
-
-  progress (App f arg) | (Step step)
-    = Step (SimplifyFuncAppFunc step)
-
 progress (Call p args) = call p (progresss args)
-
 
 -- [ EOF ]
