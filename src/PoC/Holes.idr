@@ -92,6 +92,12 @@ namespace WellScoped
            Invariant ctxt holes metas ->
            Invariant ctxt (h :: holes) (m :: metas)
 
+  initInvariant : (ctxt : List Ty) -> (holes : List (HoleIn ctxt)) ->
+                  (metas : List Meta ** Invariant ctxt holes metas)
+  initInvariant ctxt [] = ([] ** [])
+  initInvariant ctxt (MkHoleIn nm scp ty :: holes)
+    = bimap (MkMeta nm (scp <>> ctxt) ty ::) (MkInstance Keeps ::) (initInvariant ctxt holes)
+
   Skips : {metas : List Meta} -> Invariant ctxt [] metas
   Skips {metas = []} = []
   Skips {metas = m :: metas} = Skip Skips

@@ -8,7 +8,6 @@ import Toolkit.Decidable.Informative
 
 %default total
 
-
 public export
 data Subset : (eq   : a -> b -> Type)
            -> (this : List a)
@@ -26,6 +25,11 @@ data Subset : (eq   : a -> b -> Type)
 
     Skip : (rest : Subset eq xs     ys)
                 -> Subset eq xs (y::ys)
+
+export
+Keeps : {xs : List a} -> Subset (===) xs xs
+Keeps {xs = []} = Empty
+Keeps {xs = x :: xs} = Keep Refl Keeps
 
 export
 Skips : {zs : SnocList b} -> Subset eq xs ys -> Subset eq xs (zs <>> ys)
