@@ -23,6 +23,10 @@ data AtIndex : (x   :      type)
 
 
 export
+Uninhabited (AtIndex x [] n) where
+  uninhabited at impossible
+
+export
 irrelevantAtIndex : (p, q : AtIndex x xs n) -> p === q
 irrelevantAtIndex Here Here = Refl
 irrelevantAtIndex (There p) (There q) = cong There (irrelevantAtIndex p q)

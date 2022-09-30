@@ -1,6 +1,7 @@
 module Velo.Elaborator.Holey
 
 import Data.DPair
+import Data.SnocList.Quantifiers
 import Decidable.Equality
 
 import Toolkit.Data.List.Pointwise
@@ -29,40 +30,83 @@ isVar fc (ty :: tys) (x :: xs) nm = case decEq x nm of
   Yes Refl => pure (ty ** V 0 Here)
   No _ => bimap id shift <$> isVar fc tys xs nm
 
-{-
+export
 check : {ctxt : List Ty} ->
         All (\ _ => String) ctxt ->
         (ty : Ty) ->
-        Check ->
-        Maybe (holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
+        Raw ->
+        Velo (holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
 
+export
 synth : {ctxt : List Ty} ->
         All (\ _ => String) ctxt ->
-        Synth ->
-        Maybe (ty : Ty ** holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
+        Raw ->
+        Velo (ty : Ty ** holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
 
-check scp ty (Met nm) = Just (_ ** Met nm)
-check scp ty (Lam x b)
-  = do TyFunc dom cod <- isTyFunc ty
-       (holes ** b) <- check {ctxt = dom :: ctxt} (x :: scp) cod b
-       let (holes ** stepped) = steps holes
-       pure (holes ** Lam stepped b)
-check scp ty (Emb s)
-  = do (ty' ** holes ** tm) <- synth scp s
-       case decEq ty ty' of
-         Yes Refl => pure (holes ** tm)
-         No _ => Nothing
+check scp ty (Hole fc nm)
+  = pure ([MkHoleIn fc nm [<] [<] ty] ** Met nm)
+check scp ty (Let fc x e t)
+  = do (dom ** holes2 ** e) <- synth scp e
+       (holes1 ** t) <- check {ctxt = ctxt += dom} (x :: scp) ty t
+       let (holes1 ** stp) = steps x holes1
+       (holes ** mg) <- merge fc holes1 holes2
+       pure (holes ** Call App (Cons (Fun stp t) mg (Cons e NilR Empty)))
+check scp ty (Fun fc x ty' t)
+  = do TyFunc dom cod <- isTyFunc fc ty
+       Refl <- compare fc dom ty'
+       (holes ** t) <- check {ctxt = ctxt += dom} (x :: scp) cod t
+       let (holes ** stp) = steps x holes
+       pure (holes ** Fun stp t)
+check scp ty (App fc f t)
+  = do (dom ** holes2 ** t) <- synth scp t
+       (holes1 ** f) <- check scp (TyFunc dom ty) f
+       (holes ** mg) <- merge fc holes1 holes2
+       pure (holes ** Call App (Cons f mg (Cons t NilR Empty)))
+check scp ty t
+  = do let fc = getFC t
+       (ty' ** holes ** t) <- synth scp t
+       Refl <- compare fc ty ty'
+       pure (holes ** t)
 
-synth scp (Var v)
-  = do (ty ** v) <- isVar _ scp v
+synth scp (Ref fc str)
+  = do (ty ** v) <- isVar fc ctxt scp str
        pure (ty ** [] ** Var v)
-synth scp (Cut t ty)
+synth scp (Hole fc str) = throwAt fc (Hole str)
+synth scp (Zero fc)
+  = pure (TyNat ** [] ** Call Zero Empty)
+synth scp (Plus fc m)
+  = do (holes ** m) <- check scp TyNat m
+       pure (TyNat ** holes ** Call Plus (Cons m NilR Empty))
+synth scp (Add fc m n)
+  = do (holes1 ** m) <- check scp TyNat m
+       (holes2 ** n) <- check scp TyNat n
+       (holes ** mg) <- merge fc holes1 holes2
+       pure (TyNat ** holes ** Call Add (Cons m mg (Cons n NilR Empty)))
+synth scp (T fc)
+  = pure (TyBool ** [] ** Call True Empty)
+synth scp (F fc)
+  = pure (TyBool ** [] ** Call False Empty)
+synth scp (And fc b c)
+  = do (holes1 ** b) <- check scp TyBool b
+       (holes2 ** c) <- check scp TyBool c
+       (holes ** mg) <- merge fc holes1 holes2
+       pure (TyBool ** holes ** Call And (Cons b mg (Cons c NilR Empty)))
+synth scp (Let fc x e t)
+  = do (dom ** holes2 ** e) <- synth scp e
+       (cod ** holes1 ** t) <- synth {ctxt = ctxt += dom} (x :: scp) t
+       let (holes1 ** stp) = steps x holes1
+       (holes ** mg) <- merge fc holes1 holes2
+       pure (cod ** holes ** Call App (Cons (Fun stp t) mg (Cons e NilR Empty)))
+synth scp (Fun fc x ty t)
+  = do (cod ** holes ** t) <- synth {ctxt = ctxt += ty} (x :: scp) t
+       let (holes ** stp) = steps x holes
+       pure (TyFunc ty cod ** holes ** Fun stp t)
+synth scp (App fc f t)
+  = do (ty ** holes1 ** f) <- synth scp f
+       TyFunc dom cod <- isTyFunc fc ty
+       (holes2 ** t) <- check scp dom t
+       (holes ** mg) <- merge fc holes1 holes2
+       pure (cod ** holes ** Call App (Cons f mg (Cons t NilR Empty)))
+synth scp (The fc ty t)
   = do (holes ** t) <- check scp ty t
        pure (ty ** holes ** t)
-synth scp (App f t)
-  = do (ty ** holes1 ** f) <- synth scp f
-       TyFunc dom cod <- isTyFunc ty
-       (holes2 ** t) <- check scp dom t
-       (holes ** mg) <- merge holes1 holes2
-       pure (cod ** holes ** App f t mg)
--}

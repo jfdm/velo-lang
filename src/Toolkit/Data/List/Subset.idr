@@ -4,6 +4,7 @@
 |||
 module Toolkit.Data.List.Subset
 
+import Toolkit.Data.List.Quantifiers
 import Toolkit.Decidable.Informative
 
 %default total
@@ -25,6 +26,16 @@ data Subset : (eq   : a -> b -> Type)
 
     Skip : (rest : Subset eq xs     ys)
                 -> Subset eq xs (y::ys)
+
+namespace All
+
+  export
+  action : (compat : forall x, y. p y -> eq x y -> q x) ->
+           All p ys -> Subset eq xs ys -> All q xs
+  action compat pxs Empty = []
+  action compat pxs EmptyThis = []
+  action compat (px :: pxs) (Keep prf rest) = compat px prf :: action compat pxs rest
+  action compat (px :: pxs) (Skip rest) = action compat pxs rest
 
 export
 Keeps : {xs : List a} -> Subset (===) xs xs
