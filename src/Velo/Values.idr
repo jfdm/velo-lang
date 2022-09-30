@@ -22,6 +22,7 @@ data ComputePrim : (op : Prim tys ty)
   where
     Add : ComputePrim Add
     And : ComputePrim And
+    App : ComputePrim App
 
 public export
 isValuePrim : (op : Prim tys ty)
@@ -32,6 +33,7 @@ isValuePrim Add = Right Add
 isValuePrim True = Left True
 isValuePrim False = Left False
 isValuePrim And = Right And
+isValuePrim App = Right App
 
 data Values : (args : All (Term ctxt) tys) -> Type
 data Value : (term : Term ctxt type) -> Type

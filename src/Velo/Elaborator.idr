@@ -159,9 +159,9 @@ data Elab : Term i o xs type
        -> Elab (Fun scope) (Fun scope')
     Let : Elab val v
        -> Elab scope s
-       -> Elab (Let val scope) (App (Fun s) v)
+       -> Elab (Let val scope) (Call App [Fun s, v])
     App : Elab func f
-       -> Elab arg  a -> Elab (App func arg) (App f a)
+       -> Elab arg  a -> Elab (App func arg) (Call App [f, a])
 
     Zero : Elab Zero (Call Zero [])
 
@@ -206,22 +206,22 @@ elab (Fun body) with (elab body)
 elab (Let val scope) with (elab val)
   elab (Let val scope) | (Yes (v ** prfV)) with (elab scope)
     elab (Let val scope) | (Yes (v ** prfV)) | (Yes (s ** prfS))
-      = Yes (App (Fun s) v ** Let prfV prfS)
+      = Yes (Call App [Fun s, v] ** Let prfV prfS)
 
     elab (Let val scope) | (Yes (v ** prfV)) | (No no)
-      = No (\(App (Fun s) v ** Let x sc) => no (s ** sc))
+      = No (\(Call App [Fun s, v] ** Let x sc) => no (s ** sc))
 
   elab (Let val scope) | (No no)
-    = No (\(App (Fun s) v ** Let x sc) => no (v ** x))
+    = No (\(Call App [Fun s, v] ** Let x sc) => no (v ** x))
 
 elab (App func arg) with (elab func)
   elab (App func arg) | (Yes (f ** prfF)) with (elab arg)
     elab (App func arg) | (Yes (f ** prfF)) | (Yes (a ** prfA))
-      = Yes (App f a ** App prfF prfA)
+      = Yes (Call App [f, a] ** App prfF prfA)
     elab (App func arg) | (Yes (f ** prfF)) | (No no)
-      = No (\(App f a ** App pF pA) => no (a ** pA))
+      = No (\(Call App [f, a] ** App pF pA) => no (a ** pA))
   elab (App func arg) | (No no)
-    = No (\(App f a ** App pF pA) => no (f ** pF))
+    = No (\(Call App [f, a] ** App pF pA) => no (f ** pF))
 
 elab Zero
   = Yes (Call Zero [] ** Zero)
@@ -254,7 +254,6 @@ elab (And l r) with (elab l)
       = No (\(Call And [l, r] ** And pl pr) => no (r ** pr))
   elab (And l r) | (No no)
     = No (\(Call And [l, r] ** And pl pr) => no (l ** pl))
-
 
 namespace Closed
   public export

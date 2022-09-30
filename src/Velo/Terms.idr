@@ -25,6 +25,8 @@ data Prim : (args : List Ty)
     False : Prim [] TyBool
     And   : Prim [TyBool, TyBool] TyBool
 
+    App   : Prim [TyFunc dom cod, dom] cod
+
 public export
 data Term : (ctxt : List Ty)
          -> (type : Ty)
@@ -36,11 +38,6 @@ data Term : (ctxt : List Ty)
     Fun : {a : Ty}
        -> (body : Term (types += a) b)
                -> Term types (TyFunc a b)
-
-    App : {a : Ty}
-       -> (func : Term ctxt (TyFunc a b))
-       -> (arg  : Term ctxt         a)
-               -> Term ctxt           b
 
     Call : {tys : List Ty}
        -> (op : Prim tys ty)
@@ -58,10 +55,6 @@ Rename Ty Term where
   rename f (Fun body)
     = Fun (rename (weaken f) body)
 
-  rename f (App f' a)
-    = App (rename f f')
-          (rename f a)
-
   rename f (Call p ts)
     = Call p (assert_total $ map (rename f) ts)
 
@@ -77,10 +70,6 @@ Substitute Ty Term where
 
   subst f (Fun body)
     = Fun (subst (weakens f) body)
-
-  subst f (App f' a)
-    = App (subst f f')
-          (subst f a)
 
   subst f (Call p ts)
     = Call p (assert_total $ map (subst f) ts)
@@ -98,6 +87,7 @@ namespace Prim
     True  : HeadSim True True
     False : HeadSim False False
     And   : HeadSim And And
+    App   : HeadSim App App
 
   public export
   headSim : (p, q : Prim tys ty) -> Maybe (HeadSim p q)
@@ -107,6 +97,7 @@ namespace Prim
   headSim True True = Just True
   headSim False False = Just False
   headSim And And = Just And
+  headSim App App = Just App
   headSim _ _ = Nothing
 
   export
@@ -117,6 +108,7 @@ namespace Prim
   headSimFullDiag True = absurd
   headSimFullDiag False = absurd
   headSimFullDiag And = absurd
+  headSimFullDiag App = absurd
 
   export
   DecEq (Prim tys ty) where
@@ -127,13 +119,13 @@ namespace Prim
       _ | Just True = Yes Refl
       _ | Just False = Yes Refl
       _ | Just And = Yes Refl
+      _ | Just App = Yes Refl
       _ | Nothing = No (\ Refl => headSimFullDiag _ hdSim)
 
 ------------------------------------------------------------------------
 -- Decidable equality
 
 export Injective Var where injective Refl = Refl
-export Biinjective App where biinjective Refl = (Refl, Refl)
 export Biinjective Call where biinjective Refl = (Refl, Refl)
 
 export {0 x : a} -> {0 xs : List a} -> {0 p : a -> Type} ->
@@ -145,10 +137,6 @@ namespace Term
   data HeadSim : (t, u : Term ctxt ty) -> Type where
     Var  : (v, w : _) -> HeadSim (Var v) (Var w)
     Fun  : (t, u : _) -> HeadSim (Fun t) (Fun u)
-    App  : (a, b : _) ->
-           (f : Term ctxt (TyFunc a ty)) -> (t : _) ->
-           (g : Term ctxt (TyFunc b ty)) -> (u : _) ->
-           HeadSim (App f t) (App g u)
     Call : (tys, uys : List Ty) ->
            (p : Prim tys ty) -> (ts : All (Term ctxt) tys) ->
            (q : Prim uys ty) -> (us : All (Term ctxt) uys) ->
@@ -158,7 +146,6 @@ namespace Term
   headSim : (t, u : Term ctxt ty) -> Maybe (HeadSim t u)
   headSim (Var _) (Var _) = pure (Var _ _)
   headSim (Fun _) (Fun _) = pure (Fun _ _)
-  headSim (App _ _) (App _ _) = pure (App _ _ _ _ _ _)
   headSim (Call _ _) (Call _ _) = pure (Call _ _ _ _ _ _)
   headSim _ _ = Nothing
 
@@ -166,7 +153,6 @@ namespace Term
   headSimFullDiag : (t : Term ctxt ty) -> Not (headSim t t === Nothing)
   headSimFullDiag (Var _) = absurd
   headSimFullDiag (Fun _) = absurd
-  headSimFullDiag (App _ _) = absurd
   headSimFullDiag (Call _ _) = absurd
 
   public export
@@ -179,10 +165,6 @@ namespace Term
   decEqHeadSim (Var v w) = decEqCong (decEq v w)
   decEqHeadSim (Fun t u) with (decEqTerm t u)
     _ | Yes eq = Yes (cong Fun eq)
-    _ | No neq = No (\case Refl => neq Refl)
-  decEqHeadSim (App a b f t g u) with (decEq a b)
-    decEqHeadSim (App a .(a) f t g u) | Yes Refl
-      = decEqCong2 (decEqTerm f g) (decEqTerm t u)
     _ | No neq = No (\case Refl => neq Refl)
   decEqHeadSim (Call tys uys p ts q us) with (decEq tys uys)
     decEqHeadSim (Call tys .(tys) p ts q us) | Yes Refl

@@ -35,7 +35,7 @@ velo (Fun body)
 
   = parens (pretty "fun" <++> velo body)
 
-velo (App f a)
+velo (Call App [f, a])
   = parens (pretty "apply" <++> align (vsep [velo f, velo a]))
 
 velo (Call Zero []) = pretty "zero"
@@ -70,8 +70,8 @@ showRedux (RewriteEqNatPW vl vr) = "Rewriting Add"
 
 showRedux (SimplifyCall Plus (x !: _)) = "Simplify Plus by " ++ showRedux x
 
-showRedux (SimplifyFuncAppFunc func) = "Simplify Application Function"
-showRedux (SimplifyFuncAppVar value var) = "Simplify Application Variable by " ++ showRedux var
+showRedux (SimplifyCall App (_ !: _)) = "Simplify Application Function"
+showRedux (SimplifyCall App (_ :: var !: _)) = "Simplify Application Variable by " ++ showRedux var
 showRedux (ReduceFuncApp x) = "Reduce Application"
 
 
