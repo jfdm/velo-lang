@@ -1,5 +1,6 @@
 module Velo.Trace
 
+import Data.String
 import Text.PrettyPrint.Prettyprinter
 
 import Toolkit.DeBruijn.Context.Item
@@ -116,7 +117,7 @@ prettyComputation {term = term} (R that val steps)
 export
 Pretty kind => Pretty (Item {kind} a) where
   pretty (I str a)
-    = hcat [ pretty str
+    = hsep [ pretty str
            , pretty ":"
            , pretty a]
 
@@ -146,8 +147,8 @@ export
 Pretty Meta where
   pretty (MkMeta nm [] [] ty) = pretty (I ("?" ++ nm) ty)
   pretty (MkMeta nm ctxt nms ty)
-    = hcat (displayAssumptions ctxt nms [<]
-            <>> [pretty (replicate 72 '-'), pretty (I ("?" ++ nm) ty)])
+    = vcat (displayAssumptions ctxt nms [<]
+            <>> [pretty (String.replicate 10 '-'), pretty (I ("?" ++ nm) ty), ""])
 
     where
 
