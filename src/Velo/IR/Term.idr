@@ -29,7 +29,7 @@ record Meta where
   constructor MkMeta
   metaName : Name
   metaScope : List Ty
-  metaScopeNames : All (\ _ => String) metaScope
+  metaScopeNames : All Item metaScope
   metaType : Ty
 
 ------------------------------------------------------------------------

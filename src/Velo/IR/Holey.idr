@@ -30,7 +30,7 @@ record HoleIn (ctxt : List Ty) where
   ||| and `Conflict` for what happens when there are conflicting
   ||| occurrences of the hole appearing in different local extensions.
   localExtension : SnocList Ty
-  localNames : All (\ _ => String) localExtension
+  localNames : All Item localExtension
   holeType : Ty
 
 ------------------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace Stepped
          {dom : _} -> (h : HoleIn (ctxt += dom)) ->
          (h' : _ ** Stepped dom h h')
   step x (MkHoleIn fc nm scp xs ty)
-    = (MkHoleIn fc nm (scp :< dom) (xs :< x) ty ** MkHoleIn)
+    = (MkHoleIn fc nm (scp :< dom) (xs :< I x dom) ty ** MkHoleIn)
 
   export
   steps : Name ->
@@ -75,8 +75,8 @@ namespace Conflict
   data Conflict : (h, h1, h2 : HoleIn ctxt) -> Type where
     MkHoleIn :
       (nm : Name) -> (ty : Ty) -> {ext1, ext2 : _} ->
-      {0 xs1 : All (\ _ => String) ext1} ->
-      {0 xs2 : All (\ _ => String) ext2} ->
+      {0 xs1 : All Item ext1} ->
+      {0 xs2 : All Item ext2} ->
       Conflict (MkHoleIn fc1 nm [<] [<] ty) -- arbitrary choice: fc1
                (MkHoleIn fc1 nm ext1 xs1 ty)
                (MkHoleIn fc2 nm ext2 xs2 ty)

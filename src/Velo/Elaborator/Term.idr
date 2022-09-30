@@ -40,7 +40,7 @@ namespace HoleIn
   ||| scope possible
   export
   initInvariant :
-    (ctxt : List Ty) -> (nms : All (\ _ => String) ctxt) ->
+    (ctxt : List Ty) -> (nms : All Item ctxt) ->
     (hole : HoleIn ctxt) ->
     (meta : Meta ** Invariant ctxt hole meta)
   initInvariant ctxt nms (MkHoleIn fc nm scp xs ty)
@@ -81,7 +81,7 @@ namespace HolesIn
 
   export
   initInvariant :
-    (ctxt : List Ty) -> All (\ _ => String) ctxt ->
+    (ctxt : List Ty) -> All Item ctxt ->
     (holes : List (HoleIn ctxt)) ->
     (metas : List Meta ** Invariant ctxt holes metas)
   initInvariant ctxt nms [] = ([] ** [])
@@ -120,7 +120,7 @@ namespace HolesIn
 namespace Meta
   export
   wscoped : Invariant ctxt [MkHoleIn fc nm [<] [<] ty] metas ->
-            Exists {type = (scp : List Ty ** All (\ _ => String) scp)}
+            Exists {type = (scp : List Ty ** All Item scp)}
               $ \ hd => (IsVar metas (MkMeta nm hd.fst hd.snd ty), Thinning hd.fst ctxt)
   wscoped (Skip inv)
     = let Evidence _ (v, th) = wscoped inv in
