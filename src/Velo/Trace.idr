@@ -7,6 +7,7 @@ import Toolkit.DeBruijn.Context
 import Toolkit.Data.Location
 import Velo.Types
 import Velo.Terms
+import Velo.IR.Common
 import Velo.Values
 
 import Velo.Elaborator

@@ -3,6 +3,7 @@ module Velo.Semantics.Reductions
 import Decidable.Equality
 
 import Velo.Types
+import Velo.IR.Common
 import Velo.Terms
 import Velo.Values
 

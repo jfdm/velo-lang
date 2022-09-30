@@ -61,12 +61,17 @@ throw : (msg : e) -> TheRug e a
 throw = fail
 
 export
+Functor (TheRug e) where
+  map f (MkTheRug a)
+    = MkTheRug (map f <$> a)
+
+export
 %inline
-map : (a -> b)
-    -> TheRug e a
-    -> TheRug e b
-map f (MkTheRug a)
-  = MkTheRug (map (map f) a)
+during : (e -> e')
+       -> TheRug e a
+       -> TheRug e' a
+during f (MkTheRug a)
+  = MkTheRug (mapFst f <$> a)
 
 export
 %inline

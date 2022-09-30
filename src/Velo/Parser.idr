@@ -14,7 +14,7 @@ import Velo.Parser.API
 
 import Velo.Types
 
-import Velo.AST
+import Velo.IR.AST
 
 %default total
 

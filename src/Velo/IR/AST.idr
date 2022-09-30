@@ -1,4 +1,4 @@
-module Velo.AST
+module Velo.IR.AST
 
 import Data.String
 

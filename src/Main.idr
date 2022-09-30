@@ -8,7 +8,7 @@ import Velo.Values
 import Velo.Semantics.Evaluation
 
 import Velo.Core
-import Velo.AST
+import Velo.IR.AST
 import Velo.Parser
 import Velo.Lexer
 import Velo.Elaborator

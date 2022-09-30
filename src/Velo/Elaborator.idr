@@ -7,15 +7,14 @@ import Toolkit.Decidable.Informative
 
 import Velo.Types
 import Velo.Terms
+import Velo.IR.Common
 import Velo.Terms.Holes
 
 import Velo.Core
-import Velo.AST
+import Velo.Elaborator.Common
+import Velo.IR.AST
 
 %default total
-
-throwAt : FileContext -> Elaborating.Error -> Velo a
-throwAt l e = throw $ Elab (Err l e)
 
 dec : FileContext
    -> Elaborating.Error
@@ -34,13 +33,6 @@ decInfo _ _ (Yes prf)
   = pure prf
 decInfo fc e (No msg prf)
   = throwAt fc e
-
-compare : (fc  : FileContext)
-       -> (a,b : Ty)
-              -> Velo (a = b)
-compare fc a b
-  = dec fc (Mismatch a b)
-           (decEq    a b)
 
 Context : List Ty -> Type
 Context = Context Ty

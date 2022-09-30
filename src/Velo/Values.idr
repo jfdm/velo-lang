@@ -3,6 +3,7 @@ module Velo.Values
 import Decidable.Equality
 
 import Velo.Types
+import Velo.IR.Common
 import Velo.Terms
 
 %default total
