@@ -27,7 +27,7 @@ data Prim : (args : List Ty)
 namespace Prim
 
   public export
-  data HeadSim : (p, q : Prim tys ty) -> Type where
+  data HeadSim : (p : Prim tys1 ty1) -> (q : Prim tys2 ty2) -> Type where
     Zero  : HeadSim Zero Zero
     Plus  : HeadSim Plus Plus
     Add   : HeadSim Add Add
@@ -37,7 +37,7 @@ namespace Prim
     App   : HeadSim App App
 
   public export
-  headSim : (p, q : Prim tys ty) -> Maybe (HeadSim p q)
+  headSim : (p : Prim tys1 ty1) -> (q : Prim tys2 ty2) -> Maybe (HeadSim p q)
   headSim Zero Zero = Just Zero
   headSim Plus Plus = Just Plus
   headSim Add Add = Just Add
@@ -58,13 +58,27 @@ namespace Prim
   headSimFullDiag App = absurd
 
   export
-  DecEq (Prim tys ty) where
-    decEq p@_ q@_ with (headSim p q) proof hdSim
-      _ | Just Zero = Yes Refl
-      _ | Just Plus = Yes Refl
-      _ | Just Add = Yes Refl
-      _ | Just True = Yes Refl
-      _ | Just False = Yes Refl
-      _ | Just And = Yes Refl
-      _ | Just App = Yes Refl
-      _ | Nothing = No (\ Refl => headSimFullDiag _ hdSim)
+  hetDecEq : {tys1, tys2 : List Ty} ->
+             (p : Prim tys1 ty1) -> (q : Prim tys2 ty2) ->
+             Dec (tys1 === tys2, ty1 === ty2, p ~=~ q)
+  hetDecEq p@_ q@_ with (headSim p q) proof hdSim
+      _ | Just Zero = Yes (Refl, Refl, Refl)
+      _ | Just Plus = Yes (Refl, Refl, Refl)
+      _ | Just Add = Yes (Refl, Refl, Refl)
+      _ | Just True = Yes (Refl, Refl, Refl)
+      _ | Just False = Yes (Refl, Refl, Refl)
+      _ | Just And = Yes (Refl, Refl, Refl)
+      hetDecEq
+        {tys1 = [TyFunc dom1 cod1, _]}
+        {tys2 = [TyFunc dom2 cod2, _]}
+        p@_ q@_ | Just App with (decEq dom1 dom2, decEq cod1 cod2)
+          _ | (Yes eq1, Yes eq2) = Yes (rewrite eq1 in rewrite eq2 in (Refl, Refl, Refl))
+          _ | (No neq1, _) = No (\case (Refl, _, _) => neq1 Refl)
+          _ | (_, No neq2) = No (\case (Refl, _, _) => neq2 Refl)
+      _ | Nothing = No (\ (Refl, Refl, Refl) => headSimFullDiag _ hdSim)
+
+  export
+  {tys : List Ty} -> DecEq (Prim tys ty) where
+    decEq p q = case hetDecEq p q of
+      Yes (_, _, eq) => Yes eq
+      No neq => No (\ eq => neq (Refl, Refl, eq))
