@@ -3,7 +3,6 @@ module Main
 import Data.String
 
 import Velo.Types
-import Velo.Terms
 import Velo.Values
 import Velo.Semantics.Evaluation
 

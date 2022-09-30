@@ -11,8 +11,6 @@ import Velo.IR.Term
 import Velo.IR.Common
 import Velo.Values
 
-import Velo.Elaborator
-
 import Velo.Semantics.Reductions
 import Velo.Semantics.Evaluation
 
@@ -125,23 +123,6 @@ ctxt : Context Ty is -> List (Doc ())
 ctxt [] = []
 ctxt (elem :: rest)
   = pretty elem :: ctxt rest
-
-hole : Hole h -> Doc ()
-hole (H fc str t c)
-  = vcat [hcat [pretty (show fc), pretty str]
-         , vcat (ctxt c ++ [pretty "---", pretty (I str t)])
-         ]
-
-
-holes' : Holes holes -> List (Doc ())
-holes' [] = []
-holes' (elem :: rest)
-  = (vcat [hole elem, pretty ""]) :: holes' rest
-
-export
-prettyHoles : Holes ss -> Velo ()
-prettyHoles h
-  = printLn $ vcat (holes' h)
 
 export
 Pretty Meta where
