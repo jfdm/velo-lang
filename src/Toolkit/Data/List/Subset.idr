@@ -4,6 +4,7 @@
 |||
 module Toolkit.Data.List.Subset
 
+import Data.List
 import Toolkit.Decidable.Informative
 
 %default total
@@ -16,9 +17,7 @@ data Subset : (eq   : a -> b -> Type)
   where
     Empty : Subset eq Nil Nil
 
-    EmptyThis : Subset eq Nil xs
-
-    Keep : {eq : a -> b -> Type}
+    Keep : {0 eq : a -> b -> Type}
         -> (prf  :        eq  x       y)
         -> (rest : Subset eq    xs      ys)
                 -> Subset eq (x::xs) (y::ys)
@@ -32,9 +31,28 @@ Keeps {xs = []} = Empty
 Keeps {xs = x :: xs} = Keep Refl Keeps
 
 export
-Skips : {zs : SnocList b} -> Subset eq xs ys -> Subset eq xs (zs <>> ys)
-Skips {zs = [<]} rest = rest
-Skips {zs = (sz :< z)} rest = Skips (Skip rest)
+Skips : {zs : List b} -> Subset eq xs ys -> Subset eq xs (zs ++ ys)
+Skips {zs = []} rest = rest
+Skips {zs = z :: zs} rest = Skip (Skips rest)
+
+export
+EmptyThis : {xs : List b} -> Subset eq [] xs
+EmptyThis = rewrite sym (appendNilRightNeutral xs) in Skips Empty
+
+export
+trans : (forall x, y, z. eq x y -> eq y z -> eq x z) ->
+        (Subset eq xs ys -> Subset eq ys zs -> Subset eq xs zs)
+trans tr th Empty = th
+trans tr (Keep prf1 th) (Keep prf2 ph) = Keep (tr prf1 prf2) (trans tr th ph)
+trans tr (Skip th) (Keep prf ph) = Skip (trans tr th ph)
+trans tr th (Skip ph) = Skip (trans tr th ph)
+
+export
+(++) : Subset eq xs ys -> Subset eq as bs ->
+       Subset eq (xs ++ as) (ys ++ bs)
+Empty ++ ph = ph
+Keep prf th ++ ph = Keep prf (th ++ ph)
+Skip th ++ ph = Skip (th ++ ph)
 
 public export
 data Error : Type -> Type where

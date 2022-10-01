@@ -21,6 +21,9 @@ data AtIndex : (x   :      type)
     There : (later : AtIndex x     rest     idx)
                   -> AtIndex x (y::rest) (S idx)
 
+export
+Uninhabited (AtIndex x [] n) where
+  uninhabited at impossible
 
 export
 irrelevantAtIndex : (p, q : AtIndex x xs n) -> p === q

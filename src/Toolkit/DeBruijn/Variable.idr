@@ -16,6 +16,8 @@ import Toolkit.Data.DList.AtIndex
 
 import Toolkit.DeBruijn.Context
 
+import Toolkit.Data.List.Thinning
+
 %default total
 
 public export
@@ -28,6 +30,10 @@ data IsVar : (ctxt : List kind)
               -> IsVar   ctxt type
 
 export
+Uninhabited (IsVar [] x) where
+  uninhabited (V n prf) = void (uninhabited prf)
+
+export
 DecEq (IsVar ctxt type) where
   decEq (V m p) (V n q) with (decEq m n)
     decEq (V m p) (V .(m) q) | Yes Refl
@@ -36,8 +42,28 @@ DecEq (IsVar ctxt type) where
 
 public export
 %inline
+here : IsVar (ctxt += a) a
+here = V 0 Here
+
+public export
+%inline
 shift : IsVar ctxt type -> IsVar (ctxt += a) type
 shift (V pos prf) = V (S pos) (There prf)
+
+export
+shifts : IsVar g s -> {g' : List a} -> IsVar (g' ++ g) s
+shifts v {g' = []} = v
+shifts v {g' = _ :: _} = shift (shifts v)
+
+public export
+data View : IsVar ctxt type -> Type where
+  Here : View Variable.here
+  There : (v : IsVar ctxt type) -> View (shift v)
+
+export
+view : (v : IsVar ctxt type) -> View v
+view (V 0 Here) = Here
+view (V (S n) (There prf)) = There (V n prf)
 
 public export
 %inline
@@ -45,11 +71,16 @@ weaken : (func : IsVar old type
               -> IsVar new type)
       -> (IsVar (old += type') type
        -> IsVar (new += type') type)
-weaken f (V Z Here)
-  = V Z Here
-weaken f (V (S idx) (There later)) with (f (V idx later))
-  weaken f (V (S idx) (There later)) | (V pos prf)
-    = V (S pos) (There prf)
+weaken f v@_ with (view v)
+  _ | Here = here
+  _ | There later = shift (f later)
 
+export
+thin : IsVar g s -> Thinning g g' -> IsVar g' s
+thin v Empty = absurd v
+thin v (Skip th) = shift (thin v th)
+thin v@_ (Keep Refl th) with (view v)
+  _ | Here = here
+  _ | There w = shift (thin w th)
 
 -- [ EOF ]
