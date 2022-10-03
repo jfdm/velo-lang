@@ -157,8 +157,54 @@ This paper presents \Velo{} a minimal functional language based on the \ac{stlc}
 \section{Language Design}
 \label{sec:design}
 
+\subsection{Efficient De Bruijn Representation}
+\label{sec:design:deBruijn}
+
 \chcomment{Efficient De Bruijn Representation}
+
+A common strategy for realising well-scoped terms is to use \emph{De Bruijn} indices.
+These can be easily realised as a list quantifier indicating where in the type-level context a bound term is positioned.
+
+\begin{verbatim}
+data Elem : (type : kind) -> (types : List kind) -> Type
+  where
+    Here : Elem type (type::types)
+    There : Elem type types
+         -> Elem type (not_type :: types)
+\end{verbatim}
+
+\noindent
+Whilst a valid approach, this approach unfortunately does not scale to large contexts.
+To improve the efficiency of variable representation we use \texttt{AtIndex} to make explicit the numerical index of the element in the list.
+
+\begin{verbatim}
+public export
+data AtIndex : (x   :      type)
+            -> (xs  : List type)
+            -> (idx : Nat)
+                   -> Type
+  where
+    Here : AtIndex x (x::xs) Z
+    There : (later : AtIndex x     rest     idx)
+                  -> AtIndex x (y::rest) (S idx)
+\end{verbatim}
+
+We can then make sure that this proof is only relevent at compile time whilest retaining the numerical index itself.
+
+\begin{verbatim}
+data IsVar : (ctxt : List kind) -> (type : kind) -> Type
+  where
+    V : (pos : Nat) -> (0 prf : AtIndex type ctxt pos) -> IsVar ctxt type
+\end{verbatim}
+
+\subsection{Compact Constant Folding}
+\label{sec:design:constants}
 \chcomment{Compact constant folding}
+
+
+\subsection{Well-Typed Holes}
+\label{sec:design:holes}
+
 \chcomment{Well-Typed Holes}
 
 \section{Optimisation \& Execution}
@@ -171,7 +217,7 @@ This paper presents \Velo{} a minimal functional language based on the \ac{stlc}
 \section{Good Programming Idioms}
 \label{sec:idioms}
 
-Within \Velo{} there are two programming idioms that helped with the reporting of errors, and efficiency of deciding equality.
+Within \Velo{} there are two programming idioms that helped with the reporting of errors, and the efficiency of deciding equality.
 
 \subsection{Being Positively Negative}
 \label{sec:idioms:posneg}
@@ -231,21 +277,20 @@ any : (f  : (x : type) -> Dec (q x) (p x))
          -> DecInfo (All (\x => Pair (q x) (Not (p x))) xs) (Any p xs)
 \end{verbatim}
 
-\texttt{DecInfo} is, however, not strictly positive as it carries a proof of false.
+\texttt{DecInfo} is, however, not \emph{strictly} positive as it carries a proof of false.
 A more interesting line of work would be to adopt \emph{constructive negation} to ensure that proofs of false arise from positive sources only~\cite{msfp/Atkey22}.
 That is, given:
 
 \begin{verbatim}
-Predicate : Type -> Type -> Type
-Predicate pos neg = (pos ** neg ** (pos -> neg -> Void))
+Predicate : Type
+Predicate = (pos ** neg ** (pos -> neg -> Void))
 \end{verbatim}
 
 we can recreate \texttt{DecInfo} as:
 
-
 \begin{verbatim}
-Dec : Predicate -> Type
-Dec (pos ** neg ** no) = Either neg pos
+DecInfo : Predicate -> Type
+DecInfo (pos ** neg ** no) = Either neg pos
 \end{verbatim}
 
 This is line of investigation is on going.
