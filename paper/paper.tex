@@ -226,9 +226,9 @@ isGT : (x,y : Nat) -> DecInfo (LTE x y) (GT x y)
 and
 
 \begin{verbatim}
-any : (f  : (x : type) -> Dec (p x))
+any : (f  : (x : type) -> Dec (q x) (p x))
    -> (xs : List type)
-         -> DecInfo (All (\x => Not (p x)) xs) (Any p xs)
+         -> DecInfo (All (\x => Pair (q x) (Not (p x))) xs) (Any p xs)
 \end{verbatim}
 
 \texttt{DecInfo} is, however, not strictly positive as it carries a proof of false.
