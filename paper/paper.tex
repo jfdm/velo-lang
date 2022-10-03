@@ -216,6 +216,21 @@ data DecInfo e p = Yes p | No e (p -> Void)
 \end{verbatim}
 
 With this simple change we can now report \emph{why} a decision procedure failed, as well as proof that it failed.
+Our examples can now become:
+
+\begin{verbatim}
+isGT : (x,y : Nat) -> DecInfo (LTE x y) (GT x y)
+\end{verbatim}
+
+\noindent
+and
+
+\begin{verbatim}
+any : (f  : (x : type) -> Dec (p x))
+   -> (xs : List type)
+         -> DecInfo (All (\x => Not (p x)) xs) (Any p xs)
+\end{verbatim}
+
 \texttt{DecInfo} is, however, not strictly positive as it carries a proof of false.
 A more interesting line of work would be to adopt \emph{constructive negation} to ensure that proofs of false arise from positive sources only~\cite{msfp/Atkey22}.
 That is, given:
@@ -226,6 +241,7 @@ Predicate pos neg = (pos ** neg ** (pos -> neg -> Void))
 \end{verbatim}
 
 we can recreate \texttt{DecInfo} as:
+
 
 \begin{verbatim}
 Dec : Predicate -> Type
@@ -243,6 +259,8 @@ This is line of investigation is on going.
 Creating a decidable equality instance (\texttt{DecEq}) over a data structure requires pairwise comparison over the structure.
 Although we can already reduce the number of contraditions using symmetry breaking (\texttt{negEqSym}), the number of cases is still many.
 We can address the complexity of \texttt{decEq} instance creation further computing a diagonal relation that ensures we are comparing the same constructors.
+
+\chcomment[id=jfdm]{The example is probably not needed, but useful to have...}
 
 \begin{verbatim}
 data Thing = Apples | Oranges
