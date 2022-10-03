@@ -3,23 +3,24 @@ module Velo.Semantics.Reductions
 import Decidable.Equality
 
 import Velo.Types
-import Velo.Terms
+import Velo.IR.Common
+import Velo.IR.Term
 import Velo.Values
 
 %default total
 
-data Reduxes : (these, those : All (Term ctxt) tys) -> Type
-data Redux : (this,that : Term ctxt type) -> Type
+data Reduxes : (these, those : All (Term [] ctxt) tys) -> Type
+data Redux : (this,that : Term [] ctxt type) -> Type
 
 infixr 7 !:
 
 public export
-data Reduxes : (these, those : All (Term ctxt) tys)
+data Reduxes : (these, those : All (Term [] ctxt) tys)
             -> Type
   where
 
     (!:) : (hd : Redux this that)
-        -> (rest : All (Term ctxt) tys)
+        -> (rest : All (Term [] ctxt) tys)
         -> Reduxes (this :: rest) (that :: rest)
 
     (::) : (value : Value hd)
@@ -27,7 +28,7 @@ data Reduxes : (these, those : All (Term ctxt) tys)
         -> Reduxes (hd :: these) (hd :: those)
 
 public export
-data Redux : (this,that : Term ctxt type)
+data Redux : (this,that : Term [] ctxt type)
           -> Type
   where
 
@@ -59,21 +60,21 @@ data Redux : (this,that : Term ctxt type)
                         (Call False [])
 
 
-    ReduceFuncApp : {body : Term (ctxt += type) return}
-                 -> {var  : Term  ctxt    type}
+    ReduceFuncApp : {body : Term [] (ctxt += type) return}
+                 -> {var  : Term [] ctxt type}
                  -> Value var
                           -> Redux (Call App [Fun body, var])
                                    (Single.subst var body)
 
 public export
-data Reduces : (this : Term ctxt type)
-            -> (that : Term ctxt type)
+data Reduces : (this : Term [] ctxt type)
+            -> (that : Term [] ctxt type)
             -> Type
   where
-    Refl  : {this : Term ctxt type}
+    Refl  : {this : Term [] ctxt type}
                  -> Reduces this this
 
-    Trans : {this, that, end : Term ctxt type}
+    Trans : {this, that, end : Term [] ctxt type}
          -> Redux this that
          -> Reduces that end
          -> Reduces this end

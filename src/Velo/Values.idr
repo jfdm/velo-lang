@@ -3,7 +3,8 @@ module Velo.Values
 import Decidable.Equality
 
 import Velo.Types
-import Velo.Terms
+import Velo.IR.Common
+import Velo.IR.Term
 
 %default total
 
@@ -35,11 +36,11 @@ isValuePrim False = Left False
 isValuePrim And = Right And
 isValuePrim App = Right App
 
-data Values : (args : All (Term ctxt) tys) -> Type
-data Value : (term : Term ctxt type) -> Type
+data Values : (args : All (Term [] ctxt) tys) -> Type
+data Value : (term : Term [] ctxt type) -> Type
 
 public export
-data Values : (args : All (Term ctxt) tys)
+data Values : (args : All (Term [] ctxt) tys)
            -> Type
   where
 
@@ -49,7 +50,7 @@ data Values : (args : All (Term ctxt) tys)
         -> Values (t :: ts)
 
 public export
-data Value : (term : Term ctxt type)
+data Value : (term : Term [] ctxt type)
           -> Type
   where
     Fun : Value (Fun body)

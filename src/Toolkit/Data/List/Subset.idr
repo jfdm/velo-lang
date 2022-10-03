@@ -5,6 +5,7 @@
 module Toolkit.Data.List.Subset
 
 import Data.List
+import Toolkit.Data.List.Quantifiers
 import Toolkit.Decidable.Informative
 
 %default total
@@ -25,19 +26,35 @@ data Subset : (eq   : a -> b -> Type)
     Skip : (rest : Subset eq xs     ys)
                 -> Subset eq xs (y::ys)
 
+namespace All
+
+  export
+  action : (compat : forall x, y. p y -> eq x y -> q x) ->
+           All p ys -> Subset eq xs ys -> All q xs
+  action compat pxs Empty = []
+  action compat (px :: pxs) (Keep prf rest) = compat px prf :: action compat pxs rest
+  action compat (px :: pxs) (Skip rest) = action compat pxs rest
+
 export
 Keeps : {xs : List a} -> Subset (===) xs xs
 Keeps {xs = []} = Empty
 Keeps {xs = x :: xs} = Keep Refl Keeps
 
+namespace SnocList
+  export
+  Skips : {zs : SnocList b} -> Subset eq xs ys -> Subset eq xs (zs <>> ys)
+  Skips {zs = [<]} rest
+    = rest
+  Skips {zs = (sx :< x)} rest = Skips (Skip rest)
+
 export
 Skips : {zs : List b} -> Subset eq xs ys -> Subset eq xs (zs ++ ys)
 Skips {zs = []} rest = rest
-Skips {zs = z :: zs} rest = Skip (Skips rest)
+Skips {zs = z :: zs} rest = Skip (Subset.Skips rest)
 
 export
 EmptyThis : {xs : List b} -> Subset eq [] xs
-EmptyThis = rewrite sym (appendNilRightNeutral xs) in Skips Empty
+EmptyThis = rewrite sym (appendNilRightNeutral xs) in Subset.Skips Empty
 
 export
 trans : (forall x, y, z. eq x y -> eq y z -> eq x z) ->

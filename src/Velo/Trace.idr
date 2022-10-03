@@ -1,15 +1,15 @@
 module Velo.Trace
 
+import Data.String
 import Text.PrettyPrint.Prettyprinter
 
 import Toolkit.DeBruijn.Context.Item
 import Toolkit.DeBruijn.Context
 import Toolkit.Data.Location
 import Velo.Types
-import Velo.Terms
+import Velo.IR.Term
+import Velo.IR.Common
 import Velo.Values
-
-import Velo.Elaborator
 
 import Velo.Semantics.Reductions
 import Velo.Semantics.Evaluation
@@ -18,42 +18,56 @@ import Velo.Core
 
 %default total
 
-ty : Ty -> Doc ()
-ty (TyNat) = pretty "Nat"
-ty (TyBool) = pretty "Bool"
-ty (TyFunc x y)
-  = parens (hsep [ty x, pretty "->", ty y])
+ty : Prec -> Ty -> Doc ann
+ty _ (TyNat) = pretty "Nat"
+ty _ (TyBool) = pretty "Bool"
+ty d (TyFunc x y)
+  = parenthesise (d > Open) $
+     hsep [ty App x, pretty "->", ty Open y]
 
-elem : IsVar ctxt type -> Doc ()
-elem (V pos prf) = pretty pos
+var : IsVar ctxt type -> Doc ann
+var (V pos prf) = pretty pos
 
+meta : (metas : List Meta) -> (n : Nat) -> (0 _ : AtIndex _ metas n) -> Doc ann
+meta (m :: _) 0 p = "?" <+> pretty m.metaName
+meta (_ :: metas) (S n) (There p) = meta metas n p
 
-velo : Term ctxt type -> Doc ()
-velo (Var prf)
-  = elem prf
-velo (Fun body)
+velo : {metas : _} -> Prec -> Term metas ctxt type -> Doc ann
+velo d (Var prf)
+  = var prf
 
-  = parens (pretty "fun" <++> velo body)
+velo d (Met (V n p) th)
+  = meta metas n p
 
-velo (Call App [f, a])
-  = parens (pretty "apply" <++> align (vsep [velo f, velo a]))
+velo d (Fun body)
 
-velo (Call Zero []) = pretty "zero"
-velo (Call Plus [x]) = group $ parens $ hsep [pretty "inc", velo x]
-velo (Call Add [l, r]) = group $ parens (hsep [pretty "add", velo l, velo r])
-velo (Call True []) = pretty "True"
-velo (Call False []) = pretty "False"
-velo (Call And [l, r]) = group $ parens (hsep [pretty "and", velo l, velo r])
+  = parenthesise (d > Open) (pretty "fun" <++> velo Open body)
+
+velo d (Call App [f, a])
+  = parenthesise (d >= App) (pretty "apply" <++> align (vsep [velo Dollar f, velo App a]))
+
+velo _ (Call Zero []) = pretty "zero"
+velo d (Call Plus [x])
+  = group $ parenthesise (d > Open) $
+      hsep [pretty "inc", velo App x]
+velo d (Call Add [l, r])
+  = group $ parenthesise (d > Open) $
+      hsep [pretty "add", velo App l, velo App r]
+velo _ (Call True []) = pretty "True"
+velo _ (Call False []) = pretty "False"
+velo d (Call And [l, r])
+  = group $ parenthesise (d > Open) $
+      hsep [pretty "and", velo App l, velo App r]
 
 namespace Velo
 
   export
-  pretty : Term ctxt type -> Doc ()
-  pretty = velo
+  {metas : _} -> Pretty (Term metas ctxt type) where
+    prettyPrec = velo
 
   export
-  prettyTypes : Ty -> Doc ()
-  prettyTypes = ty
+  Pretty Ty where
+    prettyPrec = ty
 
 
 showRedux : Redux a b -> String
@@ -75,15 +89,15 @@ showRedux (SimplifyCall App (_ :: var !: _)) = "Simplify Application Variable by
 showRedux (ReduceFuncApp x) = "Reduce Application"
 
 
-wrap : {type : Ty} -> Term Nil type -> Doc ()
+wrap : {type : Ty} -> Term [] [] type -> Doc ()
 wrap {type} tm
-  = vcat [ Doc.pretty "```"
-         , velo tm
-         , Doc.pretty "```"
+  = vcat [ pretty "```"
+         , pretty tm
+         , pretty "```"
          ]
 
 
-showSteps : {ty : Ty} -> {a,b : Term Nil ty} -> Reduces a b -> List (Doc ())
+showSteps : {ty : Ty} -> {a,b : Term [] [] ty} -> Reduces a b -> List (Doc ())
 showSteps {a = a} {b = a} Refl
   = [wrap a]
 
@@ -92,39 +106,45 @@ showSteps {a = a} {b = b} (Trans x y)
 
 export
 prettyComputation : {ty : Ty}
-                 -> {term : Term Nil ty}
+                 -> {term : Term [] [] ty}
                  -> (res  : Result term)
                          -> Velo ()
 prettyComputation {term = term} (R that val steps)
   = printLn $ vcat (showSteps steps)
 
-
-item : {a : Ty} -> Item a -> Doc ()
-item (I str a)
-  = hcat [ pretty str
-         , Doc.pretty ":"
-         , ty a]
+export
+Pretty kind => Pretty (Item {kind} a) where
+  pretty (I str a)
+    = hsep [ pretty str
+           , pretty ":"
+           , pretty a]
 
 ctxt : Context Ty is -> List (Doc ())
 ctxt [] = []
 ctxt (elem :: rest)
-  = item elem :: ctxt rest
-
-hole : Hole h -> Doc ()
-hole (H fc str t c)
-  = vcat [hcat [pretty (show fc), pretty str]
-         , vcat (ctxt c ++ [Doc.pretty "---", hcat [pretty str, Doc.pretty ":", ty t]])
-         ]
-
-
-holes' : Holes holes -> List (Doc ())
-holes' [] = []
-holes' (elem :: rest)
-  = (vcat [hole elem, Doc.pretty ""]) :: holes' rest
+  = pretty elem :: ctxt rest
 
 export
-prettyHoles : Holes ss -> Velo ()
-prettyHoles h
-  = printLn $ vcat (holes' h)
+Pretty Meta where
+  pretty (MkMeta nm [] [] ty) = pretty (I ("?" ++ nm) ty)
+  pretty (MkMeta nm ctxt nms ty)
+    = vcat (displayAssumptions nms [<]
+            <>> [pretty (String.replicate 10 '-'), pretty (I ("?" ++ nm) ty), ""])
+
+    where
+
+    displayAssumptions :
+      {0 scp : List Ty} ->
+      All Item scp ->
+      SnocList (Doc ann) ->
+      SnocList (Doc ann)
+    displayAssumptions [] acc = acc
+    displayAssumptions (i :: is) acc
+      = displayAssumptions is (acc :< pretty i)
+
+export
+prettyMetas : List Meta -> Velo ()
+prettyMetas metas
+  = printLn $ vcat {ann = ()} (pretty <$> metas)
 
 -- [ EOF ]

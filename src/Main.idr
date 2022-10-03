@@ -3,15 +3,17 @@ module Main
 import Data.String
 
 import Velo.Types
-import Velo.Terms
 import Velo.Values
 import Velo.Semantics.Evaluation
 
 import Velo.Core
-import Velo.AST
+import Velo.IR.AST
+import Velo.IR.Holey
+import Velo.IR.Term
 import Velo.Parser
 import Velo.Lexer
-import Velo.Elaborator
+import Velo.Elaborator.Holey
+import Velo.Elaborator.Term
 import Velo.Eval
 import Velo.Trace
 import Velo.Options
@@ -35,21 +37,22 @@ mainRug
        ast <- fromFile fname
        putStrLn "# Finished Parsing"
 
-       res <- elab ast
+       (ty ** holes ** t) <- synth [] ast
+       let (metas ** inv) = initInvariant [] [] holes
+       let t = wscoped t inv
        putStrLn "# Finished Type Checking"
 
-       case res of
-         Holly h => do prettyHoles h
-                       exitSuccess
-         Closed tm
+       case metas of
+         (_ :: _) => do prettyMetas metas
+                        exitSuccess
+         []
            => do when (justCheck opts)
                    $ exitSuccess
 
                  putStrLn "# Executing"
-                 v <- eval tm
+                 v <- eval t
                  prettyComputation v
                  putStrLn "# Finished"
-                 pure ()
 
 main : IO ()
 main

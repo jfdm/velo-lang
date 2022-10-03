@@ -8,7 +8,7 @@
 |||
 module Toolkit.TheRug
 
-import System
+import public System
 import System.File
 import System.Clock
 import Data.Vect
@@ -61,44 +61,55 @@ throw : (msg : e) -> TheRug e a
 throw = fail
 
 export
-%inline
-map : (a -> b)
-    -> TheRug e a
-    -> TheRug e b
-map f (MkTheRug a)
-  = MkTheRug (map (map f) a)
+Functor (TheRug e) where
+  map f (MkTheRug a)
+    = MkTheRug (map f <$> a)
 
 export
 %inline
-ignore : TheRug e a -> TheRug e ()
-ignore
-  = map (\_ => ())
+bind : TheRug       e a
+     -> (a -> TheRug e b)
+     -> TheRug e b
+bind (MkTheRug act) f
+  = MkTheRug (act >>=
+             (\res =>
+                case res of
+                  Left  err => pure (Left err)
+                  Right val => rugRun (f val)))
+
+export
+Applicative (TheRug e) where
+  pure a = MkTheRug (pure (pure a))
+  mf <*> mx = bind mf (<$> mx)
+
+export
+Monad (TheRug e) where
+  (>>=) = bind
 
 export
 %inline
-embed : (this : IO       a)
-             -> TheRug e a
-embed op
-  = MkTheRug (do o <- op
-                 pure (Right o))
+during : (e -> e')
+       -> TheRug e a
+       -> TheRug e' a
+during f (MkTheRug a)
+  = MkTheRug (mapFst f <$> a)
+
+export
+HasIO (TheRug e) where
+  liftIO op = MkTheRug $
+    do o <- op
+       pure (Right o)
+
+%inline
+export
+embed : IO a -> TheRug e a
+embed = liftIO
 
 export
 %inline
 embed_ : (this : IO        a)
               -> TheRug e ()
 embed_ this = ignore (embed this)
-
-export
-%inline
-(>>=) : TheRug       e a
-     -> (a -> TheRug e b)
-     -> TheRug e b
-(>>=) (MkTheRug act) f
-  = MkTheRug (act >>=
-             (\res =>
-                case res of
-                  Left  err => pure (Left err)
-                  Right val => rugRun (f val)))
 
 export
 %inline
@@ -110,51 +121,6 @@ export
                  case res of
                    (Left _)    => rugRun backup
                    (Right val) => pure (Right val))
-
-export
-%inline
-(>>) : TheRug e ()
-    -> TheRug e a
-    -> TheRug e a
-(>>) ma mb = ma >>= const mb
-
-export
-%inline
-pure : a -> TheRug e a
-pure x = MkTheRug (pure (pure x))
-
-export
-(<*>) : TheRug e (a -> b)
-     -> TheRug e  a
-     -> TheRug e       b
-(<*>) (MkTheRug f)
-      (MkTheRug a) = MkTheRug [| f <*> a |]
-
-
-export
-(*>) : TheRug e a
-    -> TheRug e b
-    -> TheRug e b
-(*>) (MkTheRug a)
-     (MkTheRug b) = MkTheRug [| a *> b |]
-
-export
-(<*) : TheRug e a
-    -> TheRug e b
-    -> TheRug e a
-(<*) (MkTheRug a)
-     (MkTheRug b) = MkTheRug [| a <* b |]
-
-export
-%inline
-when : (test : Bool)
-    -> Lazy (TheRug e ())
-    -> TheRug e ()
-when False _
-  = pure ()
-
-when True f
-  = f
 
 export
 %inline
@@ -284,41 +250,6 @@ namespace Traverse
       = [| f x :: traverse f xs |]
 
 namespace IO
-  export
-  %inline
-  putStr : (s : String)
-             -> TheRug e ()
-  putStr = (TheRug.embed . putStr)
-
-  export
-  %inline
-  putStrLn : (s : String)
-               -> TheRug e ()
-  putStrLn = (TheRug.embed . putStrLn)
-
-  export
-  %inline
-  print : Show a
-       => (this : a)
-               -> TheRug e ()
-  print = (TheRug.embed . print)
-
-  export
-  %inline
-  printLn : Show a
-         => (this : a)
-                 -> TheRug e ()
-  printLn = (TheRug.embed . printLn)
-
-  export
-  %inline
-  exitFailure : TheRug e ()
-  exitFailure = TheRug.embed exitFailure
-
-  export
-  %inline
-  exitSuccess : TheRug e ()
-  exitSuccess = TheRug.embed exitSuccess
 
   export
   covering -- not my fault

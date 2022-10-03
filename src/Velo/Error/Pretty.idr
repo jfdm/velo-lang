@@ -19,12 +19,6 @@ import Velo.Lexer.Token
 
 %default total
 
-Show Ty where
-  show TyNat         = "NAT"
-  show TyBool        = "BOOL"
-  show (TyFunc x y)  = "(\{show x} -> \{show y}) "
-
-
 Show (Lexing.Error) where
   show (LError _ e) = show e
 
