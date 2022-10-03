@@ -58,7 +58,8 @@ namespace HoleIn
                Invariant ctxt h m ->
                (Invariant ctxt h1 m, Invariant ctxt h2 m)
   unconflict (MkHoleIn nm ty) (MkInvariant th)
-    = (MkInvariant (Skips th), MkInvariant (Skips th))
+    = ( MkInvariant (SnocList.Skips th)
+      , MkInvariant (SnocList.Skips th))
 
 namespace HolesIn
 
