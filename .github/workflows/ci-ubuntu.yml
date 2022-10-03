@@ -47,10 +47,10 @@ jobs:
           cd idris2
           make bootstrap && make install
 
-      - name: Checkout systemv
+      - name: Checkout Project.
         uses: actions/checkout@v2
 
-      - name: Build LightClick
+      - name: Build Project
         run: make velo
 
       - name: Run Tests
