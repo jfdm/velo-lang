@@ -1,12 +1,15 @@
 module Velo.Elaborator.Term
 
+import Data.SnocList
 import Data.DPair
 import Decidable.Equality
 
 import Toolkit.Data.List.Pointwise
 import Toolkit.Data.List.Quantifiers
+
 import Toolkit.Data.SnocList.Quantifiers
-import Toolkit.Data.List.Subset
+import Toolkit.Data.SnocList.Thinning
+
 import Toolkit.DeBruijn.Context
 import Toolkit.DeBruijn.Variable
 
@@ -30,25 +33,30 @@ namespace HoleIn
   ||| 2. they have the same type
   ||| 3. the scope of the meta embeds in that of the hole
   public export
-  data Invariant : (ctxt : List Ty) -> HoleIn ctxt -> Meta -> Type where
-    MkInvariant : Thinning scp (ext <>> ctxt) ->
+  data Invariant : (ctxt : SnocList Ty) -> HoleIn ctxt -> Meta -> Type where
+    MkInvariant : {0 scp : SnocList Ty} ->
+                  {0 ext : List Ty} ->
+                  {0 nms : All Item ext} ->
+                  {0 xs : All Item scp} ->
+                  Thinning scp (ctxt <>< ext) ->
                   Invariant ctxt
-                    (MkHoleIn fc nm ext nms ty)
-                    (MkMeta nm scp xs ty)
+                    (MkHoleIn fc nm {localExtension = ext} nms ty)
+                    (MkMeta nm {metaScope = scp} xs ty)
 
   ||| When we initialise a meta based on an existing Hole, we pick the biggest
   ||| scope possible
   export
   initInvariant :
-    (ctxt : List Ty) -> (nms : All Item ctxt) ->
+    (nms : All Item ctxt) ->
     (hole : HoleIn ctxt) ->
     (meta : Meta ** Invariant ctxt hole meta)
-  initInvariant ctxt nms (MkHoleIn fc nm scp xs ty)
-    = (MkMeta nm (scp <>> ctxt) (xs <>> nms) ty ** MkInvariant Keeps)
+  initInvariant nms (MkHoleIn fc nm {localExtension = ext} xs ty)
+    = let items = nms <>< xs in
+      (MkMeta nm {metaScope = ctxt <>< ext} items ty ** MkInvariant (Identity items))
 
   ||| If we step across a binder, the invariant still holds
   export
-  step : Stepped a h h1 -> Invariant ctxt h1 m -> Invariant (ctxt += a) h m
+  step : Stepped a h h1 -> Invariant ctxt h1 m -> Invariant (ctxt :< a) h m
   step MkHoleIn (MkInvariant th) = MkInvariant th
 
   ||| If we step into separate subtrees, we can adapt the invariant to get
@@ -58,15 +66,15 @@ namespace HoleIn
                Invariant ctxt h m ->
                (Invariant ctxt h1 m, Invariant ctxt h2 m)
   unconflict (MkHoleIn nm ty) (MkInvariant th)
-    = ( MkInvariant (SnocList.Skips th)
-      , MkInvariant (SnocList.Skips th))
+    = ( MkInvariant (List.Skips th)
+      , MkInvariant (List.Skips th))
 
 namespace HolesIn
 
   ||| A list of metas adequately corresponds to a list of holes if there is a subset
   ||| of the metas that satisfy `HoleIn.Invariant`.
   public export
-  data Invariant : (ctxt : List Ty) -> List (HoleIn ctxt) -> List Meta -> Type where
+  data Invariant : (ctxt : SnocList Ty) -> List (HoleIn ctxt) -> List Meta -> Type where
     Nil  : Invariant ctxt [] []
     Skip : Invariant ctxt holes metas ->
            Invariant ctxt holes (m :: metas)
@@ -82,19 +90,19 @@ namespace HolesIn
 
   export
   initInvariant :
-    (ctxt : List Ty) -> All Item ctxt ->
+    All Item ctxt ->
     (holes : List (HoleIn ctxt)) ->
     (metas : List Meta ** Invariant ctxt holes metas)
-  initInvariant ctxt nms [] = ([] ** [])
-  initInvariant ctxt nms (hole :: holes)
-    = let (m ** inv) = initInvariant ctxt nms hole
-          (ms ** invs) = initInvariant ctxt nms holes
+  initInvariant nms [] = ([] ** [])
+  initInvariant nms (hole :: holes)
+    = let (m ** inv) = initInvariant nms hole
+          (ms ** invs) = initInvariant nms holes
       in (m :: ms ** inv :: invs)
 
   export
   step : Pointwise (Stepped a) holes1 holes ->
          Invariant ctxt holes metas ->
-         Invariant (ctxt += a) holes1 metas
+         Invariant (ctxt :< a) holes1 metas
   step [] [] = []
   step pw (Skip invs) = Skip (step pw invs)
   step (stp :: xs) (inv :: invs) = step stp inv :: step xs invs
@@ -114,15 +122,14 @@ namespace HolesIn
   unmerge (ConL mg) (inv :: invs) = bimap (inv ::) Skip (unmerge mg invs)
   unmerge (ConR mg) (inv :: invs) = bimap Skip (inv ::) (unmerge mg invs)
 
-
 ------------------------------------------------------------------------
 -- This elaboration step is total thanks to the invariants we maintained
 
 namespace Meta
   export
-  wscoped : Invariant ctxt [MkHoleIn fc nm [<] [<] ty] metas ->
-            Exists {type = (scp : List Ty ** All Item scp)}
-              $ \ hd => (IsVar metas (MkMeta nm hd.fst hd.snd ty), Thinning hd.fst ctxt)
+  wscoped : Invariant ctxt [MkHoleIn fc nm [] ty] metas ->
+            Exists {type = (scp : SnocList Ty ** All Item scp)}
+              $ \ hd => (IsMember metas (MkMeta nm hd.snd ty), Thinning hd.fst ctxt)
   wscoped (Skip inv)
     = let Evidence _ (v, th) = wscoped inv in
       Evidence ? (shift v, th)

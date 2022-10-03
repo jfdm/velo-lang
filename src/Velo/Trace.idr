@@ -1,5 +1,6 @@
 module Velo.Trace
 
+import Data.SnocList.Quantifiers
 import Data.String
 import Text.PrettyPrint.Prettyprinter
 
@@ -89,7 +90,7 @@ showRedux (SimplifyCall App (_ :: var !: _)) = "Simplify Application Variable by
 showRedux (ReduceFuncApp x) = "Reduce Application"
 
 
-wrap : {type : Ty} -> Term [] [] type -> Doc ()
+wrap : {type : Ty} -> Term [] [<] type -> Doc ()
 wrap {type} tm
   = vcat [ pretty "```"
          , pretty tm
@@ -97,7 +98,7 @@ wrap {type} tm
          ]
 
 
-showSteps : {ty : Ty} -> {a,b : Term [] [] ty} -> Reduces a b -> List (Doc ())
+showSteps : {ty : Ty} -> {a,b : Term [] [<] ty} -> Reduces a b -> List (Doc ())
 showSteps {a = a} {b = a} Refl
   = [wrap a]
 
@@ -106,7 +107,7 @@ showSteps {a = a} {b = b} (Trans x y)
 
 export
 prettyComputation : {ty : Ty}
-                 -> {term : Term [] [] ty}
+                 -> {term : Term [] [<] ty}
                  -> (res  : Result term)
                          -> Velo ()
 prettyComputation {term = term} (R that val steps)
@@ -126,21 +127,20 @@ ctxt (elem :: rest)
 
 export
 Pretty Meta where
-  pretty (MkMeta nm [] [] ty) = pretty (I ("?" ++ nm) ty)
-  pretty (MkMeta nm ctxt nms ty)
-    = vcat (displayAssumptions nms [<]
+  pretty (MkMeta nm [<] ty) = pretty (I ("?" ++ nm) ty)
+  pretty (MkMeta nm nms ty)
+    = vcat (displayAssumptions nms
             <>> [pretty (String.replicate 10 '-'), pretty (I ("?" ++ nm) ty), ""])
 
     where
 
     displayAssumptions :
-      {0 scp : List Ty} ->
+      {0 scp : SnocList Ty} ->
       All Item scp ->
-      SnocList (Doc ann) ->
       SnocList (Doc ann)
-    displayAssumptions [] acc = acc
-    displayAssumptions (i :: is) acc
-      = displayAssumptions is (acc :< pretty i)
+    displayAssumptions [<] = [<]
+    displayAssumptions (is :< i)
+      = displayAssumptions is :< pretty i
 
 export
 prettyMetas : List Meta -> Velo ()

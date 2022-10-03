@@ -6,6 +6,8 @@ import Decidable.Equality
 
 import Toolkit.Data.List.Pointwise
 import Toolkit.Data.List.Quantifiers
+
+import Toolkit.Data.SnocList.Quantifiers
 import Toolkit.Data.List.Subset
 import Toolkit.DeBruijn.Context
 import Toolkit.DeBruijn.Variable
@@ -24,9 +26,9 @@ isVar : FileContext ->
         All Item ctxt ->
         String ->
         Velo (ty : Ty ** IsVar ctxt ty)
-isVar fc [] nm = throwAt fc (NotBound nm)
-isVar fc (I x ty :: xs) nm = case decEq x nm of
-  Yes Refl => pure (ty ** V 0 Here)
+isVar fc [<] nm = throwAt fc (NotBound nm)
+isVar fc (xs :< I x ty) nm = case decEq x nm of
+  Yes Refl => pure (ty ** here)
   No _ => bimap id shift <$> isVar fc xs nm
 
 export
@@ -41,17 +43,17 @@ synth : All Item ctxt ->
         Velo (ty : Ty ** holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
 
 check scp ty (Hole fc nm)
-  = pure ([MkHoleIn fc nm [<] [<] ty] ** Met nm)
+  = pure ([MkHoleIn fc nm [] ty] ** Met nm)
 check scp ty (Let fc x e t)
   = do (dom ** holes2 ** e) <- synth scp e
-       (holes1 ** t) <- check (I x dom :: scp) ty t
+       (holes1 ** t) <- check (scp :< I x dom) ty t
        let (holes1 ** stp) = steps x holes1
        (holes ** mg) <- merge fc holes1 holes2
        pure (holes ** Call App (Cons (Fun stp t) mg (Cons e NilR Empty)))
 check scp ty (Fun fc x ty' t)
   = do TyFunc dom cod <- isTyFunc fc ty
        Refl <- compare fc dom ty'
-       (holes ** t) <- check (I x dom :: scp) cod t
+       (holes ** t) <- check (scp :< I x dom) cod t
        let (holes ** stp) = steps x holes
        pure (holes ** Fun stp t)
 check scp ty (App fc f t)
@@ -90,12 +92,12 @@ synth scp (And fc b c)
        pure (TyBool ** holes ** Call And (Cons b mg (Cons c NilR Empty)))
 synth scp (Let fc x e t)
   = do (dom ** holes2 ** e) <- synth scp e
-       (cod ** holes1 ** t) <- synth (I x dom :: scp) t
+       (cod ** holes1 ** t) <- synth (scp :< I x dom) t
        let (holes1 ** stp) = steps x holes1
        (holes ** mg) <- merge fc holes1 holes2
        pure (cod ** holes ** Call App (Cons (Fun stp t) mg (Cons e NilR Empty)))
 synth scp (Fun fc x ty t)
-  = do (cod ** holes ** t) <- synth (I x ty :: scp) t
+  = do (cod ** holes ** t) <- synth (scp :< I x ty) t
        let (holes ** stp) = steps x holes
        pure (TyFunc ty cod ** holes ** Fun stp t)
 synth scp (App fc f t)

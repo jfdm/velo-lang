@@ -1,0 +1,10 @@
+echo "Running Test"
+
+$1 main.velo
+
+
+# Local Variables:
+# mode: sh
+# End:
+
+# -- [ EOF ]

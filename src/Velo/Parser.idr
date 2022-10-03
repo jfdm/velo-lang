@@ -129,6 +129,18 @@ mutual
        e <- Toolkit.location
        pure (App (newFC s e) f a)
 
+  ann : Rule (AST FileContext)
+  ann =
+    do s <- Toolkit.location
+       symbol "("
+       a <- expr
+       symbol ":"
+       ty <- type
+       symbol ")"
+       e <- Toolkit.location
+       pure (The (newFC s e) ty a)
+
+
   expr : Rule (AST FileContext)
   expr =   ref
        <|> hole
@@ -136,6 +148,7 @@ mutual
        <|> let_
        <|> app
        <|> funAnon
+       <|> ann
 
 velo : Rule (AST FileContext)
 velo

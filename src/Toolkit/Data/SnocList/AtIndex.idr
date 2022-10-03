@@ -1,10 +1,10 @@
-||| Predicates for reasoning about elements of a list, based on their
+||| Predicates for reasoning about elements of a SnocList, based on their
 ||| index.
 |||
 ||| Copyright : see COPYRIGHT
 ||| License   : see LICENSE
 |||
-module Toolkit.Data.List.AtIndex
+module Toolkit.Data.SnocList.AtIndex
 
 import Decidable.Equality
 import Toolkit.Decidable.Informative
@@ -13,16 +13,16 @@ import Toolkit.Decidable.Informative
 
 public export
 data AtIndex : (x   :      type)
-            -> (xs  : List type)
+            -> (xs  : SnocList type)
             -> (idx : Nat)
                    -> Type
   where
-    Here : AtIndex x (x::xs) Z
-    There : (later : AtIndex x     rest     idx)
-                  -> AtIndex x (y::rest) (S idx)
+    Here : AtIndex x (xs :< x) Z
+    There : (later : AtIndex x rest           idx)
+                  -> AtIndex x (rest :< y) (S idx)
 
 export
-Uninhabited (AtIndex x [] n) where
+Uninhabited (AtIndex x [<] n) where
   uninhabited at impossible
 
 export
@@ -34,47 +34,39 @@ namespace Check
 
   namespace IsAtIndex
     public export
-    data Error = EmptyList
+    data Error = EmptySnocList
                | SupposedToBeHere
                | SupposedToBeLater
                | Later Error
 
-  listIsEmpty : AtIndex x [] 0 -> Void
-  listIsEmpty Here impossible
-  listIsEmpty (There later) impossible
-
-  supposedToBeHere : (x = y -> Void) -> AtIndex x (y :: xs) 0 -> Void
+  supposedToBeHere : (x = y -> Void) -> AtIndex x (xs :< y) 0 -> Void
   supposedToBeHere f Here = f Refl
 
-  supposedToBeLater : AtIndex x [] (S k) -> Void
-  supposedToBeLater Here impossible
-  supposedToBeLater (There later) impossible
-
-  isNotLater : (AtIndex x xs k -> Void) -> AtIndex x (y :: xs) (S k) -> Void
+  isNotLater : (AtIndex x xs k -> Void) -> AtIndex x (xs :< y) (S k) -> Void
   isNotLater f (There later) = f later
 
   export
   isAtIndex : DecEq type
            => (idx : Nat)
            -> (x   : type)
-           -> (xs  : List type)
+           -> (xs  : SnocList type)
                   -> DecInfo Error (AtIndex x xs idx)
-  isAtIndex Z x []
-    = No EmptyList (listIsEmpty)
+  isAtIndex Z x [<]
+    = No EmptySnocList absurd
 
-  isAtIndex Z x (y :: xs) with (decEq x y)
-    isAtIndex Z x (x :: xs) | (Yes Refl)
+  isAtIndex Z x (xs :< y) with (decEq x y)
+    isAtIndex Z x (xs :< x) | (Yes Refl)
       = Yes Here
-    isAtIndex Z x (y :: xs) | (No contra)
+    isAtIndex Z x (xs :< y) | (No contra)
       = No SupposedToBeHere (supposedToBeHere contra)
 
-  isAtIndex (S k) x []
-    = No SupposedToBeLater (supposedToBeLater)
+  isAtIndex (S k) x [<]
+    = No SupposedToBeLater absurd
 
-  isAtIndex (S k) x (_ :: xs) with (isAtIndex k x xs)
-    isAtIndex (S k) x (_ :: xs) | (Yes prf)
+  isAtIndex (S k) x (xs :< _) with (isAtIndex k x xs)
+    isAtIndex (S k) x (xs :< _) | (Yes prf)
       = Yes (There prf)
-    isAtIndex (S k) x (_ :: xs) | (No msg contra)
+    isAtIndex (S k) x (xs :< _) | (No msg contra)
       = No (Later msg) (isNotLater contra)
 
 namespace Find
@@ -84,13 +76,13 @@ namespace Find
     data Error = IsEmpty
                | Later HasIndex.Error
 
-  isEmpty : DPair Nat (AtIndex x []) -> Void
+  isEmpty : DPair Nat (AtIndex x [<]) -> Void
   isEmpty (MkDPair _ Here) impossible
 
   isNotElem : {x,y : type}
            -> (DPair Nat (AtIndex x xs) -> Void)
            -> (x = y -> Void)
-           -> DPair Nat (AtIndex x (y :: xs))
+           -> DPair Nat (AtIndex x (xs :< y))
            -> Void
   isNotElem {x} {y} f g (MkDPair fst snd) with (snd)
     isNotElem {x = x} {y = x} f g (MkDPair 0 snd) | Here
@@ -101,20 +93,20 @@ namespace Find
   export
   hasIndex : DecEq type
           => (x : type)
-          -> (xs : List type)
+          -> (xs : SnocList type)
                 -> DecInfo HasIndex.Error
                            (DPair Nat (AtIndex x xs))
-  hasIndex x []
+  hasIndex x [<]
     = No IsEmpty (isEmpty)
-  hasIndex x (y :: xs) with (decEq x y)
-    hasIndex x (x :: xs) | (Yes Refl)
+  hasIndex x (xs :< y) with (decEq x y)
+    hasIndex x (xs :< x) | (Yes Refl)
       = Yes (MkDPair Z Here)
 
-    hasIndex x (y :: xs) | (No contra) with (hasIndex x xs)
-      hasIndex x (y :: xs) | (No contra) | (Yes (MkDPair idx prf))
+    hasIndex x (xs :< y) | (No contra) with (hasIndex x xs)
+      hasIndex x (xs :< y) | (No contra) | (Yes (MkDPair idx prf))
         = Yes (MkDPair (S idx) (There prf))
 
-      hasIndex x (y :: xs) | (No contra) | (No msg f)
+      hasIndex x (xs :< y) | (No contra) | (No msg f)
         = No (Later msg) (isNotElem f contra)
 
 -- [ EOF ]
