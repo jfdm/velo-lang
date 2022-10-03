@@ -8,7 +8,6 @@ sourcedir = "src"
 executable = velo
 
 modules = Velo.Types
-        , Velo.Terms
 
         , Velo.Values
 
@@ -19,13 +18,20 @@ modules = Velo.Types
         , Velo.Error
         , Velo.Error.Pretty
         , Velo.Core
-        , Velo.AST
+
+        , Velo.IR.Common
+        , Velo.IR.AST
+        , Velo.IR.Holey
+        , Velo.IR.Term
+
+        , Velo.Elaborator.Common
+        , Velo.Elaborator.Holey
+        , Velo.Elaborator.Term
 
         , Velo.Lexer.Token
         , Velo.Lexer
         , Velo.Parser
 
-        , Velo.Elaborator
         , Velo.Trace
 
         , Velo.Options

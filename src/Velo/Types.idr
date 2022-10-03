@@ -11,16 +11,27 @@ data Ty = TyNat
         | TyBool
         | TyFunc Ty Ty
 
+export
+Show Ty where
+  showPrec d TyNat = "Nat"
+  showPrec d TyBool = "Bool"
+  showPrec d (TyFunc a b) =
+    showParens (d > Open) $
+      "\{showPrec App a} -> \{show b}"
 
+export
 Uninhabited (TyNat = TyBool) where
   uninhabited Refl impossible
 
+export
 Uninhabited (TyNat = TyFunc x y) where
   uninhabited Refl impossible
 
+export
 Uninhabited (TyBool = TyFunc x y) where
   uninhabited Refl impossible
 
+export
 Biinjective TyFunc where
   biinjective Refl = (Refl, Refl)
 

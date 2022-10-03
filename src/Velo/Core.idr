@@ -10,6 +10,8 @@ import        Toolkit.System
 import public Velo.Error
 import        Velo.Error.Pretty
 
+import public Toolkit.Data.Location
+
 %default total
 
 public export
@@ -17,7 +19,19 @@ public export
 Velo : Type -> Type
 Velo = TheRug Velo.Error
 
+export
+throwAt : FileContext -> Elaborating.Error -> Velo a
+throwAt l e = throw $ Elab (Err l e)
 
+export
+dec : FileContext
+   -> Elaborating.Error
+   -> Dec     a
+   -> Velo a
+dec _ _ (Yes prf)
+  = pure prf
+dec fc err (No _)
+  = throwAt fc err
 
 namespace Velo
 

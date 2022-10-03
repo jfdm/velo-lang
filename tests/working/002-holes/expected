@@ -1,21 +1,13 @@
 Running Test
 # Finished Parsing
 # Finished Type Checking
-main.velo:3:18-20:c
-c:Nat
-b:Nat
-a:Nat
----
-c:Nat
+a : Nat
+----------
+?a : Nat
 
-main.velo:2:18-20:a
-b:Nat
-a:Nat
----
-a:Nat
-
-main.velo:1:18-20:a
-a:Nat
----
-a:Nat
+c : Nat
+b : Nat
+a : Nat
+----------
+?c : Nat
 

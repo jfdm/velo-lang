@@ -28,6 +28,10 @@ data IsVar : (ctxt : List kind)
               -> IsVar   ctxt type
 
 export
+Uninhabited (IsVar [] x) where
+  uninhabited (V n prf) = void (uninhabited prf)
+
+export
 DecEq (IsVar ctxt type) where
   decEq (V m p) (V n q) with (decEq m n)
     decEq (V m p) (V .(m) q) | Yes Refl
