@@ -129,18 +129,21 @@ export
 Pretty Meta where
   pretty (MkMeta nm [<] ty) = pretty (I ("?" ++ nm) ty)
   pretty (MkMeta nm nms ty)
-    = vcat (displayAssumptions nms
+    = vcat (displayAssumptions [] nms
             <>> [pretty (String.replicate 10 '-'), pretty (I ("?" ++ nm) ty), ""])
 
     where
 
     displayAssumptions :
+      (seen : List String) ->
       {0 scp : SnocList Ty} ->
       All Item scp ->
       SnocList (Doc ann)
-    displayAssumptions [<] = [<]
-    displayAssumptions (is :< i)
-      = displayAssumptions is :< pretty i
+    displayAssumptions seen [<] = [<]
+    displayAssumptions seen (is :< I str x)
+      = ifThenElse (str `elem` seen)
+          (displayAssumptions seen is)
+          (displayAssumptions (str :: seen) is :< pretty (I str x))
 
 export
 prettyMetas : List Meta -> Velo ()

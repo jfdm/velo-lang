@@ -1,10 +1,6 @@
 Running Test
 # Finished Parsing
 # Finished Type Checking
-a : Nat
-a : Bool
-a : Bool
-a : Nat
 a : Nat -> Nat
 ----------
 ?hole : Nat
