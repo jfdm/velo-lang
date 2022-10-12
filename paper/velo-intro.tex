@@ -23,7 +23,7 @@ in (foo ?hole)
 We have presented \Velo{} as a \emph{complete} language with a standard pipeline.
 A \ac{dsl} captures the language's concrete syntax, and a parser turns \ac{dsl} instances into raw unchecked terms.
 Type checking elaborates these raw terms into a set of well-typed well-scoped intermediate representations: \IdrisType{Holey} supports well-scoped typed holes; and \IdrisType{Terms} our core representation that captures our language's abstract syntax.
-From the core representation we provide well-scoped \ac{cse} using co-DeBruijn inexing, and we provide a verifiable evaluator to reduce terms to values.
+From the core representation we provide well-scoped \ac{cse} using co-DeBruijn indexing, and we provide a verifiable evaluator to reduce terms to values.
 
 \jfdm{Would it be good to show an example high-level trace of the output?}
 
