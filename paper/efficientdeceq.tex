@@ -1,0 +1,72 @@
+\subsection{Efficient Decidable Equality}
+\label{sec:idioms:decEq}
+\chcomment{Linear (in number of cases) decidable equality}
+
+When users do not have access to a meta-program deriving proofs that propositional
+equality is decidable~\cite{DBLP:conf/icfp/ChristiansenB16},
+the most common strategy is to use nested pattern matching and produce
+a number of clauses quadratic in the number of constructors for the type at hand.
+
+
+\chcomment[id=gallais]{I don't understand this claim:
+  \begin{quote}
+      Although we can already reduce the number of contraditions using
+      symmetry breaking (\texttt{negEqSym}), the number of cases is still many.
+   \end{quote}
+   }
+\chcomment[id=jfdm]{The claim is that with \texttt{negEqSym} we reduce the number of cases that we need to provide in half, as \texttt{negEqSym} helps break the symmetry. It implies that there is other stuff we can do that helps but not as compared to our own approaches.}
+
+We can reduce the complexity of \IdrisType{DecEq} instance creation from quadratic
+to linear in the number of constructors.
+For example, consider the following standard definition of a binary tree:
+
+\begin{verbatim}
+data Bin = Leaf | Node Bin Bin
+\end{verbatim}
+
+\noindent
+We first define a \IdrisType{Diag} relation stating that two terms have the same
+top-level constructor.
+
+\begin{verbatim}
+data Diag : (s, t : Bin) -> Type where
+  Leaf2 : Diag Leaf Leaf
+  Node2 : (s, t, u, v : Bin) -> Diag (Node s t) (Node u v)
+\end{verbatim}
+
+\noindent
+Using \IdrisType{Diag} we can define a function, \IdrisFunction{diag}, function that, from two terms, either returns a proof that they satisfy the \IdrisType{Diag} relation or return \IdrisData{Nothing}.
+
+\begin{verbatim}
+diag : (s, t : Bin) -> Maybe (Diag s t)
+diag Leaf Leaf = Just Leaf2
+diag (Node s t) (Node u v) = Just (Node2 s t u v)
+diag _ _ = Nothing
+\end{verbatim}
+
+\noindent
+We can easily prove that \IdrisFunction{diag} cannot possibly return \IdrisData{Nothing}
+if it's input are in fact equal.
+
+\begin{verbatim}
+diagNot : (t : Bin) -> Not (diag t t === Nothing)
+diagNot Leaf = absurd
+diagNot (Node _ _) = absurd
+\end{verbatim}
+
+\noindent
+We can finally use this auxiliary function to implement \IdrisFunction{decEq}
+by only needing to consider cases where the two input terms share the same
+top-level constructor and have a generic catch-all case handling all top-level
+mismatches thanks to \IdrisFunction{diagNot}.
+
+\begin{verbatim}
+decEq : (s, t : Bin) -> Dec (s === t)
+decEq s@_ t@_ with (diag s t) proof eq
+  _ | Just Leaf2 = Yes Refl
+  _ | Just (Node2 a b u v) with (decEq a u) | (decEq b v)
+    _ | Yes eq1 | Yes eq2 = Yes (cong2 Node eq1 eq2)
+    _ | No neq1 | _ = No (\case Refl => neq1 Refl)
+    _ | _ | No neq2 = No (\case Refl => neq2 Refl)
+  _ | Nothing = No (\ Refl => diagNot _ eq)
+\end{verbatim}

@@ -1,0 +1,103 @@
+\subsection{Being Positively Negative}
+\label{sec:idioms:posneg}
+
+A workhorse of dependently typed programming is using decidable
+predicates that capture, and produce, positive information.
+We can represent the results of a decidable function using \texttt{Dec}:
+
+\begin{verbatim}
+data Dec a = Yes a | No (a -> Void)
+\end{verbatim}
+
+\noindent
+Notice that in the negative position (the \texttt{No} constructor) we do not return positive information.
+We provide a proof of falsity.
+When reasoning about our programs such proof of falsity is good.
+When interacting with our programs such proof of falsity is not good.
+Consider the following type signatures that specify two decidable procedures.
+The first to determine if one natural number is greater than another.
+
+\begin{verbatim}
+isGT : (x,y : Nat) -> Dec (GT x y)
+\end{verbatim}
+
+\noindent
+The other, \IdrisFunction{any}, determines if any element in the list satisfies a supplied predicate.
+
+\begin{verbatim}
+any : (f  : (x : type) -> Dec (p x)) -> (xs : List type) -> Dec (Any p xs)
+\end{verbatim}
+
+For \IdrisFunction{isGT} we know that if the result is negative we can safely assume that \IdrisType{GT} \IdrisImplicit{x y} is false.
+With \IdrisFunction{any} we do not know for sure why the decidable procedure failed.
+Was it because the list was empty?
+or,
+was it because all elements of \IdrisBound{xs} did not satisfy \IdrisImplicit{p}!?
+More so what was the reason for any element in \IdrisBound{xs} for not satisfying \IdrisImplicit{p}?
+
+To address these issues. we introduce \IdrisType{DecInfo} a variant of \IdrisType{Dec} that carries positive information in the negative case, as well as proofs-of-falsity.
+
+\chcomment[id=gallais]
+          {Do we want to spend precious space talking about DecInfo
+            rather than going straight to the nicest solution?}
+\chcomment[id=jfdm]
+          {But we do not use the nicest solution...}
+
+\begin{verbatim}
+data DecInfo e p = Yes p | No e (p -> Void)
+\end{verbatim}
+
+With this simple change we can now report \emph{why} a decision procedure failed, as well as proof that it failed.
+Our examples can now become:
+
+\begin{verbatim}
+isGT : (x,y : Nat) -> DecInfo (LTE x y) (GT x y)
+\end{verbatim}
+
+\noindent
+and
+
+\begin{verbatim}
+any : (f  : (x : type) -> Dec (q x) (p x))
+   -> (xs : List type)
+         -> DecInfo (All (\x => Pair (q x) (Not (p x))) xs) (Any p xs)
+\end{verbatim}
+
+\chcomment[id=gallais]
+          {Strictly positive has a very specific technical meaning.
+            I'm concerned this will give people a false impression that the datatype is malformed}
+
+\chcomment[id=jfdm]
+          {I agree, we need a better name: absolutely positive?}
+
+\IdrisType{DecInfo} is, however, not \emph{strictly} positive as it carries a proof of false.
+A more interesting line of work would be to adopt \emph{constructive negation} to ensure that proofs of false arise from positive sources only~\cite{msfp/Atkey22}.
+That is, given:
+
+\begin{verbatim}
+Predicate : Type
+Predicate = (pos ** neg ** (pos -> neg -> Void))
+\end{verbatim}
+
+we can recreate \IdrisType{DecInfo} as:
+
+\begin{verbatim}
+DecInfo : Predicate -> Type
+DecInfo (pos ** neg ** no) = Either neg pos
+\end{verbatim}
+
+This is line of investigation stems back to
+producing good error messages when implementing
+elaborators~\cite{DBLP:journals/jfp/McBrideM04}.
+
+\chcomment[id=gallais]
+  {Not sure how to put back in the ``is ongoing'' part. Maybe something like:
+  \begin{quote}
+    We have yet to see a clear presentation of the underlying principles
+  \end{quote}
+  but isn't it the point of this section to give such a presentation?}
+\chcomment[id=jfdm]{I would suggest:
+  \begin{quote}
+    We are investigating the efficacy of being \emph{positively negative} and how that impacts program design in dependently-typed languages.
+  \end{quote}
+}

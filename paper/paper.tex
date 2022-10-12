@@ -1,4 +1,5 @@
 \documentclass[%
+draft, % note that the orcid.pdf logo is not included with draft mode
 a4paper,
 UKenglish,
 cleveref,
@@ -7,6 +8,13 @@ thm-restate,
 %anonymous,
 pdfa
 ]{oasics-v2021}
+
+\usepackage{todonotes}
+\setuptodonotes{inline}
+
+\usepackage{acronym}
+\usepackage{xspace}
+\usepackage[commandnameprefix=always]{changes}
 
 \pdfoutput=1
 \hideOASIcs %uncomment to remove references to OASIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
@@ -84,7 +92,19 @@ pdfa
 \ArticleNo{23}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\acrodef{dsl}[DSL]{Domain Specific Language}
+\acrodef{edsl}[EDSL]{Embedded Domain Specific Language}
+\acrodef{stlc}[STLC]{Simply-Typed Lambda Calculus}
+
+\definechangesauthor[color=orange,name={Jan}]{jfdm}
+\definechangesauthor[color=green, name={Guillaume}]{gallais}
+\definechangesauthor[color=red, name={Edwin}]{edwin}
+
+\newcommand{\Velo}{V{\'e}lo\xspace}
+
 \begin{document}
+
+\input{notations}
 
 \maketitle
 
@@ -114,6 +134,77 @@ Our ongoing work is available at:
 \url{https://github.com/jfdm/velo-lang}
 \end{abstract}
 
+\todo{Run spellcheck}
+\todo{Use Katla to typeset Idris 2 code}
+
+\section{Introduction}
+\label{sec:introduction}
+
+A \emph{Language Workbench} offers language designers an expressive
+environment in which to design and implement their \Acp{dsl}~\cite{hudak1996building}.
+\chcomment[id=jfdm]{Needs extending.}
+
+Dependently-typed languages such as Idris~\cite{DBLP:conf/ecoop/Brady21}
+provide programmers with an expressive environment in which to reason not
+only about their software programs but more importantly about the
+\emph{programming languages} in which we write our programs.
+%
+There is a plethora of work attesting to the ability of dependent-types to
+reason about the programming languages we all use, and textbooks such as
+\emph{Programming Language Foundations in Agda}~\cite{plfa22.08} and
+\emph{Software Foundations}~\cite{Pierce:SF2}
+detail how others can learn to develop mechanised formal descriptions of their languages.
+\chcomment[id=jfdm]{Needs extending.}
+
+The formal design of a programming language is, however, just one aspect of he language's lifecycle.
+Programming languages are also to be used.
+Dependently-typed languages such as Idris also supports the efficient execution of our `reasoned about' software programmes and the programming languages described.
+\chcomment[id=jfdm]{Needs extending.}
+
+This paper presents \Velo{} a minimal functional language based on the \ac{stlc}
+combined with an extended form of \emph{Hutton's Razor}~\cite{DBLP:conf/mpc/HuttonW04}
+that showcases how we can use languages, such as Idris, as language workbenches.
+\chcomment[id=jfdm]{Needs extending.}
 % C-c C-a ?todo
+
+\section{Introducing Velo}
+\label{sec:velo}
+
+\chcomment{Whole pipeline (parser, elaborator, REPL, evaluator, compiler passes)}
+
+
+\section{Language Design}
+\label{sec:design}
+
+\input{deBruijn}
+
+\input{compactconstant}
+
+
+\subsection{Well-Typed Holes}
+\label{sec:design:holes}
+
+\chcomment{Well-Typed Holes}
+
+\section{Optimisation \& Execution}
+\label{sec:compiler}
+
+\chcomment{Co de Bruijn for CSE}
+\chcomment{Evaluation as Progress (with computation rules in one separate function)}
+
+\section{Good Programming Idioms}
+\label{sec:idioms}
+
+Within \Velo{} there are two programming idioms that helped
+with the reporting of errors, and the ease of deciding equality.
+
+\input{positivelynegative}
+\input{efficientdeceq}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+
+\bibliography{paper}
 
 \end{document}
