@@ -2,7 +2,8 @@
 \subsection{Being Positively Negative}
 \label{sec:idioms:posneg}
 
-A workhorse of dependently typed programming is using decidable predicates capture, and produce, positive information.
+A workhorse of dependently typed programming is using decidable
+predicates that capture, and produce, positive information.
 We can represent the results of a decidable function using \texttt{Dec}:
 
 \begin{verbatim}
@@ -11,7 +12,7 @@ data Dec a = Yes a | No (a -> Void)
 
 \noindent
 Notice that in the negative position (the \texttt{No} constructor) we do not return positive information.
-Wee provide a proof of falsity.
+We provide a proof of falsity.
 When reasoning about our programs such proof of falsity is good.
 When interacting with our programs such proof of falsity is not good.
 Consider the following type signatures that specify two decidable procedures.
@@ -37,6 +38,10 @@ More so what was the reason for any element in \texttt{xs} for not satisfying \t
 
 To address these issues. we introduce \texttt{DecInfo} a variant of \texttt{Dec} that carries positive information in the negative case, as well as proofs-of-falsity.
 
+\chcomment[id=gallais]
+          {Do we want to spend precious space talking about DecInfo
+           rather than going straight to the nicest solution?}
+
 \begin{verbatim}
 data DecInfo e p = Yes p | No e (p -> Void)
 \end{verbatim}
@@ -57,6 +62,10 @@ any : (f  : (x : type) -> Dec (q x) (p x))
          -> DecInfo (All (\x => Pair (q x) (Not (p x))) xs) (Any p xs)
 \end{verbatim}
 
+\chcomment[id=gallais]
+          {Strictly positive has a very specific technical meaning.
+            I'm concerned this will give people a false impression that the datatype is malformed}
+
 \texttt{DecInfo} is, however, not \emph{strictly} positive as it carries a proof of false.
 A more interesting line of work would be to adopt \emph{constructive negation} to ensure that proofs of false arise from positive sources only~\cite{msfp/Atkey22}.
 That is, given:
@@ -73,4 +82,13 @@ DecInfo : Predicate -> Type
 DecInfo (pos ** neg ** no) = Either neg pos
 \end{verbatim}
 
-This is line of investigation is on going.
+This is line of investigation stems back to
+producing good error messages when implementing
+elaborators~\cite{DBLP:journals/jfp/McBrideM04}.
+
+\chcomment[id=gallais]
+  {Not sure how to put back in the ``is ongoing'' part. Maybe something like:
+  \begin{quote}
+    We have yet to see a clear presentation of the underlying principles
+  \end{quote}
+  but isn't it the point of this section to give such a presentation?}
