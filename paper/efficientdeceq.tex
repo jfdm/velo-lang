@@ -1,9 +1,8 @@
-
 \subsection{Efficient Decidable Equality}
 \label{sec:idioms:decEq}
 \chcomment{Linear (in number of cases) decidable equality}
 
-When users don't have access to a meta-program deriving proofs that propositional
+When users do not have access to a meta-program deriving proofs that propositional
 equality is decidable~\cite{DBLP:conf/icfp/ChristiansenB16},
 the most common strategy is to use nested pattern matching and produce
 a number of clauses quadratic in the number of constructors for the type at hand.
@@ -15,70 +14,53 @@ a number of clauses quadratic in the number of constructors for the type at hand
       symmetry breaking (\texttt{negEqSym}), the number of cases is still many.
    \end{quote}
    }
+\chcomment[id=jfdm]{The claim is that with \texttt{negEqSym} we reduce the number of cases that we need to provide in half, as \texttt{negEqSym} helps break the symmetry. It implies that there is other stuff we can do that helps but not as compared to our own approaches.}
 
 We can reduce the complexity of \IdrisType{DecEq} instance creation from quadratic
 to linear in the number of constructors.
-%
+For example, consider the following standard definition of a binary tree:
+
+\begin{verbatim}
+data Bin = Leaf | Node Bin Bin
+\end{verbatim}
+
+\noindent
 We first define a \IdrisType{Diag} relation stating that two terms have the same
 top-level constructor.
-%
-We can then define a \IdrisType{diag} function that, from two terms, either returns
-a proof that they satisfy the \IdrisType{Diag} relation or return \IdrisData{Nothing}.
-%
-We can easily proof that \IdrisType{diag} cannot possibly return \IdrisData{Nothing}
-if its input actually are equal.
-%
+
+\begin{verbatim}
+data Diag : (s, t : Bin) -> Type where
+  Leaf2 : Diag Leaf Leaf
+  Node2 : (s, t, u, v : Bin) -> Diag (Node s t) (Node u v)
+\end{verbatim}
+
+\noindent
+Using \IdrisType{Diag} we can define a function, \IdrisFunction{diag}, function that, from two terms, either returns a proof that they satisfy the \IdrisType{Diag} relation or return \IdrisData{Nothing}.
+
+\begin{verbatim}
+diag : (s, t : Bin) -> Maybe (Diag s t)
+diag Leaf Leaf = Just Leaf2
+diag (Node s t) (Node u v) = Just (Node2 s t u v)
+diag _ _ = Nothing
+\end{verbatim}
+
+\noindent
+We can easily prove that \IdrisFunction{diag} cannot possibly return \IdrisData{Nothing}
+if it's input are in fact equal.
+
+\begin{verbatim}
+diagNot : (t : Bin) -> Not (diag t t === Nothing)
+diagNot Leaf = absurd
+diagNot (Node _ _) = absurd
+\end{verbatim}
+
+\noindent
 We can finally use this auxiliary function to implement \IdrisFunction{decEq}
 by only needing to consider cases where the two input terms share the same
 top-level constructor and have a generic catch-all case handling all top-level
 mismatches thanks to \IdrisFunction{diagNot}.
 
-
-\chcomment[id=jfdm]{The example is probably not needed, but useful to have...}
-\chcomment[id=gallais]{I think an example with recursive subterms would be more helpful}
-
 \begin{verbatim}
-data Thing = Apples | Oranges
-
-data Diag : (x,y : Thing) -> Type where
-  A : Diag Apples Apples
-  O : Diag Oranges Oranges
-
-diag : (x,y : Thing) -> Maybe (Diag x y)
-diag Apples Apples = pure A
-diag Oranges Oranges = pure O
-diag _ _ = Nothing
-
-diagNot : (x : Thing) -> Not (diag x x === Nothing)
-diagNot Apples Refl impossible
-diagNot Oranges Refl impossible
-
-diagEq : Diag x y -> Dec (x === y)
-diagEq A = Yes Refl
-diagEq O = Yes Refl
-
-decEq : (x,y : Thing) -> Dec ( x === y)
-decEq x y with (diag x y) proof sim
-  decEq x y | Nothing = No (\Refl => diagNot _ sim)
-  decEq x y | (Just prf) = diagEq prf
-\end{verbatim}
-
-\begin{verbatim}
-data Bin = Leaf | Node Bin Bin
-
-data Diag : (s, t : Bin) -> Type where
-  Leaf2 : Diag Leaf Leaf
-  Node2 : (s, t, u, v : Bin) -> Diag (Node s t) (Node u v)
-
-diag : (s, t : Bin) -> Maybe (Diag s t)
-diag Leaf Leaf = Just Leaf2
-diag (Node s t) (Node u v) = Just (Node2 s t u v)
-diag _ _ = Nothing
-
-diagNot : (t : Bin) -> Not (diag t t === Nothing)
-diagNot Leaf = absurd
-diagNot (Node _ _) = absurd
-
 decEq : (s, t : Bin) -> Dec (s === t)
 decEq s@_ t@_ with (diag s t) proof eq
   _ | Just Leaf2 = Yes Refl
