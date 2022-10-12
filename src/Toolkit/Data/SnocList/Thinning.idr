@@ -1,32 +1,40 @@
-module Toolkit.Data.List.Thinning
+module Toolkit.Data.SnocList.Thinning
 
-import public Toolkit.Data.List.Subset
+import Toolkit.Data.SnocList.Quantifiers
+import public Toolkit.Data.SnocList.Subset
 
 public export
-Thinning : (xs, ys : List a) -> Type
+Thinning : (sx, sy : SnocList a) -> Type
 Thinning = Subset (===)
 
 export
-Identity : {xs : List a} -> Thinning xs xs
-Identity {xs = []} = Empty
-Identity {xs = x :: xs} = Keep Refl Identity
+Identity : {sx : SnocList a} -> Thinning sx sx
+Identity {sx = [<]} = Empty
+Identity {sx = sx :< x} = Keep Refl Identity
+
+namespace All
+
+  export
+  Identity : All p sx -> Thinning sx sx
+  Identity [<] = Empty
+  Identity (psx :< _) = Keep Refl (Identity psx)
 
 infixr 8 <.>
 export
-(<.>) : Thinning xs ys -> Thinning ys zs -> Thinning xs zs
+(<.>) : Thinning sx sy -> Thinning sy sz -> Thinning sx sz
 (<.>) = trans (\ eq1, eq2 => trans eq1 eq2)
 
 namespace Cover
 
   public export
-  data Cover : (th : Thinning {a} xs1 ys) -> (ph : Thinning xs2 ys) -> Type where
+  data Cover : (th : Thinning {a} sx1 sy) -> (ph : Thinning sx2 sy) -> Type where
     Empty : Cover Empty Empty
     Keep  : Cover th ph -> Cover (Keep Refl th) (Keep Refl ph)
     SkipL : Cover th ph -> Cover (Skip th) (Keep Refl ph)
     SkipR : Cover th ph -> Cover (Keep eq th) (Skip ph)
 
   export
-  coverDec : (th : Thinning {a} xs1 ys) -> (ph : Thinning xs2 ys) -> Dec (Cover th ph)
+  coverDec : (th : Thinning {a} sx1 sy) -> (ph : Thinning sx2 sy) -> Dec (Cover th ph)
   coverDec Empty Empty = Yes Empty
   coverDec (Keep Refl th) (Keep Refl ph) with (coverDec th ph)
     _ | Yes p = Yes (Keep p)
@@ -43,18 +51,18 @@ namespace Join
 
   public export
   record Join
-    {a : Type} {xs1, xs2, ys : List a}
-    (th : Thinning xs1 ys)
-    (ph : Thinning xs2 ys) where
+    {a : Type} {sx1, sx2, sy : SnocList a}
+    (th : Thinning sx1 sy)
+    (ph : Thinning sx2 sy) where
     constructor MkJoin
-    {union : List a}
-    {left   : Thinning xs1 union}
-    middle : Thinning union ys
-    {right  : Thinning xs2 union}
+    {union : SnocList a}
+    {left   : Thinning sx1 union}
+    middle : Thinning union sy
+    {right  : Thinning sx2 union}
     cover  : Cover left right
 
   export
-  join : {ys : _} -> (th : Thinning xs1 ys) -> (ph : Thinning xs2 ys) -> Join th ph
+  join : {sy : _} -> (th : Thinning sx1 sy) -> (ph : Thinning sx2 sy) -> Join th ph
   join Empty Empty = MkJoin Empty Empty
   join (Keep Refl th) (Keep Refl ph) =
     let (MkJoin middle cover) = join th ph in
@@ -70,11 +78,11 @@ namespace Join
     MkJoin (Skip middle) cover
 
 export
-none : {xs : List a} -> Thinning [] xs
-none {xs = []} = Empty
-none {xs = x :: xs} = Skip none
+none : {sx : SnocList a} -> Thinning [<] sx
+none {sx = [<]} = Empty
+none {sx = sx :< x} = Skip none
 
 export
-ones : {xs : List a} -> Thinning xs xs
-ones {xs = []} = Empty
-ones {xs = x :: xs} = Keep Refl ones
+ones : {sx : SnocList a} -> Thinning sx sx
+ones {sx = [<]} = Empty
+ones {sx = sx :< x} = Keep Refl ones

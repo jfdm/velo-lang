@@ -60,7 +60,7 @@ data Redux : (this,that : Term [] ctxt type)
                         (Call False [])
 
 
-    ReduceFuncApp : {body : Term [] (ctxt += type) return}
+    ReduceFuncApp : {body : Term [] (ctxt :< type) return}
                  -> {var  : Term [] ctxt type}
                  -> Value var
                           -> Redux (Call App [Fun body, var])

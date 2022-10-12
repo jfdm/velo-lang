@@ -3,9 +3,11 @@ module Velo.IR.Term
 import Data.String
 import Decidable.Equality
 
+import public Toolkit.Data.List.Member
 import Toolkit.Data.List.Pointwise
 import public Toolkit.Data.List.Quantifiers
-import Toolkit.Data.List.Subset
+import Toolkit.Data.SnocList.Quantifiers
+import Toolkit.Data.SnocList.Thinning
 import public Toolkit.DeBruijn.Context
 import public Toolkit.DeBruijn.Variable
 
@@ -28,7 +30,7 @@ public export
 record Meta where
   constructor MkMeta
   metaName : Name
-  metaScope : List Ty
+  {0 metaScope : SnocList Ty}
   metaScopeNames : All Item metaScope
   metaType : Ty
 
@@ -36,16 +38,12 @@ record Meta where
 -- The type of well-scoped terms with meta variables
 
 public export
-Thinning : (xs, ys : List a) -> Type
-Thinning = Subset (===)
-
-public export
-data Term : (metas : List Meta) -> (ctxt : List Ty) -> Ty -> Type where
+data Term : (metas : List Meta) -> (ctxt : SnocList Ty) -> Ty -> Type where
   Var : IsVar ctxt ty -> Term metas ctxt ty
-  Met : IsVar metas m ->
+  Met : IsMember metas m ->
         Thinning m.metaScope ctxt ->
         Term metas ctxt m.metaType
-  Fun : Term metas (ctxt += a) b ->
+  Fun : Term metas (ctxt :< a) b ->
         Term metas ctxt (TyFunc a b)
   Call : {tys : _} ->
          Prim tys ty ->
@@ -103,8 +101,8 @@ namespace Term
   public export
   data HeadSim : (t : Term metas ctxt ty1) -> (u : Term metas ctxt ty2) -> Type where
     Var  : (v, w : _) -> HeadSim (Var v) (Var w)
-    Met  : (v : IsVar metas m) -> (th : Thinning m.metaScope ctxt) ->
-           (w : IsVar metas n) -> (ph : _) -> HeadSim (Met v th) (Met w ph)
+    Met  : (v : IsMember metas m) -> (th : Thinning m.metaScope ctxt) ->
+           (w : IsMember metas n) -> (ph : _) -> HeadSim (Met v th) (Met w ph)
     Fun  : (t, u : _) -> HeadSim (Fun t) (Fun u)
     Call : (tys, uys : List Ty) ->
            (p : Prim tys ty1) -> (ts : All (Term metas ctxt) tys) ->
@@ -130,7 +128,7 @@ namespace Term
   public export
   decEqTerm : (t, u : Term metas ctxt ty) -> Dec (t === u)
   public export
-  decEqTerms : (ts, us : All (Term metas ctxt) tys) -> Dec (ts === us)
+  decEqTerms : {0 tys : List Ty} -> (ts, us : All (Term metas ctxt) tys) -> Dec (ts === us)
   public export
   decEqHeadSim : {0 t, u : Term metas ctxt ty} -> HeadSim t u -> Dec (t === u)
 

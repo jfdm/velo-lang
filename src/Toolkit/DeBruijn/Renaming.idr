@@ -5,24 +5,15 @@
 |||
 module Toolkit.DeBruijn.Renaming
 
-import Decidable.Equality
-import Data.DPair
-
-import Toolkit.Decidable.Informative
-
-import Toolkit.Data.List.AtIndex
-import Toolkit.Data.DList
-import Toolkit.Data.DList.AtIndex
-
-import Toolkit.DeBruijn.Context
+import Toolkit.Data.SnocList.AtIndex
 import public Toolkit.DeBruijn.Variable
 
 %default total
 
 
 public export
-interface Rename (type : Type) (term : List type -> type -> Type) | term where
-  rename : {old, new : List type}
+interface Rename (type : Type) (term : SnocList type -> type -> Type) | term where
+  rename : {old, new : SnocList type}
         -> (f : {ty : type} -> IsVar old ty
                             -> IsVar new ty)
         -> ({ty : type} -> term old ty
@@ -30,26 +21,27 @@ interface Rename (type : Type) (term : List type -> type -> Type) | term where
 
   %inline
   embed : {ty   : type}
-       -> {ctxt : List type}
+       -> {ctxt : SnocList type}
                -> IsVar ctxt ty
                -> term  ctxt ty
 
 public export
 %inline
 weakens : {type : Type}
-       -> {term : List type -> type -> Type}
+       -> {term : SnocList type -> type -> Type}
        -> Rename type term
-       => {old, new : List type}
+       => {old, new : SnocList type}
        -> (f : {ty  : type}
                    -> IsVar old ty
                    -> term  new ty)
        -> ({ty,type' : type}
-              -> IsVar (old += type') ty
-              -> term  (new += type') ty)
+              -> IsVar (old :< type') ty
+              -> term  (new :< type') ty)
 
-weakens f (V 0 Here)
-  = embed (V Z Here)
-weakens f (V (S idx) (There later))
-  = rename shift (f (V idx later))
+weakens f v@_ with (view v)
+  _ | Here
+    = embed here
+  _ | There w
+    = rename shift (f w)
 
 -- [ EOF ]

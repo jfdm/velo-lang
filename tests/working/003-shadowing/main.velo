@@ -1,0 +1,6 @@
+   let a = (inc (inc zero))
+in let a = true
+in let a = false
+in let a = (inc zero)
+in let a = (fun x : nat => x)
+in (?hole : nat)

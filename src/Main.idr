@@ -1,5 +1,7 @@
 module Main
 
+import Data.SnocList.Quantifiers
+import Data.List.Quantifiers
 import Data.String
 
 import Velo.Types
@@ -37,8 +39,8 @@ mainRug
        ast <- fromFile fname
        putStrLn "# Finished Parsing"
 
-       (ty ** holes ** t) <- synth [] ast
-       let (metas ** inv) = initInvariant [] [] holes
+       (ty ** holes ** t) <- synth [<] ast
+       let (metas ** inv) = initInvariant [<] holes
        let t = wscoped t inv
        putStrLn "# Finished Type Checking"
 

@@ -10,30 +10,30 @@ import Velo.Semantics.Reductions
 
 %default total
 
-data Progresss : (args : All (Term [] []) tys) -> Type
-data Progress : (term : Term [] [] type) -> Type
+data Progresss : (args : All (Term [] [<]) tys) -> Type
+data Progress : (term : Term [] [<] type) -> Type
 
 public export
-data Progresss : (args : All (Term [] []) tys)
+data Progresss : (args : All (Term [] [<]) tys)
               -> Type
   where
     Dones : (vals : Values args)
          -> Progresss args
 
-    Steps : {those : All (Term [] []) tys}
+    Steps : {those : All (Term [] [<]) tys}
          -> (step : Reduxes these those)
          -> Progresss these
 
 public export
-data Progress : (term : Term [] [] type)
+data Progress : (term : Term [] [<] type)
                      -> Type
   where
     Done : forall mty
-         . {term : Term [] [] mty}
+         . {term : Term [] [<] mty}
         -> (val  : Value term)
                 -> Progress term
 
-    Step : {this, that : Term [] [] type}
+    Step : {this, that : Term [] [<] type}
         -> (step       : Redux this that)
                       -> Progress this
 
@@ -41,7 +41,7 @@ export
 compute : {tys : List Ty}
        -> {0 op : Prim tys ty}
        -> ComputePrim op
-       -> {args : All (Term [] []) tys}
+       -> {args : All (Term [] [<]) tys}
        -> Values args
        -> Progress (Call op args)
 compute Add [m, n] = case m of
@@ -67,7 +67,7 @@ compute App [f, t] = case f of
 export
 call : {tys : _}
     -> (p : Prim tys ty)
-    -> {args : All (Term [] []) tys}
+    -> {args : All (Term [] [<]) tys}
     -> Progresss args
     -> Progress (Call p args)
 call p (Steps stes) = Step (SimplifyCall p stes)
@@ -77,11 +77,11 @@ call p (Dones vals) = case isValuePrim p of
 
 export
 progresss : {tys : List Ty}
-         -> (args : All (Term [] []) tys)
+         -> (args : All (Term [] [<]) tys)
          -> Progresss args
 export
 progress : {ty   : Ty}
-        -> (term : Term [] [] ty)
+        -> (term : Term [] [<] ty)
         -> Progress term
 
 progresss [] = Dones []

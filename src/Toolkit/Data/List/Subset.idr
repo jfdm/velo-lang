@@ -35,11 +35,6 @@ namespace All
   action compat (px :: pxs) (Keep prf rest) = compat px prf :: action compat pxs rest
   action compat (px :: pxs) (Skip rest) = action compat pxs rest
 
-export
-Keeps : {xs : List a} -> Subset (===) xs xs
-Keeps {xs = []} = Empty
-Keeps {xs = x :: xs} = Keep Refl Keeps
-
 namespace SnocList
   export
   Skips : {zs : SnocList b} -> Subset eq xs ys -> Subset eq xs (zs <>> ys)
@@ -54,7 +49,8 @@ Skips {zs = z :: zs} rest = Skip (Subset.Skips rest)
 
 export
 EmptyThis : {xs : List b} -> Subset eq [] xs
-EmptyThis = rewrite sym (appendNilRightNeutral xs) in Subset.Skips Empty
+EmptyThis {xs = []} = Empty
+EmptyThis {xs = x :: xs} = Skip EmptyThis
 
 export
 trans : (forall x, y, z. eq x y -> eq y z -> eq x z) ->

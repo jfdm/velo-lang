@@ -3,33 +3,32 @@
 ||| Copyright : see COPYRIGHT
 ||| License   : see LICENSE
 |||
-module Toolkit.DeBruijn.Variable
+module Toolkit.Data.List.Member
 
 import Decidable.Equality
-import Data.SnocList
 
 import Toolkit.Decidable.Informative
 
-import Toolkit.Data.SnocList.AtIndex
-import Toolkit.Data.SnocList.Thinning
+import Toolkit.Data.List.AtIndex
+import Toolkit.Data.List.Thinning
 
 %default total
 
 public export
-data IsVar : (ctxt : SnocList kind)
+data IsMember : (ctxt : List kind)
           -> (type :      kind)
                   -> Type
   where
     V : (  pos : Nat)
      -> (0 prf : AtIndex type ctxt pos)
-              -> IsVar   ctxt type
+              -> IsMember   ctxt type
 
 export
-Uninhabited (IsVar [<] x) where
+Uninhabited (IsMember [] x) where
   uninhabited (V n prf) = void (uninhabited prf)
 
 export
-DecEq (IsVar ctxt type) where
+DecEq (IsMember ctxt type) where
   decEq (V m p) (V n q) with (decEq m n)
     decEq (V m p) (V .(m) q) | Yes Refl
       = Yes (rewrite irrelevantAtIndex p q in Refl)
@@ -37,41 +36,41 @@ DecEq (IsVar ctxt type) where
 
 public export
 %inline
-here : IsVar (ctxt :< a) a
+here : IsMember (a :: ctxt) a
 here = V 0 Here
 
 public export
 %inline
-shift : IsVar ctxt type -> IsVar (ctxt :< a) type
+shift : IsMember ctxt type -> IsMember (a :: ctxt) type
 shift (V pos prf) = V (S pos) (There prf)
 
 export
-shifts : IsVar g s -> {g' : SnocList a} -> IsVar (g <+> g') s
-shifts v {g' = [<]} = v
-shifts v {g' = _ :< _} = shift (shifts v)
+shifts : IsMember g s -> {g' : List a} -> IsMember (g' <+> g) s
+shifts v {g' = []} = v
+shifts v {g' = _ :: _} = shift (shifts v)
 
 public export
-data View : IsVar ctxt type -> Type where
-  Here : View Variable.here
-  There : (v : IsVar ctxt type) -> View (shift v)
+data View : IsMember ctxt type -> Type where
+  Here : View Member.here
+  There : (v : IsMember ctxt type) -> View (shift v)
 
 export
-view : (v : IsVar ctxt type) -> View v
+view : (v : IsMember ctxt type) -> View v
 view (V 0 Here) = Here
 view (V (S n) (There prf)) = There (V n prf)
 
 public export
 %inline
-weaken : (func : IsVar old type
-              -> IsVar new type)
-      -> (IsVar (old :< type') type
-       -> IsVar (new :< type') type)
+weaken : (func : IsMember old type
+              -> IsMember new type)
+      -> (IsMember (type' :: old) type
+       -> IsMember (type' :: new) type)
 weaken f v@_ with (view v)
   _ | Here = here
   _ | There later = shift (f later)
 
 export
-thin : IsVar g s -> Thinning g g' -> IsVar g' s
+thin : IsMember g s -> Thinning g g' -> IsMember g' s
 thin v Empty = absurd v
 thin v (Skip th) = shift (thin v th)
 thin v@_ (Keep Refl th) with (view v)
