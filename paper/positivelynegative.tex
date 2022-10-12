@@ -1,4 +1,3 @@
-
 \subsection{Being Positively Negative}
 \label{sec:idioms:posneg}
 
@@ -36,11 +35,13 @@ or,
 was it because all elements of \IdrisBound{xs} did not satisfy \IdrisImplicit{p}!?
 More so what was the reason for any element in \IdrisBound{xs} for not satisfying \IdrisImplicit{p}?
 
-To address these issues. we introduce \texttt{DecInfo} a variant of \texttt{Dec} that carries positive information in the negative case, as well as proofs-of-falsity.
+To address these issues. we introduce \IdrisType{DecInfo} a variant of \IdrisType{Dec} that carries positive information in the negative case, as well as proofs-of-falsity.
 
 \chcomment[id=gallais]
           {Do we want to spend precious space talking about DecInfo
-           rather than going straight to the nicest solution?}
+            rather than going straight to the nicest solution?}
+\chcomment[id=jfdm]
+          {But we do not use the nicest solution...}
 
 \begin{verbatim}
 data DecInfo e p = Yes p | No e (p -> Void)
@@ -66,7 +67,10 @@ any : (f  : (x : type) -> Dec (q x) (p x))
           {Strictly positive has a very specific technical meaning.
             I'm concerned this will give people a false impression that the datatype is malformed}
 
-\texttt{DecInfo} is, however, not \emph{strictly} positive as it carries a proof of false.
+\chcomment[id=jfdm]
+          {I agree, we need a better name: absolutely positive?}
+
+\IdrisType{DecInfo} is, however, not \emph{strictly} positive as it carries a proof of false.
 A more interesting line of work would be to adopt \emph{constructive negation} to ensure that proofs of false arise from positive sources only~\cite{msfp/Atkey22}.
 That is, given:
 
@@ -92,3 +96,8 @@ elaborators~\cite{DBLP:journals/jfp/McBrideM04}.
     We have yet to see a clear presentation of the underlying principles
   \end{quote}
   but isn't it the point of this section to give such a presentation?}
+\chcomment[id=jfdm]{I would suggest:
+  \begin{quote}
+    We are investigating the efficacy of being \emph{positively negative} and how that impacts program design in dependently-typed languages.
+  \end{quote}
+}
