@@ -23,18 +23,18 @@ isGT : (x,y : Nat) -> Dec (GT x y)
 \end{verbatim}
 
 \noindent
-And the other, to determine if any element in the list satisfies a supplied predicate.
+The other, \IdrisFunction{any}, determines if any element in the list satisfies a supplied predicate.
 
 \begin{verbatim}
 any : (f  : (x : type) -> Dec (p x)) -> (xs : List type) -> Dec (Any p xs)
 \end{verbatim}
 
-For \texttt{isGT} we know that if the result is negative we can safely assume that \texttt{GT x y} is false.
-With \texttt{any} we do not know for sure why the decidable procedure failed.
+For \IdrisFunction{isGT} we know that if the result is negative we can safely assume that \IdrisType{GT} \IdrisImplicit{x y} is false.
+With \IdrisFunction{any} we do not know for sure why the decidable procedure failed.
 Was it because the list was empty?
 or,
-was it because all elements of \texttt{xs} did not satisfy \texttt{p}!?
-More so what was the reason for any element in \texttt{xs} for not satisfying \texttt{p}?
+was it because all elements of \IdrisBound{xs} did not satisfy \IdrisImplicit{p}!?
+More so what was the reason for any element in \IdrisBound{xs} for not satisfying \IdrisImplicit{p}?
 
 To address these issues. we introduce \texttt{DecInfo} a variant of \texttt{Dec} that carries positive information in the negative case, as well as proofs-of-falsity.
 
@@ -75,7 +75,7 @@ Predicate : Type
 Predicate = (pos ** neg ** (pos -> neg -> Void))
 \end{verbatim}
 
-we can recreate \texttt{DecInfo} as:
+we can recreate \IdrisType{DecInfo} as:
 
 \begin{verbatim}
 DecInfo : Predicate -> Type
