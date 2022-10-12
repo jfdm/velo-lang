@@ -9,6 +9,9 @@ thm-restate,
 pdfa
 ]{oasics-v2021}
 
+\usepackage{todonotes}
+\setuptodonotes{inline}
+
 \usepackage{acronym}
 \usepackage{xspace}
 \usepackage[commandnameprefix=always]{changes}
@@ -101,6 +104,8 @@ pdfa
 
 \begin{document}
 
+\input{notations}
+
 \maketitle
 
 % 1. State the problem
@@ -128,6 +133,9 @@ Our ongoing work is available at:
 
 \url{https://github.com/jfdm/velo-lang}
 \end{abstract}
+
+\todo{Run spellcheck}
+\todo{Use Katla to typeset Idris 2 code}
 
 \section{Introduction}
 \label{sec:introduction}

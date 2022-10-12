@@ -3,6 +3,10 @@ DEPENDS=\
   oasics-logo-bw.pdf \
   oasics-v2021.cls \
   orcid.pdf \
+  deBruijn.tex \
+  efficientdeceq.tex \
+  positivelynegative.tex \
+  notations.tex \
   paper.bib
 
 
