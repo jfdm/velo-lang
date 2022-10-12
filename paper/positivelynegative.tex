@@ -1,0 +1,76 @@
+
+\subsection{Being Positively Negative}
+\label{sec:idioms:posneg}
+
+A workhorse of dependently typed programming is using decidable predicates capture, and produce, positive information.
+We can represent the results of a decidable function using \texttt{Dec}:
+
+\begin{verbatim}
+data Dec a = Yes a | No (a -> Void)
+\end{verbatim}
+
+\noindent
+Notice that in the negative position (the \texttt{No} constructor) we do not return positive information.
+Wee provide a proof of falsity.
+When reasoning about our programs such proof of falsity is good.
+When interacting with our programs such proof of falsity is not good.
+Consider the following type signatures that specify two decidable procedures.
+The first to determine if one natural number is greater than another.
+
+\begin{verbatim}
+isGT : (x,y : Nat) -> Dec (GT x y)
+\end{verbatim}
+
+\noindent
+And the other, to determine if any element in the list satisfies a supplied predicate.
+
+\begin{verbatim}
+any : (f  : (x : type) -> Dec (p x)) -> (xs : List type) -> Dec (Any p xs)
+\end{verbatim}
+
+For \texttt{isGT} we know that if the result is negative we can safely assume that \texttt{GT x y} is false.
+With \texttt{any} we do not know for sure why the decidable procedure failed.
+Was it because the list was empty?
+or,
+was it because all elements of \texttt{xs} did not satisfy \texttt{p}!?
+More so what was the reason for any element in \texttt{xs} for not satisfying \texttt{p}?
+
+To address these issues. we introduce \texttt{DecInfo} a variant of \texttt{Dec} that carries positive information in the negative case, as well as proofs-of-falsity.
+
+\begin{verbatim}
+data DecInfo e p = Yes p | No e (p -> Void)
+\end{verbatim}
+
+With this simple change we can now report \emph{why} a decision procedure failed, as well as proof that it failed.
+Our examples can now become:
+
+\begin{verbatim}
+isGT : (x,y : Nat) -> DecInfo (LTE x y) (GT x y)
+\end{verbatim}
+
+\noindent
+and
+
+\begin{verbatim}
+any : (f  : (x : type) -> Dec (q x) (p x))
+   -> (xs : List type)
+         -> DecInfo (All (\x => Pair (q x) (Not (p x))) xs) (Any p xs)
+\end{verbatim}
+
+\texttt{DecInfo} is, however, not \emph{strictly} positive as it carries a proof of false.
+A more interesting line of work would be to adopt \emph{constructive negation} to ensure that proofs of false arise from positive sources only~\cite{msfp/Atkey22}.
+That is, given:
+
+\begin{verbatim}
+Predicate : Type
+Predicate = (pos ** neg ** (pos -> neg -> Void))
+\end{verbatim}
+
+we can recreate \texttt{DecInfo} as:
+
+\begin{verbatim}
+DecInfo : Predicate -> Type
+DecInfo (pos ** neg ** no) = Either neg pos
+\end{verbatim}
+
+This is line of investigation is on going.

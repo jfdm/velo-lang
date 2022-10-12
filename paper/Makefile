@@ -11,8 +11,7 @@ all: paper.pdf
 
 %.pdf : %.tex $(DEPENDS)
 	mkdir -p __build
-	latexmk -pdf -bibtex -outdir="__build"
-	ln -s __build/$*.pdf .
+	latexmk -pdf -bibtex -outdir="__build" $*.tex
 
 clean:
 	rm -rf __build/

@@ -1,0 +1,38 @@
+\subsection{Efficient De Bruijn Representation}
+\label{sec:design:deBruijn}
+
+\chcomment{Efficient De Bruijn Representation}
+
+A common strategy for realising well-scoped terms is to use \emph{De Bruijn} indices.
+These can be easily realised as a list quantifier indicating where in the type-level context a bound term is positioned.
+
+\begin{verbatim}
+data Elem : (type : kind) -> (types : List kind) -> Type
+  where
+    Here : Elem type (type::types)
+    There : Elem type types
+         -> Elem type (not_type :: types)
+\end{verbatim}
+
+\noindent
+Whilst a valid approach, this approach unfortunately does not scale to large contexts.
+To improve the efficiency of variable representation we use \texttt{AtIndex} to make explicit the numerical index of the element in the list.
+
+\begin{verbatim}
+data AtIndex : (x   :      type)
+            -> (xs  : List type)
+            -> (idx : Nat)
+                   -> Type
+  where
+    Here : AtIndex x (x::xs) Z
+    There : (later : AtIndex x     rest     idx)
+                  -> AtIndex x (y::rest) (S idx)
+\end{verbatim}
+
+We can then make sure that this proof is only relevent at compile time whilest retaining the numerical index itself.
+
+\begin{verbatim}
+data IsVar : (ctxt : List kind) -> (type : kind) -> Type
+  where
+    V : (pos : Nat) -> (0 prf : AtIndex type ctxt pos) -> IsVar ctxt type
+\end{verbatim}

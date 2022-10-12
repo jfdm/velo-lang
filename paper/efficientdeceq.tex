@@ -1,0 +1,38 @@
+
+\subsection{Efficient Decidable Equality}
+\label{sec:idioms:decEq}
+
+
+\chcomment{Linear (in number of cases) decidable equality}
+
+Creating a decidable equality instance (\texttt{DecEq}) over a data structure requires pairwise comparison over the structure.
+Although we can already reduce the number of contraditions using symmetry breaking (\texttt{negEqSym}), the number of cases is still many.
+We can address the complexity of \texttt{decEq} instance creation further computing a diagonal relation that ensures we are comparing the same constructors.
+
+\chcomment[id=jfdm]{The example is probably not needed, but useful to have...}
+
+\begin{verbatim}
+data Thing = Apples | Oranges
+
+data Diag : (x,y : Thing) -> Type where
+  A : Diag Apples Apples
+  O : Diag Oranges Oranges
+
+diag : (x,y : Thing) -> Maybe (Diag x y)
+diag Apples Apples = pure A
+diag Oranges Oranges = pure O
+diag _ _ = Nothing
+
+diagNot : (x : Thing) -> Not (diag x x === Nothing)
+diagNot Apples Refl impossible
+diagNot Oranges Refl impossible
+
+diagEq : Diag x y -> Dec (x === y)
+diagEq A = Yes Refl
+diagEq O = Yes Refl
+
+decEq : (x,y : Thing) -> Dec ( x === y)
+decEq x y with (diag x y) proof sim
+  decEq x y | Nothing = No (\Refl => diagNot _ sim)
+  decEq x y | (Just prf) = diagEq prf
+\end{verbatim}
