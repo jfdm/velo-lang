@@ -3,4 +3,69 @@
 \label{sec:design:constants}
 \chcomment{Compact constant folding}
 
-Exercise in \cite{Pierce:SF2} (Chapter 1)
+Software Foundations's Programming Language Foundations
+opens with a constant-folding transformation
+exercise (\cite{Pierce:SF2}, Chapter 1).
+%
+Starting from a small language of expressions containing natural numbers,
+variables, addition, subtraction, and multiplication we are to deploy the
+semiring properties to simplify expressions.
+%
+The definition of the simplifying traversal has a lot of duplicated code
+due to the way the source language is structured: all the binary operations
+are separate constructors, whose subterms need to be structurally simplified
+before we can decide whether a rule applies.
+%
+The correction proof has just as much duplication because it needs to follow
+the structure of the call graph of the function it wants to see reduce.
+%
+The only saving grace here is that Coq's tactics language lets users write
+scripts that apply to many similar goals thus avoid duplication in the source
+file.
+
+In Vélo, we structured our core language's representation in such a way that
+this duplication is never needed.
+%
+All builtin operators (from primitive operations on builtin types to function
+application itself) are represented using a single \IdrisData{Call} constructor
+which takes an operation and a type-indexed list of subterms.
+
+\begin{verbatim}
+data Term : (metas : List Meta) -> (ctxt : List Ty) -> Ty -> Type where
+  (...)
+  Call : {tys : _} ->
+         Prim tys ty ->
+         All (Term metas ctxt) tys ->
+         Term metas ctxt ty
+\end{verbatim}
+
+The primitives include
+%
+\IdrisData{Zero} which takes no argument and returns a term of type \IdrisData{TyNat},
+%
+\IdrisData{And} which takes two arguments of type \IdrisData{TyBool} and return a term
+of type \IdrisData{TyBool},
+%
+and \IdrisData{App} which takes a function and an argument of type the function's domain
+and returns a term of type the function's codomain.
+
+\begin{verbatim}
+data Prim : (args : List Ty)
+         -> (type : Ty)
+         -> Type
+  where
+    Zero  : Prim [] TyNat
+    (...)
+    And   : Prim [TyBool, TyBool] TyBool
+    (...)
+    App   : Prim [TyFunc dom cod, dom] cod
+\end{verbatim}
+
+Structural operations can now be implemented by handling
+recursive calls on \IdrisData{Call} nodes' subterms uniformly
+before dispatching on the operator to see whether additional
+simplifications can be deployed.
+
+Similarly, all of the duplication in the correction proofs is
+factored out in a single place where the induction hypotheses
+can be invoked.
