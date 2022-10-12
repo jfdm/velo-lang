@@ -1,0 +1,35 @@
+\chcomment{Whole pipeline (parser, elaborator, REPL, evaluator, compiler passes)}
+
+\jfdm{Do we need to provide the formal description of us the STLC \& our extensions sufficiently \emph{well known}?}
+
+\Velo{} is the \ac{stlc} extended with booleans and natural numbers with their respective conjunction and addition operations as primitives, together with well-scoped-typed holes to support simple interactive language design.
+Such a featherweight language helps us to better showcase how we can use dependently-typed languages as language workbenches.
+\jfdm{Do we need to evidence (through citation) benefits of featherweight languages?}
+
+\begin{verbatim}
+   let a = zero
+in let b = (inc a)
+in let c = (add a b)
+
+in let d = true
+in let e = false
+in let f = (and d e)
+
+in let foo = (fun x : nat => x)
+in (foo ?hole)
+
+\end{verbatim}
+
+We have presented \Velo{} as a complete language with a standard compilation pipeline,
+A concrete syntax is provided as a \ac{dsl}, complete with a parser to construct raw unchecked language terms.
+Type checking elaborates these raw terms into a mechanically verified set of intermediate representations in which holes and compiler optimisations are performed.
+For the final core representation we provide a verifiable evaluator to reduce terms to values.
+
+\jfdm{Would it be good to show an example high-level trace of the output?}
+
+\jfdm{Perhaps we can use this section as an outline and forward reference the latter sections?}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper"
+%%% End:

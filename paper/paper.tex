@@ -100,6 +100,8 @@ pdfa
 \definechangesauthor[color=green, name={Guillaume}]{gallais}
 \definechangesauthor[color=red, name={Edwin}]{edwin}
 
+\newcommand{\jfdm}[1]{\chcomment[id=jfdm]{#1}}
+
 \newcommand{\Velo}{V{\'e}lo\xspace}
 
 \begin{document}
@@ -170,8 +172,7 @@ that showcases how we can use languages, such as Idris, as language workbenches.
 \section{Introducing Velo}
 \label{sec:velo}
 
-\chcomment{Whole pipeline (parser, elaborator, REPL, evaluator, compiler passes)}
-
+\input{velo-intro}
 
 \section{Language Design}
 \label{sec:design}
