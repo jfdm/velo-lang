@@ -5,11 +5,11 @@ import Decidable.Equality
 %default total
 
 public export
-data IsVar : List a -> a -> Type where
-  Here : IsVar [x] x
+data IsVar : SnocList a -> a -> Type where
+  Here : IsVar [<x] x
 
 export
-Uninhabited (IsVar [] x) where
+Uninhabited (IsVar [<] x) where
   uninhabited Here impossible
 
 export

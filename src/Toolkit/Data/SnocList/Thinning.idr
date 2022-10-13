@@ -86,3 +86,16 @@ export
 ones : {sx : SnocList a} -> Thinning sx sx
 ones {sx = [<]} = Empty
 ones {sx = sx :< x} = Keep Refl ones
+
+export
+eqTh : (th : Thinning sx sa) -> (ph : Thinning sy sa) ->
+       Dec (sx === sy, th ~=~ ph)
+eqTh Empty Empty = Yes (Refl, Refl)
+eqTh (Keep Refl th) (Keep Refl ph) = case eqTh th ph of
+  Yes (Refl, Refl) => Yes (Refl, Refl)
+  No nope => No (\ (Refl, Refl) => nope (Refl, Refl))
+eqTh (Keep _ _) (Skip _) = No (\case (_, eq) impossible)
+eqTh (Skip _) (Keep _ _) = No (\case (_, eq) impossible)
+eqTh (Skip th) (Skip ph) = case eqTh th ph of
+  Yes (Refl, Refl) => Yes (Refl, Refl)
+  No nope => No (\ (Refl, Refl) => nope (Refl, Refl))

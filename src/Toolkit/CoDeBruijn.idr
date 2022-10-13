@@ -1,6 +1,6 @@
 module Toolkit.CoDeBruijn
 
-import Toolkit.Data.List.Thinning
+import Toolkit.Data.SnocList.Thinning
 import Toolkit.CoDeBruijn.Binding
 
 %default total
@@ -10,7 +10,7 @@ namespace Pair
   ||| A relevant pair is a pair that takes two values indexed by their
   ||| strict support, and returns a pair indexed by its strict support
   public export
-  data Relevant : (t, p : List a -> Type) -> (xs : List a) -> Type where
+  data Relevant : (t, p : SnocList a -> Type) -> (xs : SnocList a) -> Type where
     MkRelevant : {xs1, xs2 : _} ->
                  {th : Thinning xs1 xs} -> {ph : Thinning xs2 xs} ->
                  t xs1 -> Cover th ph -> p xs2 -> Relevant t p xs
@@ -21,9 +21,9 @@ namespace Diamond
   ||| A relevant type can be embedded in a wider scope using the Diamond
   ||| constructor. The name is a reference to modal logic's ◇.
   public export
-  record Diamond {a : Type} (t : List a -> Type) (xs : List a) where
+  record Diamond {a : Type} (t : SnocList a -> Type) (xs : SnocList a) where
     constructor MkDiamond
-    {support : List a}
+    {support : SnocList a}
     selection : Thinning {a} support xs
     selected  : t support
 
@@ -32,7 +32,7 @@ namespace Diamond
   thin (MkDiamond th tm) ph = MkDiamond (th <.> ph) tm
 
   export
-  Skip : Diamond t xs -> Diamond {a} t (x :: xs)
+  Skip : Diamond t xs -> Diamond {a} t (xs :< x)
   Skip (MkDiamond sel t) = MkDiamond (Skip sel) t
 
   export
@@ -40,7 +40,7 @@ namespace Diamond
   f <$> MkDiamond sel t = MkDiamond sel (f t)
 
   export
-  bind : Diamond p (s :: g) -> Diamond (Binding p s) g
+  bind : Diamond p (g :< s) -> Diamond (Binding p s) g
   bind (MkDiamond (Skip sel) b) = MkDiamond sel (K b)
   bind (MkDiamond (Keep Refl sel) b) = MkDiamond sel (R _ b)
 

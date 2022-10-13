@@ -5,8 +5,8 @@ import Decidable.Equality
 import Data.Maybe
 import Data.String
 
-import Toolkit.Data.List.Quantifiers
-import Toolkit.Data.List.Thinning
+import Toolkit.Data.SnocList.Quantifiers
+import Toolkit.Data.SnocList.Thinning
 
 import Toolkit.DeBruijn.Variable
 import Toolkit.DeBruijn.Context
@@ -20,7 +20,7 @@ import Velo.Types
 %default total
 
 Scoped : Type -> Type
-Scoped a = List a -> a -> Type
+Scoped a = SnocList a -> a -> Type
 
 namespace DeBruijn
 
@@ -30,7 +30,7 @@ namespace DeBruijn
   data Tm : Scoped Ty where
     V : IsVar g s -> Tm g s
     A : {s : Ty} -> Tm g (TyFunc s t) -> Tm g s -> Tm g t
-    L : Tm (g += s) t -> Tm g (s `TyFunc` t)
+    L : Tm (g :< s) t -> Tm g (s `TyFunc` t)
 
   namespace Tm
     export
@@ -40,19 +40,19 @@ namespace DeBruijn
     thin (L b) th = L (thin b (Keep Refl th))
 
   export
-  CONST : Tm [] (TyFunc TyBool $ TyFunc TyBool TyBool)
+  CONST : Tm [<] (TyFunc TyBool $ TyFunc TyBool TyBool)
   CONST = L (L (V (shift here)))
 
   export
-  ID : Tm [] (TyFunc TyBool TyBool)
+  ID : Tm [<] (TyFunc TyBool TyBool)
   ID = L (V here)
 
   export
-  SKIP : Tm [] (TyFunc TyBool $ TyFunc TyBool TyBool)
+  SKIP : Tm [<] (TyFunc TyBool $ TyFunc TyBool TyBool)
   SKIP = L (L (V here))
 
   export
-  CONSTS : Tm [] (TyFunc TyBool $ TyFunc TyBool TyBool)
+  CONSTS : Tm [<] (TyFunc TyBool $ TyFunc TyBool TyBool)
   CONSTS = A (A (A (L $ L $ L $ thin CONST none) CONST) CONST) CONST
 
 
@@ -116,8 +116,8 @@ namespace IsVar
                DeBruijn.Variable.IsVar g s ->
                Diamond (`CoDeBruijn.Variable.IsVar` s) g
   coDeBruijn v@_ with (view v)
-    coDeBruijn {g = _ :: _} v@_ | Here = MkDiamond (Keep Refl none) Here
-    coDeBruijn {g = _ :: _} v@_ | There w = Skip (coDeBruijn w)
+    coDeBruijn {g = _ :< _} v@_ | Here = MkDiamond (Keep Refl none) Here
+    coDeBruijn {g = _ :< _} v@_ | There w = Skip (coDeBruijn w)
 
   export
   deBruijn : CoDeBruijn.Variable.IsVar g s ->
@@ -143,52 +143,52 @@ namespace Tm
 namespace CoDeBruijn
 
   export
-  coDeBruijn : {s : _} -> DeBruijn.Tm [] s  -> CoDeBruijn.Tm [] s
+  coDeBruijn : {s : _} -> DeBruijn.Tm [<] s  -> CoDeBruijn.Tm [<] s
   coDeBruijn t = let (MkDiamond Empty tm) = coDeBruijn t in tm
 
   export
-  CONST : CoDeBruijn.Tm [] (TyFunc TyBool $ TyFunc TyBool TyBool)
+  CONST : CoDeBruijn.Tm [<] (TyFunc TyBool $ TyFunc TyBool TyBool)
   CONST = coDeBruijn DeBruijn.CONST
 
   export
-  SKIP : CoDeBruijn.Tm [] (TyFunc TyBool $ TyFunc TyBool TyBool)
+  SKIP : CoDeBruijn.Tm [<] (TyFunc TyBool $ TyFunc TyBool TyBool)
   SKIP = coDeBruijn DeBruijn.SKIP
 
   export
-  ID : CoDeBruijn.Tm [] (TyFunc TyBool TyBool)
+  ID : CoDeBruijn.Tm [<] (TyFunc TyBool TyBool)
   ID = coDeBruijn DeBruijn.ID
 
   export
-  CONSTS : CoDeBruijn.Tm [] (TyFunc TyBool $ TyFunc TyBool TyBool)
+  CONSTS : CoDeBruijn.Tm [<] (TyFunc TyBool $ TyFunc TyBool TyBool)
   CONSTS = coDeBruijn DeBruijn.CONSTS
 
 namespace Tm
 
   ||| abstract here (provided things match up)
   abstractH : {g, g', ctx, s, t : _} ->
-              DeBruijn.Variable.IsVar (g' ++ g) s -> Diamond (`CoDeBruijn.Tm` s) g ->
-              Diamond (`CoDeBruijn.Tm` t) (ctx ++ g) ->
-              Maybe (Diamond (`CoDeBruijn.Tm` t) (ctx ++ (g' ++ g)))
+              DeBruijn.Variable.IsVar (g <+> g') s -> Diamond (`CoDeBruijn.Tm` s) g ->
+              Diamond (`CoDeBruijn.Tm` t) (g <+> ctx) ->
+              Maybe (Diamond (`CoDeBruijn.Tm` t) ((g <+> g') <+> ctx))
   abstractH v se@(MkDiamond {support = xs@_} th se'@_) tm@(MkDiamond {support = ys} ph tm')
     with (decEq s t)
     _ | No p = Nothing
-    _ | Yes Refl with (decEq xs ys)
+    _ | Yes Refl with (eqTh (th <+> none) ph)
       _ | No p = Nothing
-      _ | Yes Refl with (decEq se' tm')
+      _ | Yes (Refl, _) with (decEq se' tm')
         _ | Yes Refl = pure (coDeBruijn (V (shifts v)))
         _ | No p = Nothing
 
-  first : {xs : List a} ->
-          ({x : a} -> DeBruijn.Variable.IsVar (xs ++ ys) x -> p x -> Maybe b) ->
+  first : {xs : SnocList a} ->
+          ({x : a} -> DeBruijn.Variable.IsVar (ys <+> xs) x -> p x -> Maybe b) ->
           All p xs -> Maybe b
-  first p [] = Nothing
-  first p (x :: xs) = p here x <|> first (p . shift) xs
+  first p [<] = Nothing
+  first p (xs :< x) = p here x <|> first (p . shift) xs
 
   export
   abstractR : {g, g', ctx, t : _} ->
               All (\ s => Diamond (`CoDeBruijn.Tm` s) g) g' ->
-              Diamond (`CoDeBruijn.Tm` t) (ctx ++ g) ->
-              Diamond (`CoDeBruijn.Tm` t) (ctx ++ (g' ++ g))
+              Diamond (`CoDeBruijn.Tm` t) (g <+> ctx) ->
+              Diamond (`CoDeBruijn.Tm` t) ((g <+> g') <+> ctx)
   abstractR ses tm = case first (\ v, se => abstractH v se tm) ses of
     Just tm => tm
     Nothing => case tm of
@@ -200,13 +200,13 @@ namespace Tm
       (MkDiamond th (L (K b))) =>
         (L . K) <$> abstractR ses (MkDiamond th b)
       (MkDiamond th (L (R x b))) =>
-        L <$> bind (abstractR {ctx = x :: ctx} ses (MkDiamond (Keep Refl th) b))
-      _ => thin tm (ones ++ Skips ones {zs = g'})
+        L <$> bind (abstractR {ctx = ctx :< x} ses (MkDiamond (Keep Refl th) b))
+      _ => thin tm (Skips ones {zs = g'} <+> ones)
 
   export
-  CSE : DeBruijn.Tm [] (TyFunc TyBool $ TyFunc TyBool TyBool)
+  CSE : DeBruijn.Tm [<] (TyFunc TyBool $ TyFunc TyBool TyBool)
   CSE =
-    let tm = abstractR {ctx = []} [MkDiamond Empty CONST] (MkDiamond Empty CONSTS) in
+    let tm = abstractR {ctx = [<]} [<MkDiamond Empty CONST] (MkDiamond Empty CONSTS) in
     let MkDiamond th f = L <$> bind tm in
     A (deBruijn f th) CONST
 
