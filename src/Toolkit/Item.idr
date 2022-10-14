@@ -3,7 +3,7 @@
 ||| Copyright : see COPYRIGHT
 ||| License   : see LICENSE
 |||
-module Toolkit.DeBruijn.Context.Item
+module Toolkit.Item
 
 import Decidable.Equality
 

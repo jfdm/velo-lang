@@ -8,8 +8,8 @@ import Toolkit.Data.List.Pointwise
 import public Toolkit.Data.List.Quantifiers
 import Toolkit.Data.SnocList.Quantifiers
 import Toolkit.Data.SnocList.Thinning
-import public Toolkit.DeBruijn.Context
 import public Toolkit.DeBruijn.Variable
+import public Toolkit.Item
 
 import Velo.Core
 import Velo.Types

@@ -15,7 +15,7 @@ import public Toolkit.Data.List.AtIndex
 import public Toolkit.Data.DList
 import Toolkit.Data.DList.AtIndex
 
-import public Toolkit.DeBruijn.Context.Item
+import public Toolkit.Item
 
 %default total
 

@@ -4,7 +4,7 @@ import Data.SnocList.Quantifiers
 import Data.String
 import Text.PrettyPrint.Prettyprinter
 
-import Toolkit.DeBruijn.Context.Item
+import Toolkit.Item
 import Toolkit.DeBruijn.Context
 import Toolkit.Data.Location
 import Velo.Types

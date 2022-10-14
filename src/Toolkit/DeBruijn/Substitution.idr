@@ -12,9 +12,9 @@ import Data.DPair
 import Toolkit.Decidable.Informative
 
 import Toolkit.DeBruijn.Variable
-import Toolkit.DeBruijn.Context.Item
 import Toolkit.DeBruijn.Context
 import Toolkit.DeBruijn.Renaming
+import Toolkit.Item
 
 %default total
 
