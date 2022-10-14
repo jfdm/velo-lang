@@ -24,17 +24,6 @@ import public Toolkit.DeBruijn.Substitution
 %default total
 
 ------------------------------------------------------------------------
--- The type of meta variables
-
-public export
-record Meta where
-  constructor MkMeta
-  metaName : Name
-  {0 metaScope : SnocList Ty}
-  metaScopeNames : All Item metaScope
-  metaType : Ty
-
-------------------------------------------------------------------------
 -- The type of well-scoped terms with meta variables
 
 public export

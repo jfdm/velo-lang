@@ -59,6 +59,12 @@ view : (v : IsMember ctxt type) -> View v
 view (V 0 Here) = Here
 view (V (S n) (There prf)) = There (V n prf)
 
+export
+lookup : {ctxt : _} -> IsMember ctxt ty -> (ty' : _ ** ty === ty')
+lookup v = case view v of
+  Here => (_ ** Refl)
+  There v => lookup v
+
 public export
 %inline
 weaken : (func : IsMember old type

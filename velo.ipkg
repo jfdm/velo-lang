@@ -23,10 +23,12 @@ modules = Velo.Types
         , Velo.IR.AST
         , Velo.IR.Holey
         , Velo.IR.Term
+        , Velo.IR.CoTerm
 
         , Velo.Elaborator.Common
         , Velo.Elaborator.Holey
         , Velo.Elaborator.Term
+        , Velo.Elaborator.CoDeBruijn
 
         , Velo.Lexer.Token
         , Velo.Lexer

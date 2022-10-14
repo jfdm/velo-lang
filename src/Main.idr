@@ -9,6 +9,7 @@ import Velo.Values
 import Velo.Semantics.Evaluation
 
 import Velo.Core
+import Velo.IR.Common
 import Velo.IR.AST
 import Velo.IR.Holey
 import Velo.IR.Term

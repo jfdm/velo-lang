@@ -1,14 +1,20 @@
 module Velo.IR.Common
 
+import Data.SnocList
 import Decidable.Equality
 
 import Velo.Types
+import public Toolkit.Item
+import Data.SnocList.Quantifiers
 
 %default total
 
 public export
 Name : Type
 Name = String
+
+------------------------------------------------------------------------
+-- The type of primitive operations
 
 public export
 data Prim : (args : List Ty)
@@ -82,3 +88,14 @@ namespace Prim
     decEq p q = case hetDecEq p q of
       Yes (_, _, eq) => Yes eq
       No neq => No (\ eq => neq (Refl, Refl, eq))
+
+------------------------------------------------------------------------
+-- The type of meta variables
+
+public export
+record Meta where
+  constructor MkMeta
+  metaName : Name
+  {0 metaScope : SnocList Ty}
+  metaScopeNames : All Item metaScope
+  metaType : Ty

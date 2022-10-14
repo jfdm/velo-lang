@@ -5,6 +5,8 @@
 |||
 module Toolkit.Item
 
+import Data.SnocList
+import Data.SnocList.Quantifiers
 import Decidable.Equality
 
 import Toolkit.Decidable.Informative
@@ -65,5 +67,11 @@ holds func key (I name type) with (decEq key name)
          (\(H Refl prf) => contra Refl)
 
 
+export
+support : All Item ctxt -> (ctxt' : _ ** ctxt === ctxt')
+support [<] = (_ ** Refl)
+support (is :< I s x)
+  = let (ctxt' ** eq) = support is in
+    (ctxt' :< x ** cong (:< x) eq)
 
 -- [ EOF ]

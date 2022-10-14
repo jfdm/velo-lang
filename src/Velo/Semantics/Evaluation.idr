@@ -5,6 +5,7 @@ import Decidable.Equality
 import Data.Fuel
 
 import Velo.Types
+import Velo.IR.Common
 import Velo.IR.Term
 import Velo.Values
 import Velo.Semantics.Reductions
