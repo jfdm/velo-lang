@@ -122,7 +122,7 @@ showTok k v = "(\{k} \{v})"
 export
 Show Token where
   show EndInput = "EOI"
-  show Colon = "EOI"
+  show Colon = "Colon"
   show (NotRecognised str)
     = showTok "NotRecognised" (show str)
   show (WS str)
@@ -163,7 +163,7 @@ Lexer = MkLexer Commands.tokenMap keep EndInput
 public export
 data Error = ExpectedOption
            | ArgsEmpty (List (WithBounds Token))
-           | ToksExpected
+           | ToksExpected (List OptDesc)
            | WrongName (List String)
            | IsVoid
            | ColonExpected
@@ -197,7 +197,7 @@ processArgs [] xs
   = Left (ArgsEmpty (xs))
 
 processArgs (x :: xs) []
-  = Left ToksExpected
+  = Left (ToksExpected (x::xs))
 
 processArgs (x :: xs) (y :: ys) with (view x y)
   processArgs ((REQ _) :: xs) ((MkBounded (CmdTok a) l q) :: ys) | (IsOptReq a)
@@ -257,7 +257,7 @@ hasCorrectName : (ns : List String)
                     -> DecInfo Error
                                (Any (\x => HasName x tok) ns)
 hasCorrectName [] tok
-  = No ToksExpected absurd
+  = No NameExpected absurd
 hasCorrectName (x :: xs) tok with (any (\x => hasName x tok) (x::xs))
   hasCorrectName (x :: xs) tok | (Yes prf)
     = Yes prf

@@ -48,7 +48,7 @@ export
 Show Commands.Error where
   show ExpectedOption = "Option Expected"
   show (ArgsEmpty cds) = "There are more arguments required.\n\t:\{show $ map (\(MkBounded t l w) => show t) cds}"
-  show ToksExpected = "There are more tokens to process."
+  show (ToksExpected xs) = "Missing arguments:\n\t \{show xs}"
   show (WrongName strs) = "The name must be one of:\n\t \{show strs}"
   show IsVoid = "Missing colon and/or argument name."
   show ColonExpected = "Commands begin with a colon."
@@ -59,9 +59,11 @@ Show Commands.Error where
 
 show : CommandDesc a -> String
 show cmd
-    = unwords [unwords (forget $ name cmd)
-              , maybe "" (unwords . map show . forget) (argsDesc cmd)
-              , maybe "" id (help cmd)]
+    = unlines [unwords ["[\{concat $ intersperse "," (forget $ name cmd)}]"
+                       , maybe "" (unwords . map show . forget) (argsDesc cmd)
+                       ]
+              , "\t" <+> maybe "" id (help cmd)
+              ]
 
 export
 processCommand : String
