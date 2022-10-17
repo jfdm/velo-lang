@@ -1,0 +1,10 @@
+echo "Running Test"
+
+$1 --repl < input
+
+
+# Local Variables:
+# mode: sh
+# End:
+
+# -- [ EOF ]

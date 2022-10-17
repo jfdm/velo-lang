@@ -1,0 +1,5 @@
+:holes
+:help
+:load main.velo
+:t c
+:holes

@@ -1,0 +1,33 @@
+Running Test
+Velo> Need to load a file.
+Velo> [:q,:quit,:exit] 
+	Exit the REPL.
+[:?,:h,:help] 
+	Show the list of available commands.
+[:holes] 
+	Show the current list of holes.
+[:hole_type,:t] [name]
+	Show the specified hole.
+[:load,:l] [file]
+	Load a program.
+
+Velo> # Finished Parsing
+# Finished Type-Checking
+Velo> a : Nat
+b : Nat
+c : Nat
+----------
+?c : Nat
+
+Velo> a : Nat
+----------
+?a : Nat
+
+a : Nat
+b : Nat
+c : Nat
+----------
+?c : Nat
+
+Velo> Not a recognised command.
+"File expected."
