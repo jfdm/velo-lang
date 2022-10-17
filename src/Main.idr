@@ -52,8 +52,8 @@ mainRug
            => do when (justCheck opts)
                    $ exitSuccess
 
-                 putStrLn "# Executing"
                  v <- eval tm
+                 putStrLn "# Finished Executing"
 
                  prettyComputation v
                  putStrLn "# Finished"

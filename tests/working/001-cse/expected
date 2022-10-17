@@ -1,7 +1,7 @@
 Running Test
 # Finished Parsing
 # Finished Type Checking
-# Executing
+# Finished Executing
 ```
 apply (fun apply (fun apply (fun apply (fun 0)
                                        (add 1 0))
