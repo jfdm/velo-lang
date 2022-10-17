@@ -11,16 +11,18 @@ record Opts where
   constructor O
   justLex   : Bool
   justCheck : Bool
+  repl      : Bool
   file      : Maybe String
 
 Show Opts where
-  show (O l c f)
-    = "O \{show l} \{show c} \{show f}"
+  show (O l c r f)
+    = "O \{show l} \{show c} \{show r} \{show f}"
 
 Eq Opts where
   (==) x y
     =  justLex x   == justLex y
     && justCheck x == justCheck y
+    && repl x      == repl y
     && file x      == file y
 
 convOpts : Arg -> Opts -> Maybe Opts
@@ -33,6 +35,8 @@ convOpts (KeyValue k v) o
 
 convOpts (Flag x) o
   = case x of
+      "repl"
+        => Just $ { repl := True} o
       "lexOnly"
         => Just $ { justLex := True} o
       "checkOnly"
@@ -40,7 +44,7 @@ convOpts (Flag x) o
       otherwise => Nothing
 
 defOpts : Opts
-defOpts = O False False Nothing
+defOpts = O False False False Nothing
 
 export
 getOpts : Velo Opts

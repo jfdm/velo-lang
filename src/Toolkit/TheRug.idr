@@ -26,6 +26,7 @@ import Toolkit.Data.Location
 import Toolkit.Text.Lexer.Run
 
 import Toolkit.Options.ArgParse
+import Toolkit.Commands
 
 import Toolkit.Data.DList
 import Toolkit.Decidable.Informative
@@ -361,6 +362,30 @@ namespace Cheap
 
                                 (f val))
            pure res
+
+namespace REPL
+  ||| Adapted from `System.REPL`
+  |||
+  ||| We assume that `onInput` exits cleanly...
+  covering export
+  repl : (prompt  : String)
+      -> (state   : a)
+      -> (onInput : (state : a)
+                 -> (str   : String)
+                          -> TheRug e a)
+                 -> TheRug e ()
+  repl prompt state onInput
+    = do eof <- fEOF stdin
+         if eof
+           then pure ()
+           else do putStr prompt
+                   putStr " " -- intentional
+                   fflush stdout
+
+                   str <- getLine
+                   new_state <- onInput state str
+
+                   repl prompt new_state onInput
 
 
 

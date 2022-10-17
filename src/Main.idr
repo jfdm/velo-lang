@@ -21,42 +21,87 @@ import Velo.Elaborator
 import Velo.Eval
 import Velo.Trace
 import Velo.Options
+import Velo.Commands
+
+namespace Velo
+  export
+  pipeline : Opts -> Velo ()
+  pipeline opts
+    = do fname <- embed
+                    (Generic "File expected.")
+                    (file opts)
+
+         when (justLex opts)
+           $ do toks <- lexFile fname
+                putStrLn (show @{veloWBs} toks)
+                exitSuccess
+
+         ast <- fromFile fname
+         putStrLn "# Finished Parsing"
+
+         res <- elab ast
+
+         putStrLn "# Finished Type Checking"
+
+         case res of
+           HasHoles metas prf
+             => do prettyMetas metas
+                   exitSuccess
+
+           ClosedTerm type tm ItIsEmpty
+             => do when (justCheck opts)
+                     $ exitSuccess
+
+                   v <- eval tm
+                   putStrLn "# Finished Executing"
+
+                   prettyComputation v
+                   putStrLn "# Finished"
+
+  State : Type
+  State = ()
+
+  MkState : State
+  MkState = ()
+
+  export
+  repl : Velo ()
+  repl = repl "Velo>" MkState onInput
+    where
+      todo : State -> Velo State
+      todo st = do putStrLn "Not Yet Implemented"
+                   pure st
+
+      process : State -> Cmd -> Velo State
+      process st Quit
+        = do putStrLn "Quitting, Goodbye."
+             exitSuccess
+
+      process st Help
+        = do putStrLn helpStr
+             pure st
+
+      process st Holes = todo st
+      process st (TypeOfHole str)
+        = todo st
+
+      onInput : () -> String -> Velo ()
+      onInput st str
+        = do Right cmd <- processCommand str
+                | Left err => do putStrLn "REPL Error"
+                                 printLn err
+                                 pure st
+
+             process st cmd
 
 
 mainRug : Velo ()
 mainRug
   = do opts <- getOpts
 
-       fname <- embed
-                  (Generic "File expected.")
-                  (file opts)
+       when (repl opts) $ Velo.repl
 
-       when (justLex opts)
-         $ do toks <- lexFile fname
-              putStrLn (show @{veloWBs} toks)
-              exitSuccess
-
-       ast <- fromFile fname
-       putStrLn "# Finished Parsing"
-
-       res <- elab ast
-
-       putStrLn "# Finished Type Checking"
-
-       case res of
-         HasHoles metas prf
-           => do prettyMetas metas
-                 exitSuccess
-
-         ClosedTerm type tm ItIsEmpty
-           => do when (justCheck opts)
-                   $ exitSuccess
-
-                 v <- eval tm
-                 putStrLn "# Finished Executing"
-
-                 prettyComputation v
-                 putStrLn "# Finished"
+       pipeline opts
 
 main : IO ()
 main
