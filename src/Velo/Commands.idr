@@ -60,11 +60,11 @@ Show Commands.Error where
 
 show : CommandDesc a -> String
 show cmd
-    = unlines [unwords ["[\{concat $ intersperse "," (forget $ name cmd)}]"
-                       , maybe "" (unwords . map show . forget) (argsDesc cmd)
-                       ]
-              , "\t" <+> maybe "" id (help cmd)
-              ]
+    = trim $ unlines [unwords ["[\{concat $ intersperse "," (map (":" <+>) $ forget $ name cmd)}]"
+                              , maybe "" (unwords . map show . forget) (argsDesc cmd)
+                              ]
+                     , "\t" <+> maybe "" id (help cmd)
+                     ]
 
 export
 helpStr : String
