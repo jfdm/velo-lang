@@ -59,3 +59,5 @@ lexFile lexer fname = do
   case lexString lexer str of
         Left err => pure $ Left (LError ({ location->source := Just fname } err))
         Right toks => pure (Right toks)
+
+-- [ EOF ]

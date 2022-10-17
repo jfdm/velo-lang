@@ -21,8 +21,6 @@ import Velo.Eval
 import Velo.Trace
 import Velo.Options
 
-showToks : (List (WithBounds Token)) -> List String
-showToks = map (\(MkBounded t _ _) => show t)
 
 mainRug : Velo ()
 mainRug
@@ -34,7 +32,7 @@ mainRug
 
        when (justLex opts)
          $ do toks <- lexFile fname
-              putStrLn $ unwords (showToks toks)
+              putStrLn (show @{veloWBs} toks)
               exitSuccess
 
        ast <- fromFile fname

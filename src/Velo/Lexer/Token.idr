@@ -3,6 +3,8 @@
 |||
 module Velo.Lexer.Token
 
+import Text.Bounded
+
 %default total
 
 public export
@@ -40,6 +42,14 @@ Show Token where
   show (WS ws) = "WS"
   show (NotRecognised s) = showToken "Urgh" s
   show EndInput          = "EndInput"
+
+export
+[veloWB] Show a => Show (WithBounds a) where
+  show (MkBounded t _ _) = show t
+
+export
+[veloWBs] Show (List (WithBounds Token)) where
+  show ts = show $ map (show @{veloWB} ) ts
 
 export
 Eq Token where
