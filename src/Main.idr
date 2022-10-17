@@ -66,7 +66,7 @@ namespace Velo
 
   export
   repl : Velo ()
-  repl = repl "Velo>" MkState onInput
+  repl = repl "Velo>" commands MkState process printLn
     where
       todo : State -> Velo State
       todo st = do putStrLn "Not Yet Implemented"
@@ -85,14 +85,6 @@ namespace Velo
       process st (TypeOfHole str)
         = todo st
 
-      onInput : () -> String -> Velo ()
-      onInput st str
-        = do Right cmd <- processCommand str
-                | Left err => do putStrLn "REPL Error"
-                                 printLn err
-                                 pure st
-
-             process st cmd
 
 
 mainRug : Velo ()

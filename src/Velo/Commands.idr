@@ -17,6 +17,7 @@ data Cmd = Quit
          | Holes
          | TypeOfHole String
 
+export
 commands : Commands Cmd
 commands
   = setCommands
@@ -64,12 +65,6 @@ show cmd
                        ]
               , "\t" <+> maybe "" id (help cmd)
               ]
-
-export
-processCommand : String
-              -> Velo (Either Commands.Error Cmd)
-processCommand str
-  = pure $ processCommand commands str
 
 export
 helpStr : String

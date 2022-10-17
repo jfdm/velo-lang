@@ -387,6 +387,33 @@ namespace REPL
 
                    repl prompt new_state onInput
 
+  namespace Command
+
+    covering export
+    repl : (prompt  : String)
+        -> (cmds    : Commands c)
+        -> (state   : a)
+        -> (onInput : (state : a)
+                   -> (str   : c)
+                            -> TheRug e a)
+        -> (onErr : Commands.Error -> TheRug e ())
+                   -> TheRug e ()
+    repl prompt cmds state onInput onErr
+      = do eof <- fEOF stdin
+           if eof
+             then pure ()
+             else do putStr prompt
+                     putStr " " -- intentional
+                     fflush stdout
+
+                     str <- getLine
+
+                     case processCommand cmds str of
+                       Left err => do onErr err
+                                      repl prompt cmds state onInput onErr
+                       Right cmd
+                         => do nst <- onInput state cmd
+                               repl prompt cmds nst onInput onErr
 
 
 -- [ EOF ]
