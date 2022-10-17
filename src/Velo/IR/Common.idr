@@ -3,6 +3,8 @@ module Velo.IR.Common
 import Data.SnocList
 import Decidable.Equality
 
+import Data.List.Quantifiers
+
 import Velo.Types
 import public Toolkit.Item
 import Data.SnocList.Quantifiers
@@ -99,3 +101,42 @@ record Meta where
   {0 metaScope : SnocList Ty}
   metaScopeNames : All Item metaScope
   metaType : Ty
+
+public export
+data HasName : Name -> Meta -> Type where
+  HN : (prf : x = y)
+    -> HasName x (MkMeta y ns type)
+
+hasName : (n : Name)
+       -> (m : Meta)
+            -> Dec (HasName n m)
+hasName n m with (decEq n (metaName m))
+  hasName n (MkMeta metaName metaScopeNames metaType) | (Yes prf)
+    = Yes (HN prf)
+  hasName n m | (No no)
+    = No (\(HN Refl) => no Refl)
+
+-- TODO Move ElemP from other project...
+get : (n : Name) -> (ms : List Meta) -> Dec (Any (HasName n) ms)
+get n ms with (any (hasName n) ms)
+  get n ms | (Yes prf)
+    = Yes prf
+  get n ms | (No contra)
+    = No contra
+
+extract : (ms : List Meta) -> List.Quantifiers.Any.Any (HasName n) ms -> Meta
+extract (x :: xs) (Here a)
+  = x
+extract (x :: xs) (There ltr)
+  = extract xs ltr
+
+export
+getByName : (n  : String)
+         -> (ms : List Meta)
+         -> Maybe Meta
+getByName n ms
+  = case get n ms of
+      No _ => Nothing
+      Yes prf => Just (extract ms prf)
+
+-- [ EOF ]

@@ -8,6 +8,7 @@ import Velo.Types
 import Velo.Values
 import Velo.Semantics.Evaluation
 
+import Velo.Error.Pretty
 import Velo.Core
 import Velo.IR.Common
 import Velo.IR.AST
@@ -26,11 +27,12 @@ import Velo.Commands
 %default total
 
 
-State : Type
-State = ()
+record State where
+  constructor MkSt
+  file : Maybe ElabResult
 
-MkState : State
-MkState = ()
+defState : State
+defState = MkSt Nothing
 
 todo : State -> Velo State
 todo st = do putStrLn "Not Yet Implemented"
@@ -45,14 +47,49 @@ process st Help
   = do putStrLn helpStr
        pure st
 
-process st Holes = todo st
+process st Holes
+  = case (file st) of
+
+      Just (ClosedTerm _ _ _)
+        => do putStrLn "No holes"
+              pure st
+
+      Just (HasHoles ms _)
+        => do prettyMetas ms
+              pure st
+      Nothing
+        => do putStrLn "Need to load a file."
+              pure st
+
 process st (TypeOfHole str)
-  = todo st
+  = case (file st) of
+
+      Just (ClosedTerm _ _ _)
+        => do putStrLn "No holes"
+              pure st
+
+      Just (HasHoles ms _)
+        => do let m = getByName str ms
+              printLn (pretty {ann = ()} m)
+              pure st
+      Nothing
+        => do putStrLn "Need to load a file."
+              pure st
+
+process st (Load str)
+  = tryCatch (do ast <- fromFile str
+                 putStrLn "# Finished Parsing"
+                 res <- elab ast
+                 putStrLn "# Finished Type-Checking"
+                 pure ({ file := Just res} st)
+                 )
+             (\err => do printLn err
+                         pure st)
 
 export covering
 repl : Velo ()
 repl
-  = repl "Velo>" commands MkState process printLn
+  = repl "Velo>" commands defState process printLn
 
 
 

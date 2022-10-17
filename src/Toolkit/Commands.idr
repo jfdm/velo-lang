@@ -143,7 +143,7 @@ tokenMap : TokenMap Commands.Token
 tokenMap
   = with List [ (space, WS)
               , (is ':', const Colon)
-              , (alphaNums <|> symbols, CmdTok)
+              , (someUntil space any, CmdTok)
               , (any, NotRecognised)
               ]
 

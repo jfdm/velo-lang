@@ -15,6 +15,7 @@ public export
 data Cmd = Quit
          | Help
          | Holes
+         | Load String
          | TypeOfHole String
 
 export
@@ -38,6 +39,10 @@ commands
                  (options [REQ "name"])
                  TypeOfHole
                  "Show the specified hole."
+    , newCommand (names ["load", "l"])
+                 (options [REQ "file"])
+                 Load
+                 "Load a program."
     ]
 
 export

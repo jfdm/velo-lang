@@ -2,7 +2,7 @@ module Velo.Trace
 
 import Data.SnocList.Quantifiers
 import Data.String
-import Text.PrettyPrint.Prettyprinter
+import public Text.PrettyPrint.Prettyprinter
 
 import Toolkit.Item
 import Toolkit.DeBruijn.Context
