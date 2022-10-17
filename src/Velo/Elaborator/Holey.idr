@@ -109,3 +109,6 @@ synth scp (App fc f t)
 synth scp (The fc ty t)
   = do (holes ** t) <- check scp ty t
        pure (ty ** holes ** t)
+
+
+-- [ EOF ]

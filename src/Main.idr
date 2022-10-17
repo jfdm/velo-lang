@@ -17,6 +17,7 @@ import Velo.Parser
 import Velo.Lexer
 import Velo.Elaborator.Holey
 import Velo.Elaborator.Term
+import Velo.Elaborator
 import Velo.Eval
 import Velo.Trace
 import Velo.Options
@@ -38,20 +39,22 @@ mainRug
        ast <- fromFile fname
        putStrLn "# Finished Parsing"
 
-       (ty ** holes ** t) <- synth [<] ast
-       let (metas ** inv) = initInvariant [<] holes
-       let t = wscoped t inv
+       res <- elab ast
+
        putStrLn "# Finished Type Checking"
 
-       case metas of
-         (_ :: _) => do prettyMetas metas
-                        exitSuccess
-         []
+       case res of
+         HasHoles metas prf
+           => do prettyMetas metas
+                 exitSuccess
+
+         ClosedTerm type tm ItIsEmpty
            => do when (justCheck opts)
                    $ exitSuccess
 
                  putStrLn "# Executing"
-                 v <- eval t
+                 v <- eval tm
+
                  prettyComputation v
                  putStrLn "# Finished"
 
