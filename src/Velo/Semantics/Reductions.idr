@@ -9,18 +9,19 @@ import Velo.Values
 
 %default total
 
-data Reduxes : (these, those : All (Term [] ctxt) tys) -> Type
-data Redux : (this,that : Term [] ctxt type) -> Type
+data Reduxes : {tys : List Ty} -> (these, those : All (Term metas ctxt) tys) -> Type
+data Redux : (this,that : Term metas ctxt type) -> Type
 
 infixr 7 !:
 
 public export
-data Reduxes : (these, those : All (Term [] ctxt) tys)
+data Reduxes :{tys : List Ty} -> (these, those : All (Term metas ctxt) tys)
             -> Type
   where
 
-    (!:) : (hd : Redux this that)
-        -> (rest : All (Term [] ctxt) tys)
+    (!:) : {0 tys : List Ty}
+        -> (hd : Redux this that)
+        -> (rest : All (Term metas ctxt) tys)
         -> Reduxes (this :: rest) (that :: rest)
 
     (::) : (value : Value hd)
@@ -28,7 +29,7 @@ data Reduxes : (these, those : All (Term [] ctxt) tys)
         -> Reduxes (hd :: these) (hd :: those)
 
 public export
-data Redux : (this,that : Term [] ctxt type)
+data Redux : (this,that : Term metas ctxt type)
           -> Type
   where
 
@@ -60,21 +61,21 @@ data Redux : (this,that : Term [] ctxt type)
                         (Call False [])
 
 
-    ReduceFuncApp : {body : Term [] (ctxt :< type) return}
-                 -> {var  : Term [] ctxt type}
+    ReduceFuncApp : {body : Term metas (ctxt :< type) return}
+                 -> {var  : Term metas ctxt type}
                  -> Value var
                           -> Redux (Call App [Fun body, var])
                                    (Single.subst var body)
 
 public export
-data Reduces : (this : Term [] ctxt type)
-            -> (that : Term [] ctxt type)
+data Reduces : (this : Term metas ctxt type)
+            -> (that : Term metas ctxt type)
             -> Type
   where
-    Refl  : {this : Term [] ctxt type}
+    Refl  : {this : Term metas ctxt type}
                  -> Reduces this this
 
-    Trans : {this, that, end : Term [] ctxt type}
+    Trans : {this, that, end : Term metas ctxt type}
          -> Redux this that
          -> Reduces that end
          -> Reduces this end

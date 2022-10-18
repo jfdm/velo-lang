@@ -36,11 +36,11 @@ isValuePrim False = Left False
 isValuePrim And = Right And
 isValuePrim App = Right App
 
-data Values : (args : All (Term [] ctxt) tys) -> Type
-data Value : (term : Term [] ctxt type) -> Type
+data Values : {0 tys : List Ty} -> (args : All (Term metas ctxt) tys) -> Type
+data Value : (term : Term metas ctxt type) -> Type
 
 public export
-data Values : (args : All (Term [] ctxt) tys)
+data Values : {0 tys : List Ty} -> (args : All (Term metas ctxt) tys)
            -> Type
   where
 
@@ -50,9 +50,11 @@ data Values : (args : All (Term [] ctxt) tys)
         -> Values (t :: ts)
 
 public export
-data Value : (term : Term [] ctxt type)
+data Value : (term : Term metas ctxt type)
           -> Type
   where
+    Met : Value (Met m sg)
+
     Fun : Value (Fun body)
 
     Call : (prim : ValuePrim op)

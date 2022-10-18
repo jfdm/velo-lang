@@ -10,7 +10,7 @@ import Velo.Core
 
 export
 eval : {type : Ty}
-    -> (this : Term [] [<] type)
+    -> (this : Term metas [<] type)
             -> Velo (Result this)
 eval this
   = maybe (throw (Eval OOF))

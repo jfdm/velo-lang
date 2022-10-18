@@ -29,16 +29,33 @@ ty d (TyFunc x y)
 var : IsVar ctxt type -> Doc ann
 var (V pos prf) = pretty pos
 
-meta : (metas : List Meta) -> (n : Nat) -> (0 _ : AtIndex _ metas n) -> Doc ann
-meta (m :: _) 0 p = "?" <+> pretty m.metaName
-meta (_ :: metas) (S n) (There p) = meta metas n p
-
 velo : {metas : _} -> Prec -> Term metas ctxt type -> Doc ann
+velos : {metas : _} -> All Item tys -> Subst metas ctxt tys -> Doc ann
+
+meta : {metas : _} ->
+       (ms : List Meta) -> (n : Nat) -> (0 _ : AtIndex m ms n) ->
+       Subst metas ctxt m.metaScope ->
+       Doc ann
+meta (MkMeta nm {metaScope} nms ty  :: _) 0 Here sg
+  = let hole = "?" <+> pretty nm in
+    case nms of
+      [<] => hole
+      _ => hole <++> velos nms sg
+meta (_ :: metas) (S n) (There p) sg = meta metas n p sg
+
+velos nms sg = "{" <+> go nms sg <+> "}" where
+
+  go : forall tys. All Item tys -> Subst metas ctxt tys -> Doc ann
+  go [<] [<] = ""
+  go [<I x _] [<t] = pretty x <++> "=" <++> velo Open t
+  go (nms :< I x _) (sg :< t)
+    = go nms sg <+> "," <++> pretty x <++> "=" <++> velo Open t
+
 velo d (Var prf)
   = var prf
 
-velo d (Met (V n p) th)
-  = meta metas n p
+velo d (Met (V n p) sg)
+  = meta metas n p sg
 
 velo d (Fun body)
 
@@ -90,7 +107,7 @@ showRedux (SimplifyCall App (_ :: var !: _)) = "Simplify Application Variable by
 showRedux (ReduceFuncApp x) = "Reduce Application"
 
 
-wrap : {type : Ty} -> Term [] [<] type -> Doc ()
+wrap : {metas, type : _} -> Term metas [<] type -> Doc ()
 wrap {type} tm
   = vcat [ pretty "```"
          , pretty tm
@@ -98,7 +115,7 @@ wrap {type} tm
          ]
 
 
-showSteps : {ty : Ty} -> {a,b : Term [] [<] ty} -> Reduces a b -> List (Doc ())
+showSteps : {metas, ty : _} -> {a,b : Term metas [<] ty} -> Reduces a b -> List (Doc ())
 showSteps {a = a} {b = a} Refl
   = [wrap a]
 
@@ -106,8 +123,8 @@ showSteps {a = a} {b = b} (Trans x y)
   = wrap a :: (pretty $ "### " <+> showRedux x) :: showSteps y
 
 export
-prettyComputation : {ty : Ty}
-                 -> {term : Term [] [<] ty}
+prettyComputation : {metas, ty : _}
+                 -> {term : Term metas [<] ty}
                  -> (res  : Result term)
                          -> Velo ()
 prettyComputation {term = term} (R that val steps)

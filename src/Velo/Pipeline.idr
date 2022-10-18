@@ -44,19 +44,16 @@ pipeline opts
 
        putStrLn "# Finished Type Checking"
 
-       case res of
-         HasHoles metas prf
-           => do prettyMetas metas
-                 exitSuccess
+       unless (null res.metas) $
+         prettyMetas res.metas
 
-         ClosedTerm type tm ItIsEmpty
-           => do when (justCheck opts)
-                   $ exitSuccess
+       when (justCheck opts)
+         $ exitSuccess
 
-                 v <- eval tm
-                 putStrLn "# Finished Executing"
+       v <- eval res.term
+       putStrLn "# Finished Executing"
 
-                 prettyComputation v
-                 putStrLn "# Finished"
+       prettyComputation v
+       putStrLn "# Finished"
 
 -- [ EOF ]

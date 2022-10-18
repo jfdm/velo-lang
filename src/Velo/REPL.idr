@@ -50,11 +50,11 @@ process st Help
 process st Holes
   = case (file st) of
 
-      Just (ClosedTerm _ _ _)
+      Just (MkElabResult [] _)
         => do putStrLn "No holes"
               pure st
 
-      Just (HasHoles ms _)
+      Just (MkElabResult ms _)
         => do prettyMetas ms
               pure st
       Nothing
@@ -64,11 +64,11 @@ process st Holes
 process st (TypeOfHole str)
   = case (file st) of
 
-      Just (ClosedTerm _ _ _)
+      Just (MkElabResult [] _)
         => do putStrLn "No holes"
               pure st
 
-      Just (HasHoles ms _)
+      Just (MkElabResult ms _)
         => do let m = getByName str ms
               printLn (pretty {ann = ()} m)
               pure st

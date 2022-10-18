@@ -45,9 +45,11 @@ nonEmpty (x :: xs)
   = Yes IsNonEmpty
 
 public export
-data ElabResult : Type where
-  HasHoles : (ms : List Meta) -> NonEmpty ms -> ElabResult
-  ClosedTerm : (type : Ty) -> Term ms [<] type -> IsEmpty ms -> ElabResult
+record ElabResult where
+  constructor MkElabResult
+  {ty : Ty}
+  metas : List Meta
+  term : Term metas [<] ty
 
 export
 elab : Raw
@@ -56,11 +58,6 @@ elab ast
   = do (ty ** holes ** t) <- synth [<] ast
        let (metas ** inv) = initInvariant [<] holes
        let t = wscoped t inv
-
-       case nonEmpty metas of
-         (Yes IsNonEmpty)
-           => pure (HasHoles metas IsNonEmpty)
-         (No prf contra)
-           => pure (ClosedTerm ty t prf)
+       pure (MkElabResult metas t)
 
 -- [ EOF ]

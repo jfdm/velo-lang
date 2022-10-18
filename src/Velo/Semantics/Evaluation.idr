@@ -13,16 +13,16 @@ import Velo.Semantics.Progress
 
 %default total
 
-data Finished : (term : Term [] ctxt type)
+data Finished : (term : Term metas ctxt type)
                      -> Type
   where
-    Normalised : {term : Term [] ctxt type}
+    Normalised : {term : Term metas ctxt type}
                       -> Value term
                       -> Finished term
     OOF : Finished term
 
-data Evaluate : (term : Term [] [<] type) -> Type where
-  RunEval : {this, that : Term [] [<] type}
+data Evaluate : (term : Term metas [<] type) -> Type where
+  RunEval : {this, that : Term metas [<] type}
          -> (steps      : Inf (Reduces this that))
          -> (result     : Finished that)
                        -> Evaluate this
@@ -30,7 +30,7 @@ data Evaluate : (term : Term [] [<] type) -> Type where
 
 evaluate : {type : Ty}
         -> (fuel : Fuel)
-        -> (term : Term [] [<] type)
+        -> (term : Term metas [<] type)
                 -> Evaluate term
 evaluate Dry term
   = RunEval Refl OOF
@@ -42,15 +42,15 @@ evaluate (More fuel) term with (progress term)
       = RunEval (Trans step steps) result
 
 public export
-data Result : (term : Term [] [<] type) -> Type where
-  R : (that : Term [] [<] type)
+data Result : (term : Term metas [<] type) -> Type where
+  R : (that : Term metas [<] type)
    -> (val   : Value that)
    -> (steps : Reduces this that)
               -> Result this
 
 export covering
 eval : {type : Ty}
-   -> (this : Term [] [<] type)
+   -> (this : Term metas [<] type)
            -> Maybe (Result this)
 eval this with (evaluate forever this)
   eval this | (RunEval steps (Normalised {term} x))
