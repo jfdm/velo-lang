@@ -28,7 +28,7 @@ The \IdrisData{There} constructor skips past the most local one to look for
 the variable of interest in the rest of the context.
 
 Whilst a valid definition, this approach unfortunately does not scale to
-large contexts: every `Elem` proof is linear in the size of the de Bruijn
+large contexts: every \IdrisType{Elem} proof is linear in the size of the de Bruijn
 index that it represents.
 %
 To improve the runtime efficiency of the representation we instead opt to
@@ -63,5 +63,5 @@ data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type
 
 \todo{Talk about smart constructors \& views?}
 
-We now have the best of both worlds: a well-scoped notion of de Bruij indices
+We now have the best of both worlds: a well-scoped notion of de Bruijn indices
 that is guaranteed to be compiled efficiently.
