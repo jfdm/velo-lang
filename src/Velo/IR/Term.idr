@@ -122,9 +122,18 @@ namespace Term
   decEqHeadSim : {0 t, u : Term metas ctxt ty} -> HeadSim t u -> Dec (t === u)
 
   decEqHeadSim (Var v w) = decEqCong (decEq v w)
+
+  decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v th w ph) with (decEqHet v w)
+    _ | No neq = No (\ Refl => neq (Refl, Refl))
+    decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v th v ph)
+      | Yes (Refl, Refl) with (eqTh th ph)
+        _ | No neq = No (\ Refl => neq (Refl, Refl))
+        _ | Yes (_, eq) = Yes (cong (Met v) eq)
+
   decEqHeadSim (Fun t u) with (decEqTerm t u)
     _ | Yes eq = Yes (cong Fun eq)
     _ | No neq = No (\case Refl => neq Refl)
+
   decEqHeadSim (Call tys uys p ts q us) with (hetDecEq p q)
     decEqHeadSim (Call tys .(tys) p ts .(p) us) | Yes (Refl, Refl, Refl)
       = decEqCong (decEqTerms ts us)
