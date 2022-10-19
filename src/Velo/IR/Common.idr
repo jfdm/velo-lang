@@ -65,7 +65,7 @@ namespace Prim
   headSimFullDiag And = absurd
   headSimFullDiag App = absurd
 
-  export
+  public export
   hetDecEq : {tys1, tys2 : List Ty} ->
              (p : Prim tys1 ty1) -> (q : Prim tys2 ty2) ->
              Dec (tys1 === tys2, ty1 === ty2, p ~=~ q)
@@ -85,7 +85,7 @@ namespace Prim
           _ | (_, No neq2) = No (\case (Refl, _, _) => neq2 Refl)
       _ | Nothing = No (\ (Refl, Refl, Refl) => headSimFullDiag _ hdSim)
 
-  export
+  public export
   {tys : List Ty} -> DecEq (Prim tys ty) where
     decEq p q = case hetDecEq p q of
       Yes (_, _, eq) => Yes eq

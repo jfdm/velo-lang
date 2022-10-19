@@ -53,3 +53,7 @@ data CoSubst : (metas : List Meta) -> (ctxt : SnocList Ty) -> SnocList Ty -> Typ
            (\ ctxt => CoTerm metas ctxt ty)
            ctxt ->
          CoSubst metas ctxt (tys :< ty)
+
+export
+DecEq (CoTerm metas ctxt ty) where
+  decEq = ?todo_deceq_coterm
