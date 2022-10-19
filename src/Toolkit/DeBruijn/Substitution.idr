@@ -21,27 +21,27 @@ import Toolkit.Item
 namespace General
   public export
   interface Rename type term
-         => Substitute (type : Type)
-                       (term : SnocList type -> type -> Type)
+         => Substitute (0 type : Type)
+                       (0 term : SnocList type -> type -> Type)
                              | term
     where
 
-      subst : {old, new : SnocList type}
-           -> (f : {ty  : type}
+      subst : {0 old, new : SnocList type}
+           -> (f : {0 ty  : type}
                        -> IsVar old ty
                        -> term  new ty)
-           -> ({ty : type}
+           -> ({0 ty : type}
                   -> term old ty
                   -> term new ty)
 
 namespace Single
   %inline
-  apply : {type : Type}
-       -> {term : SnocList type -> type -> Type}
+  apply : {0 type : Type}
+       -> {0 term : SnocList type -> type -> Type}
        -> Rename type term
-       => {ctxt   : SnocList type}
-       -> {typeA  : type}
-       -> {typeB  : type}
+       => {0 ctxt   : SnocList type}
+       -> {0 typeA  : type}
+       -> {0 typeB  : type}
        -> (this   : term   ctxt    typeB)
        -> (idx    : IsVar (ctxt :< typeB) typeA)
                  -> term   ctxt           typeA
@@ -50,13 +50,13 @@ namespace Single
     _ | There w = embed w
 
   export
-  subst : {type : Type}
-       -> {term : SnocList type -> type -> Type}
+  subst : {0 type : Type}
+       -> {0 term : SnocList type -> type -> Type}
        -> Rename type term
        => Substitute type term
-       => {ctxt          : SnocList type}
-       -> {typeA         : type}
-       -> {typeB         : type}
+       => {0 ctxt          : SnocList type}
+       -> {0 typeA         : type}
+       -> {0 typeB         : type}
        -> (this          : term  ctxt           typeB)
        -> (inThis        : term (ctxt :< typeB) typeA)
                         -> term  ctxt           typeA
@@ -67,11 +67,11 @@ namespace Double
 
   %inline
   public export
-  apply : {type : Type}
-       -> {term : SnocList type -> type -> Type}
+  apply : {0 type : Type}
+       -> {0 term : SnocList type -> type -> Type}
        -> Rename type term
-       => {ctxt          : SnocList type}
-       -> {typeA, typeB, typeC : type}
+       => {0 ctxt          : SnocList type}
+       -> {0 typeA, typeB, typeC : type}
        -> (this    : term    ctxt                     typeA)
        -> (andThis : term    ctxt                     typeB)
        -> (idx     : IsVar ((ctxt :< typeA) :< typeB) typeC)
@@ -83,12 +83,12 @@ namespace Double
       apply this andThis pos@_ | There pos'@_ | There pos'' = embed pos''
 
   public export
-  subst : {type : Type}
-       -> {term : SnocList type -> type -> Type}
+  subst : {0 type : Type}
+       -> {0 term : SnocList type -> type -> Type}
        -> Rename type term
        => Substitute type term
-       => {ctxt          : SnocList type}
-       -> {typeA, typeB, typeC : type}
+       => {0 ctxt          : SnocList type}
+       -> {0 typeA, typeB, typeC : type}
        -> (this    : term  ctxt                     typeA)
        -> (andThis : term  ctxt                     typeB)
        -> (inThis  : term ((ctxt :< typeA) :< typeB) typeC)

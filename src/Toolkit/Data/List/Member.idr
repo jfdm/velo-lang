@@ -45,6 +45,18 @@ shift : IsMember ctxt type -> IsMember (a :: ctxt) type
 shift (V pos prf) = V (S pos) (There prf)
 
 export
+hereNotShift : Not (Member.here === Member.shift v)
+hereNotShift {v = V n prf} Refl impossible
+
+export
+shiftNotHere : Not (Member.shift v === Member.here)
+shiftNotHere {v = V n prf} Refl impossible
+
+export
+shiftInjective : shift v === shift w -> v === w
+shiftInjective {v = V m p} {w = V m p} Refl = Refl
+
+export
 shifts : IsMember g s -> {g' : List a} -> IsMember (g' <+> g) s
 shifts v {g' = []} = v
 shifts v {g' = _ :: _} = shift (shifts v)
@@ -82,5 +94,17 @@ thin v (Skip th) = shift (thin v th)
 thin v@_ (Keep Refl th) with (view v)
   _ | Here = here
   _ | There w = shift (thin w th)
+
+public export
+decEqHet : (v : IsMember tys ty1) ->
+           (w : IsMember tys ty2) ->
+           Dec (ty1 === ty2, v ~=~ w)
+decEqHet v@_ w@_ with (view v) | (view w)
+  _ | Here | Here = Yes (Refl, Refl)
+  _ | There v' | Here = No (\ (Refl, p) => shiftNotHere p)
+  _ | Here | There w' = No (\ (Refl, p) => hereNotShift p)
+  _ | There v' | There w' with (decEqHet v' w')
+    _ | Yes (Refl, eq2) = Yes (Refl, cong shift eq2)
+    _ | No neq = No (\ (Refl, eq) => neq (Refl, shiftInjective eq))
 
 -- [ EOF ]

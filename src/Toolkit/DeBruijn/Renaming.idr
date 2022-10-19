@@ -12,29 +12,29 @@ import public Toolkit.DeBruijn.Variable
 
 
 public export
-interface Rename (type : Type) (term : SnocList type -> type -> Type) | term where
-  rename : {old, new : SnocList type}
-        -> (f : {ty : type} -> IsVar old ty
-                            -> IsVar new ty)
-        -> ({ty : type} -> term old ty
-                        -> term new ty)
+interface Rename (0 type : Type) (0 term : SnocList type -> type -> Type) | term where
+  rename : {0 old, new : SnocList type}
+        -> (f : {0 ty : type} -> IsVar old ty
+                              -> IsVar new ty)
+        -> ({0 ty : type} -> term old ty
+                          -> term new ty)
 
   %inline
-  embed : {ty   : type}
-       -> {ctxt : SnocList type}
+  embed : {0 ty   : type}
+       -> {0 ctxt : SnocList type}
                -> IsVar ctxt ty
                -> term  ctxt ty
 
 public export
 %inline
-weakens : {type : Type}
-       -> {term : SnocList type -> type -> Type}
+weakens : {0 type : Type}
+       -> {0 term : SnocList type -> type -> Type}
        -> Rename type term
-       => {old, new : SnocList type}
-       -> (f : {ty  : type}
+       => {0 old, new : SnocList type}
+       -> (f : {0 ty  : type}
                    -> IsVar old ty
                    -> term  new ty)
-       -> ({ty,type' : type}
+       -> ({0 ty,type' : type}
               -> IsVar (old :< type') ty
               -> term  (new :< type') ty)
 

@@ -5,3 +5,43 @@ a : Nat -> Nat
 ----------
 ?hole : Nat
 
+# Finished Executing
+```
+apply (fun apply (fun apply (fun apply (fun apply (fun ?hole)
+                                                  (fun 0))
+                                       (inc zero))
+                            False)
+                 True)
+      (inc (inc zero))
+```
+### Reduce Application
+```
+apply (fun apply (fun apply (fun apply (fun ?hole {a = inc (inc zero)})
+                                       (fun 0))
+                            (inc zero))
+                 False)
+      True
+```
+### Reduce Application
+```
+apply (fun apply (fun apply (fun ?hole {a = inc (inc zero), a = True})
+                            (fun 0))
+                 (inc zero))
+      False
+```
+### Reduce Application
+```
+apply (fun apply (fun ?hole {a = inc (inc zero), a = True, a = False})
+                 (fun 0))
+      (inc zero)
+```
+### Reduce Application
+```
+apply (fun ?hole {a = inc (inc zero), a = True, a = False, a = inc zero})
+      (fun 0)
+```
+### Reduce Application
+```
+?hole {a = inc (inc zero), a = True, a = False, a = inc zero, a = fun 0}
+```
+# Finished

@@ -146,7 +146,7 @@ wscopeds : {metas : _} ->
            All (Term metas ctxt) tys
 
 wscoped (Var x) inv = Var x
-wscoped (Met nm) inv = let Evidence _ (v, th) = wscoped inv in Met v th
+wscoped (Met nm) inv = let Evidence _ (v, th) = wscoped inv in Met v (toSubst th)
 wscoped (Fun pw b) inv = Fun (wscoped b (step pw inv))
 wscoped (Call p args) inv = Call p (wscopeds args inv)
 
