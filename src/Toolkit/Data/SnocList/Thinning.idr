@@ -34,6 +34,13 @@ namespace Cover
     SkipR : Cover th ph -> Cover (Keep eq th) (Skip ph)
 
   export
+  irrelevantCover : (c, d : Cover th ph) -> c === d
+  irrelevantCover Empty Empty = Refl
+  irrelevantCover (Keep c) (Keep d) = cong Keep (irrelevantCover c d)
+  irrelevantCover (SkipL c) (SkipL d) = cong SkipL (irrelevantCover c d)
+  irrelevantCover (SkipR c) (SkipR d) = cong SkipR (irrelevantCover c d)
+
+  export
   coverDec : (th : Thinning {a} sx1 sy) -> (ph : Thinning sx2 sy) -> Dec (Cover th ph)
   coverDec Empty Empty = Yes Empty
   coverDec (Keep Refl th) (Keep Refl ph) with (coverDec th ph)

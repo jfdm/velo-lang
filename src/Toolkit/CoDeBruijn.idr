@@ -1,5 +1,6 @@
 module Toolkit.CoDeBruijn
 
+import Decidable.Equality
 import Toolkit.Data.SnocList.Thinning
 import Toolkit.CoDeBruijn.Binding
 
@@ -15,6 +16,22 @@ namespace Pair
                  {th : Thinning xs1 xs} -> {ph : Thinning xs2 xs} ->
                  t xs1 -> Cover th ph -> p xs2 -> Relevant t p xs
 
+  public export
+  (forall xs. DecEq (t xs)) => (forall xs. DecEq (p xs)) => DecEq (Relevant t p xs) where
+     decEq (MkRelevant {th = left1, ph = right1} l1 c1 r1)
+           (MkRelevant {th = left2, ph = right2} l2 c2 r2)
+       with (eqTh left1 left2) | (eqTh right1 right2)
+       decEq (MkRelevant {th = left1, ph = right1} l1 c1 r1)
+             (MkRelevant {th = left1, ph = right1} l2 c2 r2)
+         | Yes (Refl, Refl) | Yes (Refl, Refl) with (decEq l1 l2) | (decEq r1 r2)
+         decEq (MkRelevant {th = left1, ph = right1} l1 c1 r1)
+               (MkRelevant {th = left1, ph = right1} l1 c2 r1)
+           | Yes (Refl, Refl) | Yes (Refl, Refl)
+           | Yes Refl | Yes Refl = Yes (rewrite irrelevantCover c1 c2 in Refl)
+         _ | No neq1 | _ = No (\ Refl => neq1 Refl)
+         _ | _ | No neq2 = No (\ Refl => neq2 Refl)
+       _ | No neq1 | _ = No (\ Refl => neq1 (Refl, Refl))
+       _ | _ | No neq2 = No (\ Refl => neq2 (Refl, Refl))
 
 namespace Diamond
 

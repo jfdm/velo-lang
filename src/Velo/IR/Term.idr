@@ -163,7 +163,7 @@ namespace Term
 
   decEqHeadSim (Var v w) = decEqCong (decEq v w)
 
-  decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v sg w sg') with (decEqHet v w)
+  decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v sg w sg') with (hetDecEq v w)
     _ | No neq = No (\ Refl => neq (Refl, Refl))
     decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v sg v sg')
       | Yes (Refl, Refl) with (decEqSubst sg sg')

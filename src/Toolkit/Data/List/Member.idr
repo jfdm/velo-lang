@@ -96,14 +96,14 @@ thin v@_ (Keep Refl th) with (view v)
   _ | There w = shift (thin w th)
 
 public export
-decEqHet : (v : IsMember tys ty1) ->
+hetDecEq : (v : IsMember tys ty1) ->
            (w : IsMember tys ty2) ->
            Dec (ty1 === ty2, v ~=~ w)
-decEqHet v@_ w@_ with (view v) | (view w)
+hetDecEq v@_ w@_ with (view v) | (view w)
   _ | Here | Here = Yes (Refl, Refl)
   _ | There v' | Here = No (\ (Refl, p) => shiftNotHere p)
   _ | Here | There w' = No (\ (Refl, p) => hereNotShift p)
-  _ | There v' | There w' with (decEqHet v' w')
+  _ | There v' | There w' with (hetDecEq v' w')
     _ | Yes (Refl, eq2) = Yes (Refl, cong shift eq2)
     _ | No neq = No (\ (Refl, eq) => neq (Refl, shiftInjective eq))
 
