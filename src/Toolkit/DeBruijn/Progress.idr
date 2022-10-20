@@ -16,75 +16,49 @@ import Toolkit.DeBruijn.Variable
 import Toolkit.DeBruijn.Context
 import Toolkit.DeBruijn.Renaming
 import Toolkit.DeBruijn.Substitution
-import Toolkit.DeBruijn.Reductions
 import Toolkit.Item
 
 %default total
 
 public export
-interface Reducible type term
-       => Valuable (0 type : Type)
-                   (0 term : SnocList type -> type -> Type)
-                           | term
-  where
-    public export
-    data Value : {0 ty : type} -> term [<] ty -> Type
+data Progress : (0 type : Type)
+             -> (0 term : SnocList type -> type -> Type)
 
-
-public export
-data Progress : Reducible type term
-             -> Valuable  type term
-             -> {0 ty : type} -> (that : term [<] ty) -> Type
+             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
+             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
+             -> {0 ty : type}
+             -> (that : term [<] ty) -> Type
   where
-    Done : (r : Reducible type term)
-        => (v : Valuable  type term)
-        => forall ty
+    Done : {0 type : Type}
+        -> {0 term : SnocList type -> type -> Type}
+
+        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+        -> forall ty
          . {tm : term [<] ty}
-        -> (val : Value tm)
-               -> Progress r v tm
+        -> (val : value tm)
+               -> Progress type term value redux tm
 
-    Step : (r : Reducible type term)
-        => (v : Valuable  type term)
-        => {this, that : term [<] ty}
-        -> (step       : Redux this that)
-                      -> Progress r v this
+    Step : {0 type : Type}
+        -> {0 term : SnocList type -> type -> Type}
+
+        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+        -> forall ty
+         . {this, that : term [<] ty}
+        -> (step       : redux this that)
+                      -> Progress type term value redux this
+
 
 public export
 interface Progressable (0 type : Type)
                        (0 term : SnocList type -> type -> Type)
+                       (0 value : {0 ty : type} -> (v : term [<] ty) -> Type)
+                       (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
                                | term
   where
-      progress : (r : Reducible type term)
-              => (v : Valuable  type term)
-              => {0 ty : type}
-              -> (tm : term [<] ty)
-                            -> Progress r v tm
-{-
--- This type checks but has visibility issues
-public export
-interface Reducible type term
-       => Valuable  type term
-       => Progressable (0 type : Type)
-                       (0 term : SnocList type -> type -> Type)
-                               | term
-  where
-
-    mutual
-      public export
-      data Progress : {0 ty : type} -> (that : term [<] ty) -> Type
-        where
-          Done : forall ty
+      progress : forall ty
                . (tm : term [<] ty)
-              -> (val : Value tm)
-                     -> Progress tm
-          Step : {this, that : term [<] ty}
-              -> (step       : Redux this that)
-                            -> Progress this
+                    -> Progress type term value redux tm
 
-      progress : {ty : type}
-              -> (tm : term [<] ty)
-                      -> Progress tm
-
-
--}
 -- [ EOF ]

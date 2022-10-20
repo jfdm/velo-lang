@@ -7,13 +7,16 @@ import public Text.PrettyPrint.Prettyprinter
 import Toolkit.Item
 import Toolkit.DeBruijn.Context
 import Toolkit.Data.Location
+
+
 import Velo.Types
 import Velo.IR.Term
 import Velo.IR.Common
 import Velo.Values
 
 import Velo.Semantics.Reductions
-import Velo.Semantics.Evaluation
+
+import Velo.Eval
 
 import Velo.Core
 
@@ -121,7 +124,10 @@ wrap {type} tm
          ]
 
 
-showSteps : {metas, ty : _} -> {a,b : Term metas [<] ty} -> Reduces a b -> List (Doc ())
+showSteps : {metas, ty : _}
+         -> {a,b : Term metas [<] ty}
+         -> Reduces Ty (Term metas) Value Redux a b
+         -> List (Doc ())
 showSteps {a = a} {b = a} Refl
   = [wrap a]
 
@@ -131,7 +137,7 @@ showSteps {a = a} {b = b} (Trans x y)
 export
 prettyComputation : {metas, ty : _}
                  -> {term : Term metas [<] ty}
-                 -> (res  : Result term)
+                 -> (res  : Result Ty (Term metas) Value Redux term)
                          -> Velo ()
 prettyComputation {term = term} (R that val steps)
   = printLn $ vcat (showSteps steps)

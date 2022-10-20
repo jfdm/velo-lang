@@ -18,80 +18,136 @@ import Toolkit.DeBruijn.Variable
 import Toolkit.DeBruijn.Context
 import Toolkit.DeBruijn.Renaming
 import Toolkit.DeBruijn.Substitution
-import Toolkit.DeBruijn.Reductions
+
 import Toolkit.DeBruijn.Progress
 import Toolkit.Item
 
 %default total
 
-data Finished : Reducible type term
-             -> Valuable  type term
-             -> Progressable type term
-             -> (tm : term ctxt ty)
+public export
+data Reduces : (0 type : Type)
+            -> (0 term : SnocList type -> type -> Type)
+
+            -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
+            -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
+
+            -> {0 ty : type}
+            -> (  this : term [<] ty)
+            -> (  that : term [<] ty)
+                      -> Type
+  where
+    Refl : {0 type : Type}
+        -> {0 term : SnocList type -> type -> Type}
+
+        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+        -> forall ty . {this : term [<] ty}
+                -> Reduces type term value redux this this
+
+    Trans : {0 type : Type}
+        -> {0 term : SnocList type -> type -> Type}
+
+        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+        -> forall ty . {this, that, end : term [<] ty}
+         -> redux     this that
+         -> Reduces type term value redux      that   end
+         -> Reduces type term value redux this        end
+
+data Finished : (0 type : Type)
+             -> (0 term : SnocList type -> type -> Type)
+
+             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
+             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
+             -> forall ty . (tm : term [<] ty)
                      -> Type
   where
-    Normalised : (r : Reducible    type term)
-           => (v : Valuable     type term)
-           => (p : Progressable type term)
-               => {tm : term [<] ty}
-               -> Value tm
-               -> Finished r v p tm
-    OOF : (r : Reducible    type term)
-           => (v : Valuable     type term)
-           => (p : Progressable type term)
-        => Finished r v p tm
+    Normalised : {0 type : Type}
+        -> {0 term : SnocList type -> type -> Type}
 
-data Evaluate : Reducible type term
-             -> Valuable  type term
-             -> Progressable type term
-             -> (tm : term [<] ty)
+        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+        -> forall ty . {tm : term [<] ty}
+               -> value tm
+               -> Finished type term value redux tm
+
+    OOF :  {0 type : Type}
+        -> {0 term : SnocList type -> type -> Type}
+
+        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+
+        -> forall ty . {tm : term [<] ty}
+        -> Finished type term value redux tm
+
+data Evaluate : (0 type : Type)
+             -> (0 term : SnocList type -> type -> Type)
+
+             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
+             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
+
+             -> forall ty .
+                (tm : term [<] ty)
                    -> Type
   where --
-    RunEval : (r : Reducible    type term)
-           => (v : Valuable     type term)
-           => (p : Progressable type term)
-           => {this, that : term [<] ty}
-           -> (steps      : Inf (Reduces r this that))
-           -> (result     : Finished r v p that)
-                         -> Evaluate r v p this
+    RunEval : {0 type : Type}
+           -> {0 term : SnocList type -> type -> Type}
+
+           -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+           -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+
+           -> forall ty .
+            {this, that : term [<] ty}
+           -> (steps      : Inf (Reduces type term value redux this that))
+           -> (result     : Finished type term value redux that)
+                         -> Evaluate type term value redux this
 
 
 export
-evaluate : (r : Reducible    type term)
-        => (v : Valuable     type term)
-        => (p : Progressable type term)
+evaluate : {0 type : Type}
+           -> {0 term : SnocList type -> type -> Type}
+
+           -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+           -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+           -> Progressable type term value redux
         => (fuel : Fuel)
-        -> (tm   : term [<] ty)
-                -> Evaluate r v p tm
+        -> forall ty .
+           (tm   : term [<] ty)
+                -> Evaluate type term value redux tm
 evaluate Dry term
   = RunEval Refl OOF
 evaluate (More fuel) term with (progress term)
-  evaluate (More fuel) term | (Done value)
-    = RunEval Refl (Normalised value)
+  evaluate (More fuel) term | (Done val)
+    = RunEval Refl (Normalised val)
   evaluate (More fuel) term | (Step step {that}) with (evaluate fuel that)
     evaluate (More fuel) term | (Step step {that = that}) | (RunEval steps result)
       = RunEval (Trans step steps) result
 
 public export
-data Result : Reducible type term
-           -> Valuable  type term
-           -> Progressable type term
-           -> (tm : term [<] ty) -> Type where
-  R : (r : Reducible    type term)
-   => (v : Valuable     type term)
-   => (p : Progressable type term)
-   => (that : term [<] ty)
-   -> (val   : Value that)
-   -> (steps : Reduces r this that)
-              -> Result r v p this
+data Result : (0 type : Type)
+             -> (0 term : SnocList type -> type -> Type)
+
+             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
+             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
+             -> forall ty . (tm : term [<] ty) -> Type where
+    R : {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+     -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+
+     -> (that : term [<] ty)
+     -> (val   : value that)
+     -> (steps : Reduces type term value redux this that)
+              -> Result type term value redux this
+
 
 export covering
-eval : (r    : Reducible    type term)
-    => (v    : Valuable     type term)
-    => (p    : Progressable type term)
+eval :  {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+     -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+
+     -> Progressable type term value redux
     => forall ty
      . (this : term [<] ty)
-            -> Maybe (Result r v p this)
+            -> Maybe (Result type term value redux this)
+
 
 eval this with (evaluate forever this)
   eval this | (RunEval steps (Normalised {tm} x))
