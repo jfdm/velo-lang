@@ -8,7 +8,6 @@ import Toolkit.Item
 import Toolkit.DeBruijn.Context
 import Toolkit.Data.Location
 
-
 import Velo.Types
 import Velo.IR.Term
 import Velo.IR.Common
@@ -126,18 +125,18 @@ wrap {type} tm
 
 showSteps : {metas, ty : _}
          -> {a,b : Term metas [<] ty}
-         -> Reduces Ty (Term metas) Value Redux a b
+         -> Reduces Redux a b
          -> List (Doc ())
-showSteps {a = a} {b = a} (RS Nil)
+showSteps {a = a} {b = a} Nil
   = [wrap a]
 
-showSteps {a = a} {b = b} (RS (x :: y))
-  = wrap a :: (pretty $ "### " <+> showRedux x) :: (assert_total $ showSteps (RS y))
+showSteps {a = a} {b = b} (x :: y)
+  = wrap a :: (pretty $ "### " <+> showRedux x) :: showSteps y
 
 export
 prettyComputation : {metas, ty : _}
                  -> {term : Term metas [<] ty}
-                 -> (res  : Result Ty (Term metas) Value Redux term)
+                 -> (res  : Result Value Redux term)
                          -> Velo ()
 prettyComputation {term = term} (R that val steps)
   = printLn $ vcat (showSteps steps)

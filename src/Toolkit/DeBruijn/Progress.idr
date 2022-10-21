@@ -5,60 +5,32 @@
 |||
 module Toolkit.DeBruijn.Progress
 
-import Decidable.Equality
-
-import Data.DPair
-import Data.SnocList
-
-import Toolkit.Decidable.Informative
-
-import Toolkit.DeBruijn.Variable
-import Toolkit.DeBruijn.Context
-import Toolkit.DeBruijn.Renaming
-import Toolkit.DeBruijn.Substitution
-import Toolkit.Item
+import public Toolkit.Data.Relation
 
 %default total
 
 public export
-data Progress : (0 type : Type)
-             -> (0 term : SnocList type -> type -> Type)
-
-             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
-             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
-             -> {0 ty : type}
-             -> (that : term [<] ty) -> Type
+data Progress : (0 value : Pred a)
+             -> (0 redux : Rel a)
+             -> (tm : a)
+                   -> Type
   where
-    Done : {0 type : Type}
-        -> {0 term : SnocList type -> type -> Type}
-
-        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-        -> forall ty
-         . {tm : term [<] ty}
+    Done : {0 tm : a}
         -> (val : value tm)
-               -> Progress type term value redux tm
+               -> Progress value redux tm
 
-    Step : {0 type : Type}
-        -> {0 term : SnocList type -> type -> Type}
-
-        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-        -> forall ty
-         . {this, that : term [<] ty}
+    Step : {this, that : a}
         -> (step       : redux this that)
-                      -> Progress type term value redux this
+                      -> Progress value redux this
 
 
 public export
-interface Progressable (0 type : Type)
-                       (0 term : SnocList type -> type -> Type)
-                       (0 value : {0 ty : type} -> (v : term [<] ty) -> Type)
-                       (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
-                               | term
+interface Progressable (0 a : Type)
+                       (0 value : Pred a)
+                       (0 redux : Rel a)
+                               | a
   where
-      progress : forall ty
-               . (tm : term [<] ty)
-                    -> Progress type term value redux tm
+      progress : (tm : a)
+                    -> Progress value redux tm
 
 -- [ EOF ]

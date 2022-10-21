@@ -31,7 +31,7 @@ compute : {tys : List Ty}
        -> ComputePrim op
        -> {args : All (Term metas [<]) tys}
        -> Values args
-       -> Progress Ty (Term metas) Value Redux (Call op args)
+       -> Progress Value Redux (Call op args)
 compute Add [m, n] = case m of
   Call Zero [] => Step (ReduceAddZW n)
   Call Plus [m] => Step (RewriteEqNatPW (Call Plus [m]) n)
@@ -57,7 +57,7 @@ call : {tys : _}
     -> (p : Prim tys ty)
     -> {args : All (Term metas [<]) tys}
     -> Progresss args
-    -> Progress Ty (Term metas) Value Redux (Call p args)
+    -> Progress Value Redux (Call p args)
 call p (Steps stes) = Step (SimplifyCall p stes)
 call p (Dones vals) = case isValuePrim p of
   Left pv => Done (Call pv vals)
@@ -71,7 +71,7 @@ namespace Velo
   export
   progress : {0 ty   : Ty}
           -> (term : Term metas [<] ty)
-          -> Progress Ty (Term metas) Value Redux term
+          -> Progress Value Redux term
 
   progresss [] = Dones []
   progresss (arg :: args) with (progress arg)
@@ -91,7 +91,7 @@ namespace Velo
   progress (Call p args) = call p (progresss args)
 
 public export
-Progressable Ty (Term metas) Value Redux where
+Progressable (Term metas [<] s) Value Redux where
   progress = Velo.progress
 
 -- [ EOF ]

@@ -6,6 +6,11 @@ module Toolkit.Data.Relation
 
 public export
 0
+Pred : Type -> Type
+Pred a = a -> Type
+
+public export
+0
 Rel : Type -> Type
 Rel a = a -> a -> Type
 

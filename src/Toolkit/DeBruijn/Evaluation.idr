@@ -5,115 +5,63 @@
 |||
 module Toolkit.DeBruijn.Evaluation
 
-import Decidable.Equality
-
-import Data.DPair
-import Data.SnocList
-
 import Data.Fuel
-
-import Toolkit.Decidable.Informative
 
 import public Toolkit.Data.Relation
 import public Toolkit.Data.Relation.List
-
-import Toolkit.DeBruijn.Variable
-import Toolkit.DeBruijn.Context
-import Toolkit.DeBruijn.Renaming
-import Toolkit.DeBruijn.Substitution
-
 import Toolkit.DeBruijn.Progress
-import Toolkit.Item
 
 %default total
 
 public export
-data Reduces : (0 type : Type)
-            -> (0 term : SnocList type -> type -> Type)
+0 Reduces : (0 redux : Rel a)
+         -> (this, that : a)
+         -> Type
+Reduces redux = RTList redux
 
-            -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
-            -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
-
-            -> {0 ty : type}
-            -> (  this : term [<] ty)
-            -> (  that : term [<] ty)
-                      -> Type
-  where
-    RS : {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-      -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-      -> forall ty . {this, that : term [<] ty}
-      -> RTList redux this that
-      -> Reduces type term value redux this that
-
-data Evaluate : (0 type : Type)
-             -> (0 term : SnocList type -> type -> Type)
-
-             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
-             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
-
-             -> forall ty . (tm : term [<] ty)
+public export
+data Evaluate : (0 value : Pred a)
+             -> (0 redux : Rel a)
+             -> (v : a)
              -> Type
   where --
-    RunEval : {0 type : Type}
-           -> {0 term : SnocList type -> type -> Type}
-
-           -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-           -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-
-           -> forall ty . {this, that : term [<] ty}
-           -> (steps      : Inf (Reduces type term value redux this that))
-           -> (result     : Maybe (value that))
-                         -> Evaluate type term value redux this
+    RunEval : {tm, val : a}
+           -> (steps      : Inf (Reduces redux tm val))
+           -> (result     : Maybe (value val))
+                         -> Evaluate value redux tm
 
 
 export
-evaluate : {0 type : Type}
-           -> {0 term : SnocList type -> type -> Type}
-
-           -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-           -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-           -> Progressable type term value redux
+evaluate : {0 a : Type}
+        -> {0 value : Pred a}
+        -> {0 redux : Rel a}
+        -> Progressable a value redux
         => (fuel : Fuel)
-        -> forall ty .
-           (tm   : term [<] ty)
-                -> Evaluate type term value redux tm
+        -> (tm   : a)
+                -> Evaluate value redux tm
 evaluate Dry term
-  = RunEval (RS Nil) Nothing
+  = RunEval Nil Nothing
 evaluate (More fuel) term with (progress term)
   evaluate (More fuel) term | (Done val)
-    = RunEval (RS Nil) (Just val)
+    = RunEval Nil (Just val)
   evaluate (More fuel) term | (Step step {that}) with (evaluate fuel that)
-    evaluate (More fuel) term | (Step step {that = that}) | (RunEval (RS steps) result)
-      = RunEval (RS (step :: steps)) result
+    evaluate (More fuel) term | (Step step {that = that}) | (RunEval steps result)
+      = RunEval (step :: steps) result
 
 public export
-data Result : (0 type : Type)
-           -> (0 term : SnocList type -> type -> Type)
-
-           -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
-           -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
-           -> forall ty
-            . (tm : term [<] ty)
+data Result : (0 value : Pred a)
+           -> (0 redux : Rel a)
+           -> (this : a)
            -> Type
   where
-    R : {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-     -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-
-     -> (that : term [<] ty)
+    R : (that  : a)
      -> (val   : value that)
-     -> (steps : Reduces type term value redux this that)
-              -> Result type term value redux this
-
+     -> (steps : Reduces redux this that)
+              -> Result value redux this
 
 export covering
-eval :  {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-     -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-
-     -> Progressable type term value redux
-    => forall ty
-     . (this : term [<] ty)
-            -> Maybe (Result type term value redux this)
-
+eval : Progressable a value redux
+    => (this : a) -> Maybe (Result value redux this)
 
 eval this with (evaluate forever this)
   eval this | (RunEval steps (Just val))

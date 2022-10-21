@@ -15,7 +15,7 @@ import Velo.Core
 export
 eval : {type : Ty}
     -> (this : Term metas [<] type)
-            -> Velo (Result Ty (Term metas) Value Redux this)
+            -> Velo (Result Value Redux this)
 eval this
   = maybe (throw (Eval OOF))
           (pure)
