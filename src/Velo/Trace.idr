@@ -128,11 +128,11 @@ showSteps : {metas, ty : _}
          -> {a,b : Term metas [<] ty}
          -> Reduces Ty (Term metas) Value Redux a b
          -> List (Doc ())
-showSteps {a = a} {b = a} Refl
+showSteps {a = a} {b = a} (RS Nil)
   = [wrap a]
 
-showSteps {a = a} {b = b} (Trans x y)
-  = wrap a :: (pretty $ "### " <+> showRedux x) :: showSteps y
+showSteps {a = a} {b = b} (RS (x :: y))
+  = wrap a :: (pretty $ "### " <+> showRedux x) :: (assert_total $ showSteps (RS y))
 
 export
 prettyComputation : {metas, ty : _}

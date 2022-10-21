@@ -14,6 +14,9 @@ import Data.Fuel
 
 import Toolkit.Decidable.Informative
 
+import public Toolkit.Data.Relation
+import public Toolkit.Data.Relation.List
+
 import Toolkit.DeBruijn.Variable
 import Toolkit.DeBruijn.Context
 import Toolkit.DeBruijn.Renaming
@@ -36,49 +39,11 @@ data Reduces : (0 type : Type)
             -> (  that : term [<] ty)
                       -> Type
   where
-    Refl : {0 type : Type}
-        -> {0 term : SnocList type -> type -> Type}
-
-        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-        -> forall ty . {this : term [<] ty}
-                -> Reduces type term value redux this this
-
-    Trans : {0 type : Type}
-        -> {0 term : SnocList type -> type -> Type}
-
-        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-        -> forall ty . {this, that, end : term [<] ty}
-         -> redux     this that
-         -> Reduces type term value redux      that   end
-         -> Reduces type term value redux this        end
-
-data Finished : (0 type : Type)
-             -> (0 term : SnocList type -> type -> Type)
-
-             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
-             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
-             -> forall ty . (tm : term [<] ty)
-                     -> Type
-  where
-    Normalised : {0 type : Type}
-        -> {0 term : SnocList type -> type -> Type}
-
-        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-        -> forall ty . {tm : term [<] ty}
-               -> value tm
-               -> Finished type term value redux tm
-
-    OOF :  {0 type : Type}
-        -> {0 term : SnocList type -> type -> Type}
-
-        -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
-        -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
-
-        -> forall ty . {tm : term [<] ty}
-        -> Finished type term value redux tm
+    RS : {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
+      -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
+      -> forall ty . {this, that : term [<] ty}
+      -> RTList redux this that
+      -> Reduces type term value redux this that
 
 data Evaluate : (0 type : Type)
              -> (0 term : SnocList type -> type -> Type)
@@ -86,9 +51,8 @@ data Evaluate : (0 type : Type)
              -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
              -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
 
-             -> forall ty .
-                (tm : term [<] ty)
-                   -> Type
+             -> forall ty . (tm : term [<] ty)
+             -> Type
   where --
     RunEval : {0 type : Type}
            -> {0 term : SnocList type -> type -> Type}
@@ -96,10 +60,9 @@ data Evaluate : (0 type : Type)
            -> {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
            -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
 
-           -> forall ty .
-            {this, that : term [<] ty}
+           -> forall ty . {this, that : term [<] ty}
            -> (steps      : Inf (Reduces type term value redux this that))
-           -> (result     : Finished type term value redux that)
+           -> (result     : Maybe (value that))
                          -> Evaluate type term value redux this
 
 
@@ -115,21 +78,24 @@ evaluate : {0 type : Type}
            (tm   : term [<] ty)
                 -> Evaluate type term value redux tm
 evaluate Dry term
-  = RunEval Refl OOF
+  = RunEval (RS Nil) Nothing
 evaluate (More fuel) term with (progress term)
   evaluate (More fuel) term | (Done val)
-    = RunEval Refl (Normalised val)
+    = RunEval (RS Nil) (Just val)
   evaluate (More fuel) term | (Step step {that}) with (evaluate fuel that)
-    evaluate (More fuel) term | (Step step {that = that}) | (RunEval steps result)
-      = RunEval (Trans step steps) result
+    evaluate (More fuel) term | (Step step {that = that}) | (RunEval (RS steps) result)
+      = RunEval (RS (step :: steps)) result
 
 public export
 data Result : (0 type : Type)
-             -> (0 term : SnocList type -> type -> Type)
+           -> (0 term : SnocList type -> type -> Type)
 
-             -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
-             -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
-             -> forall ty . (tm : term [<] ty) -> Type where
+           -> (0 value : {0 ty : type} -> (value : term [<] ty) -> Type)
+           -> (0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type)
+           -> forall ty
+            . (tm : term [<] ty)
+           -> Type
+  where
     R : {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
      -> {0 redux : {0 ty : type} -> (this, that : term [<] ty) -> Type}
 
@@ -150,8 +116,10 @@ eval :  {0 value : {0 ty : type} -> (value : term [<] ty) -> Type}
 
 
 eval this with (evaluate forever this)
-  eval this | (RunEval steps (Normalised {tm} x))
-    = Just (R tm x steps)
-  eval this | (RunEval steps OOF) = Nothing
+  eval this | (RunEval steps (Just val))
+    = Just (R _      -- reduce term is magiced in
+              val    -- prf it is a val
+              steps)
+  eval this | (RunEval steps Nothing) = Nothing
 
 -- [ EOF ]

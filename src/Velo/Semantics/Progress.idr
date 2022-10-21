@@ -12,9 +12,6 @@ import Velo.Semantics.Reductions
 
 %default total
 
-data Progresss : {tys : List Ty} -> (args : All (Term metas [<]) tys) -> Type
--- data Progress : (term : Term metas [<] type) -> Type
-
 public export
 data Progresss : {tys : List Ty} -> (args : All (Term metas [<]) tys)
               -> Type
@@ -27,20 +24,7 @@ data Progresss : {tys : List Ty} -> (args : All (Term metas [<]) tys)
          -> {those : All (Term metas [<]) tys}
          -> (step : Reduxes these those)
          -> Progresss these
-{-
-public export
-data Progress : (term : Term metas [<] type)
-                     -> Type
-  where
-    Done : forall mty
-         . {term : Term metas [<] mty}
-        -> (val  : Value term)
-                -> Progress term
 
-    Step : {this, that : Term metas [<] type}
-        -> (step       : Redux this that)
-                      -> Progress this
--}
 export
 compute : {tys : List Ty}
        -> {0 op : Prim tys ty}
@@ -109,4 +93,5 @@ namespace Velo
 public export
 Progressable Ty (Term metas) Value Redux where
   progress = Velo.progress
+
 -- [ EOF ]
