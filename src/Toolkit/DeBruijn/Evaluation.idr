@@ -26,7 +26,7 @@ data Evaluate : (0 value : Pred a)
              -> Type
   where --
     RunEval : {tm, val : a}
-           -> (steps      : Inf (Reduces redux tm val))
+           -> (steps      : Reduces redux tm val)
            -> (result     : Maybe (value val))
                          -> Evaluate value redux tm
 
