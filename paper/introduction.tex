@@ -1,0 +1,29 @@
+\emph{Language Workbenches}, such as Spoofax~\cite{DBLP:journals/software/WachsmuthKV14}, offers language designers an expressive environment in which to design, implement, and deploy their \Acp{dsl}~\cite{hudak1996building}.
+Another interesting environment to develop \acp{dsl} is that of dependently-typed languages such as Idris~\cite{DBLP:conf/ecoop/Brady21}, Agda~\cite{DBLP:conf/afp/Norell08}, and Coq~\cite{}.
+Such languages provides us with an expressive environment in which to reason not only about our software programs but also about the programming languages in which we write our programs.
+We have seen the use of dependent types to provide the mechanised reasoning of core language calculi~\cite{10.1145/3093333.3009866,DBLP:conf/cpp/RouvoetPKV20,DBLP:conf/mpc/ChapmanKNW19}.
+These applications of mechanised software verification are wasted if we also do not seek to run these programs as well!
+If it type checks, we might as well ship it too!
+
+Uses of dependent-typed to realise \acp{dsl} raises an important question:
+\emph{Are dependently-typed languages language workbenches?}
+Criteria has been developed to detail what a language workbench is~\cite{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13}.
+Principally speaking a language workbench is a tool supports:
+description of a language's \emph{notation}---how we present a language's concrete syntax to users;
+implementation of a language's \emph{semantics}---how we realise how a language operates;
+and
+user interaction through an \emph{editor}.
+Outside of this core criteria other language work benches support language validation, testing, and composition.
+It is easily demonstrated from extant work that dependently-typed languages support the production of verified language implementations, but what about the other required and optional criteria?
+
+
+\Velo{} is a minimal functional language that we have realised in Idris to showcase dependently typed techniques to implement and manipulate \acp{ir}.
+This paper introduces \Velo{} but that also though the auspices of \Velo{} itself that dependently-typed languages make a fine language workbench according to the core criteria for a language workbench, and that with future engineering we can satisfy more of the optional criteria.
+
+% C-c C-a ?todo
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper"
+%%% End:
