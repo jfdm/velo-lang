@@ -31,7 +31,7 @@ Uninhabited (IsVar [<] x) where
 export
 DecEq (IsVar ctxt type) where
   decEq (V m p) (V n q) with (decEq m n)
-    decEq (V m p) (V .(m) q) | Yes Refl
+    decEq (V .(m) p) (V m q) | Yes Refl
       = Yes (rewrite irrelevantAtIndex p q in Refl)
     _ | No neq = No (\case Refl => neq Refl)
 

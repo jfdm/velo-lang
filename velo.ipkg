@@ -13,7 +13,6 @@ modules = Velo.Types
 
         , Velo.Semantics.Reductions
         , Velo.Semantics.Progress
-        , Velo.Semantics.Evaluation
 
         , Velo.Error
         , Velo.Error.Pretty
@@ -37,5 +36,7 @@ modules = Velo.Types
         , Velo.Trace
 
         , Velo.Options
+        , Velo.Commands
+        , Velo.REPL
 
         , Main
