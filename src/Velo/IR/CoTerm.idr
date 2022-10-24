@@ -3,6 +3,7 @@ module Velo.IR.CoTerm
 import Data.String
 import Decidable.Equality
 
+import Toolkit.Data.Comparison.Informative
 import public Toolkit.Data.List.Member
 import Toolkit.Data.List.Pointwise
 import public Toolkit.Data.List.Quantifiers
@@ -63,6 +64,13 @@ export Injective Cons where injective Refl = Refl
 export Injective Snoc where injective Refl = Refl
 
 namespace CoTerm
+
+  public export
+  tag : CoTerm metas ctxt t -> Nat
+  tag (Var _) = 0
+  tag (Met _ _) = 1
+  tag (Fun _) = 2
+  tag (Call _ _) = 3
 
   public export
   data HeadSim : (t : CoTerm metas ctxt ty1) -> (u : CoTerm metas ctxt ty2) -> Type where
@@ -135,3 +143,51 @@ namespace CoTerm
 
   decEqCoSubst [<] [<] = Yes Refl
   decEqCoSubst (Snoc sgt) (Snoc sgt') = decEqCong (decEq sgt sgt')
+
+  public export
+  Eq (CoTerm metas ctxt ty) where
+    t == u = case decEq t u of
+      Yes _ => True
+      No _ => False
+
+  Eq (CoTerms metas ctxt ty) where
+    t == u = case decEq t u of
+      Yes _ => True
+      No _ => False
+
+  Eq (CoSubst metas ctxt ty) where
+    t == u = case decEq t u of
+      Yes _ => True
+      No _ => False
+
+  compareCoTerm : (t, u : CoTerm metas ctxt ty) -> Ordering
+  compareCoTerms : {0 tys : List Ty} -> (ts, us : CoTerms metas ctxt tys) -> Ordering
+  compareCoSubst : (sg, sg' : CoSubst metas ctxt tys) -> Ordering
+  compareHeadSim : {0 t, u : CoTerm metas ctxt ty} -> HeadSim t u -> Ordering
+
+  public export
+  Ord (CoTerm metas ctxt ty) where compare = compareCoTerm
+  Ord (CoTerms metas ctxt tys) where compare = compareCoTerms
+  Ord (CoSubst metas ctxt tys) where compare = compareCoSubst
+
+  compareHeadSim (Var Here Here) = EQ
+  compareHeadSim (Met {m = MkMeta{}} {n = MkMeta{}} p sg q sg') with (cmp p q)
+    _ | LT = LT
+    _ | GT = GT
+    compareHeadSim (Met {m = MkMeta{}} {n = MkMeta{}} p sg .(p) sg')
+      | EQ = compare sg sg'
+  compareHeadSim (Fun b c) = compare b c
+  compareHeadSim (Call tys uys p ts q us) with (cmp p q)
+    _ | LT = LT
+    compareHeadSim (Call tys .(tys) p ts .(p) us) | EQ = compareCoTerms ts us
+    _ | GT = GT
+
+  compareCoTerm t u with (headSim t u)
+    _ | Nothing = compare (tag t) (tag u)
+    _ | Just prf = compareHeadSim prf
+
+  compareCoTerms [] [] = EQ
+  compareCoTerms (Cons tts) (Cons uus) = assert_total (compare tts uus)
+
+  compareCoSubst [<] [<] = EQ
+  compareCoSubst (Snoc tst) (Snoc usu) = assert_total (compare tst usu)

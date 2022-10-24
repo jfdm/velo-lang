@@ -9,6 +9,7 @@ import Decidable.Equality
 import Data.SnocList
 
 import Toolkit.Decidable.Informative
+import Toolkit.Data.Comparison.Informative
 
 import Toolkit.Data.SnocList.AtIndex
 import Toolkit.Data.SnocList.Thinning
@@ -59,6 +60,17 @@ export
 view : (v : IsVar ctxt type) -> View v
 view (V 0 Here) = Here
 view (V (S n) (There prf)) = There (V n prf)
+
+public export
+Comparable (IsVar ctxt ty) (IsVar ctxt ty') where
+  cmp v@_ w@_ with (view v) | (view w)
+    _ | Here | Here = EQ
+    _ | Here | There _ = LT
+    _ | There _ | Here = GT
+    _ | There v' | There w' with (cmp v' w')
+      _ | LT = LT
+      cmp v@_ w@_ | There v' | There .(v') | EQ = EQ
+      _ | GT = GT
 
 public export
 %inline

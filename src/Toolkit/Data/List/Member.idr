@@ -7,6 +7,7 @@ module Toolkit.Data.List.Member
 
 import Decidable.Equality
 
+import Toolkit.Data.Comparison.Informative
 import Toolkit.Decidable.Informative
 
 import Toolkit.Data.List.AtIndex
@@ -70,6 +71,17 @@ export
 view : (v : IsMember ctxt type) -> View v
 view (V 0 Here) = Here
 view (V (S n) (There prf)) = There (V n prf)
+
+public export
+Comparable (IsMember ctxt ty) (IsMember ctxt ty') where
+  cmp v@_ w@_ with (view v) | (view w)
+    _ | Here | Here = EQ
+    _ | Here | There _ = LT
+    _ | There _ | Here = GT
+    _ | There v' | There w' with (cmp v' w')
+      _ | LT = LT
+      cmp v@_ w@_ | There v' | There .(v') | EQ = EQ
+      _ | GT = GT
 
 export
 lookup : {ctxt : _} -> IsMember ctxt ty -> (ty' : _ ** ty === ty')

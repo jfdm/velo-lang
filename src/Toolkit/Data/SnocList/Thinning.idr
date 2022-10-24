@@ -1,5 +1,6 @@
 module Toolkit.Data.SnocList.Thinning
 
+import Toolkit.Data.Comparison.Informative
 import Toolkit.Data.SnocList.Quantifiers
 import public Toolkit.Data.SnocList.Subset
 
@@ -106,3 +107,17 @@ eqTh (Skip _) (Keep _ _) = No (\case (_, eq) impossible)
 eqTh (Skip th) (Skip ph) = case eqTh th ph of
   Yes (Refl, Refl) => Yes (Refl, Refl)
   No nope => No (\ (Refl, Refl) => nope (Refl, Refl))
+
+public export
+Comparable (Thinning sx sa) (Thinning sy sa) where
+  cmp Empty Empty = LT
+  cmp (Keep Refl th) (Keep Refl ph) with (cmp th ph)
+    _ | LT = LT
+    cmp (Keep Refl th) (Keep Refl .(th)) | EQ = EQ
+    _ | GT = GT
+  cmp (Keep eq th) (Skip ph) = LT
+  cmp (Skip th) (Keep eq ph) = GT
+  cmp (Skip th) (Skip ph) with (cmp th ph)
+    _ | LT = LT
+    cmp (Skip th) (Skip .(th)) | EQ = EQ
+    _ | GT = GT

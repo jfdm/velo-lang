@@ -9,6 +9,8 @@ import Velo.Types
 import public Toolkit.Item
 import Data.SnocList.Quantifiers
 
+import Toolkit.Data.Comparison.Informative
+
 %default total
 
 public export
@@ -31,6 +33,21 @@ data Prim : (args : List Ty)
     And   : Prim [TyBool, TyBool] TyBool
 
     App   : Prim [TyFunc dom cod, dom] cod
+
+public export
+funTy : {tys : _} -> Prim tys ty -> Ty
+funTy {tys = [TyFunc dom cod, dom]} App = TyFunc dom cod
+funTy _ = TyNat
+
+public export
+tag : Prim tys ty -> Nat
+tag Zero = 0
+tag Plus = 1
+tag Add = 2
+tag True = 3
+tag False = 4
+tag And = 5
+tag App = 6
 
 namespace Prim
 
@@ -90,6 +107,23 @@ namespace Prim
     decEq p q = case hetDecEq p q of
       Yes (_, _, eq) => Yes eq
       No neq => No (\ eq => neq (Refl, Refl, eq))
+
+
+
+public export
+{tys1, tys2 : _} -> Comparable (Prim tys1 ty1) (Prim tys2 ty2) where
+  cmp p@_ q@_ with (headSim p q)
+    _ | Just Zero = EQ
+    _ | Just Plus = EQ
+    _ | Just Add = EQ
+    _ | Just True = EQ
+    _ | Just False = EQ
+    _ | Just And = EQ
+    cmp p@App q@App | Just App with (cmp (funTy p) (funTy q))
+      _ | LT = LT
+      _ | EQ = EQ
+      _ | GT = GT
+    _ | Nothing = believe_me (cmp (tag p) (tag q))
 
 ------------------------------------------------------------------------
 -- The type of meta variables
