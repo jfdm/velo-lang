@@ -85,12 +85,12 @@ namespace Join
     let (MkJoin middle cover) = join th ph in
     MkJoin (Skip middle) cover
 
-export
+public export
 none : {sx : SnocList a} -> Thinning [<] sx
 none {sx = [<]} = Empty
 none {sx = sx :< x} = Skip none
 
-export
+public export
 ones : {sx : SnocList a} -> Thinning sx sx
 ones {sx = [<]} = Empty
 ones {sx = sx :< x} = Keep Refl ones

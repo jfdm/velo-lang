@@ -73,6 +73,18 @@ namespace CoTerm
   tag (Call _ _) = 3
 
   public export
+  size : CoTerm metas ctxt t -> Nat
+  sizes : CoTerms metas ctxt t -> Nat
+
+  size (Fun (K b)) = S (size b)
+  size (Fun (R _ b)) = S (size b)
+  size (Call op ts) = S (sizes ts)
+  size _ = 1
+
+  sizes [] = 0
+  sizes (Cons (MkRelevant t _ ts)) = size t + sizes ts
+
+  public export
   data HeadSim : (t : CoTerm metas ctxt ty1) -> (u : CoTerm metas ctxt ty2) -> Type where
     Var  : (v, w : _) -> HeadSim (Var v) (Var w)
     Met  : (v : IsMember metas m) -> (sg : CoSubst metas ctxt m.metaScope) ->

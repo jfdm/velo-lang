@@ -1,5 +1,6 @@
 module Velo.Pass.CSE
 
+import Data.List
 import Data.Nat
 import Data.SortedMap
 
@@ -74,6 +75,9 @@ record Candidate (metas : _) (ctxt : _) where
   {cType : Ty}
   cTerm : Diamond (\ ctxt => CoTerm metas ctxt cType) ctxt
 
+toDPair : Candidate metas ctxt -> (x : Ty ** Diamond (\ ctxt => CoTerm metas ctxt x) ctxt)
+toDPair (MkCandidate {cType} cTerm) = (cType ** cTerm)
+
 Eq (Candidate metas ctxt) where
   MkCandidate {cType = s} t == MkCandidate {cType = s'} t' with (decEq s s')
     MkCandidate {cType = s} t == MkCandidate {cType = .(s)} t'
@@ -108,39 +112,69 @@ split cs
 cse : {metas, ctxt, t : _} ->
       Diamond (\ ctxt => CoTerm metas ctxt t) ctxt ->
       Diamond (\ ctxt => CoTerm metas ctxt t) ctxt
-cse (MkDiamond th t) = MkDiamond th (snd $ go t) where
+cse (MkDiamond th t) = let (cs, t) = go t in thin (letBind cs t) th
 
-  go : {metas, ctxt, t : _} ->
+  where
+
+  lets : {ctxt, supp, ty : _} ->
+         (sx : SnocList Ty) -> Thinning supp (ctxt ++ sx) ->
+         CoTerm metas supp ty ->
+         All (\ ty => Diamond (\ ctxt => CoTerm metas ctxt ty) ctxt) sx ->
+         Diamond (\ ctxt => CoTerm metas ctxt ty) ctxt
+  lets [<] th b vs = MkDiamond th b
+  lets (sx :< x) (Skip th) b (vs :< v) = lets sx th b vs
+  lets {ctxt} (sx :< x) (Keep Refl th) b (vs :< v)
+    = let v : Diamond (\ ctxt => CoTerms metas ctxt [x]) ctxt
+            := Cons <$> relevant v (MkDiamond none CoTerm.Nil) in
+      let v := thin v (Skips Identity {zs = sx}) in
+      let bv : Diamond (\ ctxt => CoTerms metas ctxt [TyFunc x ty, x]) (ctxt ++ sx)
+             := Cons <$> relevant (MkDiamond th (Fun (R x b))) v in
+      let MkDiamond th bv = bv in
+      lets sx th (Call App bv) vs
+
+  letBind : {ctxt, t : _} ->
+            Candidates metas ctxt ->
+            Diamond (\ ctxt => CoTerm metas ctxt t) ctxt ->
+            Diamond (\ ctxt => CoTerm metas ctxt t) ctxt
+  letBind cs t =
+    let cs = filter ((> 1) . snd) (toList cs) in
+    let cs = map (\ (t, n) => (t, (n * size (t.cTerm.selected)))) cs in
+    let cs = sortBy (flip (compare `on` snd)) cs in
+    let (vars ** tms) = Quantifiers.unzipWith (toDPair . fst) cs in
+    let MkDiamond th txs = abstractR {ctx = [<]} {g' = vars} tms t in
+    lets vars th txs tms
+
+  go : {ctxt, t : _} ->
     CoTerm metas ctxt t ->
-    (Candidates metas ctxt, CoTerm metas ctxt t)
+    (Candidates metas ctxt, Diamond (\ ctxt => CoTerm metas ctxt t) ctxt)
 
-  gos : {metas, ctxt, ts : _} ->
+  gos : {ctxt, ts : _} ->
     CoTerms metas ctxt ts ->
-    (Candidates metas ctxt, CoTerms metas ctxt ts)
+    (Candidates metas ctxt, Diamond (\ ctxt => CoTerms metas ctxt ts) ctxt)
 
-  goB : {metas, ctxt, x, t : _} ->
+  goB : {ctxt, x, t : _} ->
     Binding (\ ctxt => CoTerm metas ctxt t) x ctxt ->
-    (Candidates metas ctxt, Binding (\ ctxt => CoTerm metas ctxt t) x ctxt)
+    (Candidates metas ctxt, Diamond (Binding (\ ctxt => CoTerm metas ctxt t) x) ctxt)
 
   go (Fun b) =
     let (cs, b) = goB b in
-    let tm = Fun b in
-    (insert (MkCandidate (MkDiamond Identity tm)) 1 cs, tm)
+    let tm = Fun <$> b in
+    (insert (MkCandidate tm) 1 cs, tm)
   go (Call op ts) =
     let (cs, ts) = gos ts in
-    let tm = Call op ts in
-    (insert (MkCandidate (MkDiamond Identity tm)) 1 cs, tm)
-  go t = (empty, t)
+    let tm = Call op <$> ts in
+    (insert (MkCandidate tm) 1 cs, tm)
+  go t = (empty, MkDiamond Identity t)
 
-  gos [] = (empty, [])
+  gos [] = (empty, MkDiamond Identity [])
   gos (Cons (MkRelevant {th = left, ph = right} t cover ts)) =
     let (cs1, t) = go t in
     let (cs2, ts) = gos ts in
     ( mergeWith (+) (thin cs1 left) (thin cs2 right)
-    , Cons (MkRelevant t cover ts))
+    , Cons <$> relevant (thin t left) (thin ts right))
 
-  goB (K b) = map K (go b)
+  goB (K b) = map (K <$>) (go b)
   goB (R x b) =
     let (cs, b) = go b in
     let (locals, cs) = split cs in
-    (cs, R x ?hg_1)
+    (cs, bind (letBind locals b))
