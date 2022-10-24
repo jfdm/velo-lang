@@ -8,6 +8,7 @@ DEPENDS=\
   positivelynegative.tex \
   compactconstant.tex \
   notations.tex \
+  introduction.tex \
   velo-intro.tex \
   paper.bib
 
