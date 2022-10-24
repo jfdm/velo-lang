@@ -139,7 +139,7 @@ cse (MkDiamond th t) = let (cs, t) = go t in thin (letBind cs t) th
   letBind cs t =
     let cs = filter ((> 1) . snd) (toList cs) in
     let cs = map (\ (t, n) => (t, (n * size (t.cTerm.selected)))) cs in
-    let cs = sortBy (flip (compare `on` snd)) cs in
+    let cs = sortBy (compare `on` snd) cs in
     let (vars ** tms) = Quantifiers.unzipWith (toDPair . fst) cs in
     let MkDiamond th txs = abstractR {ctx = [<]} {g' = vars} tms t in
     lets vars th txs tms
