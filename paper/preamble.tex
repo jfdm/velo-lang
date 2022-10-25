@@ -60,6 +60,31 @@
 \newcommand{\Velo}{V{\'e}lo\xspace}
 \newcommand{\Idris}{Idris~2}
 
+\fvset
+{ xleftmargin=0.5\parindent
+, commandchars=\\\{\}
+  % , fontsize=\smaller
+  % , frame=leftline
+  % , framerule=0.5mm
+  % , rulecolor=\color{gray}
+  % , numbers = left, numbersep=2pt
+}
+
+% Options...
+\DefineVerbatimEnvironment%
+  {VerbatimInline}
+  {Verbatim}
+  {xleftmargin=0.5\parindent
+  , frame=leftline
+  }
+\DefineVerbatimEnvironment%
+  {VerbatimInlineNumbered}
+  {Verbatim}
+  {xleftmargin=\parindent
+    ,fontsize=\smaller
+    ,numbers=left,numbersep=2pt
+    ,frame=lines
+  }
 
 %%% Local Variables:
 %%% mode: latex

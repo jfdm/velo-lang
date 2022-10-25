@@ -8,12 +8,12 @@ indicating where in the type-level context the variable is bound.
 Concretely, we index the \IdrisType{Elem} family by the kind of the variable it represents and a \IdrisType{SnocList} of kinds as the context to reflect the fact that,
 in inference rules, the most local end of the context is always on the right hand side.
 
-\begin{verbatim}
+\begin{Verbatim}
 data Elem : (ty : kind) -> (ctxt : SnocList kind) -> Type
   where
     Here : Elem ty (ctxt :< ty)
     There : Elem ty ctxt -> Elem ty (ctxt :< not_ty)
-\end{verbatim}
+\end{Verbatim}
 
 The \IdrisData{Here} constructor indicates that the variable of interest is
 the most local one in scope.
@@ -35,23 +35,23 @@ all of the natural numbers we use correspond to valid indices.
 We pointedly reuse the \IdrisType{Elem} names because these \IdrisData{Here}
 and \IdrisData{There} play exactly the same role.
 
-\begin{verbatim}
+\begin{Verbatim}
 data AtIndex : (ty : kind) -> (ctxt : SnocList kind) -> (idx : Nat) -> Type
   where
     Here : AtIndex ty (ctxt :< ty) Z
     There : (later : AtIndex ty  ctxt               idx)
                   -> AtIndex ty (ctxt :< not_ty) (S idx)
-\end{verbatim}
+\end{Verbatim}
 
 \noindent
 We then define a variable as the pairing of a natural number and an \emph{erased}
 proof that the given natural numbers is indeed a valid de~Bruijn index.
 
-\begin{verbatim}
+\begin{Verbatim}
 data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type
   where
     V : (idx : Nat) -> (0 prf : AtIndex ty ctxt idx) -> IsVar ctxt ty
-\end{verbatim}
+\end{Verbatim}
 
 We now have the best of both worlds: a well-scoped realisation of de~Bruijn indices
 that is guaranteed to be compiled efficiently.

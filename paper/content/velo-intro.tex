@@ -7,7 +7,7 @@ To promote the idea of interactive editing \Velo{} also supports well-scoped-typ
 Such a featherweight language design helps us to better showcase how we can use dependently-typed languages as language workbenches.
 \jfdm{Do we need to evidence (through citation) benefits of featherweight languages?}
 
-\begin{verbatim}
+\begin{Verbatim}
    let a = zero
 in let b = (inc a)
 in let c = (add a b)
@@ -19,7 +19,7 @@ in let f = (and d e)
 in let foo = (fun x : nat => x)
 in (foo ?hole)
 
-\end{verbatim}
+\end{Verbatim}
 
 We have presented \Velo{} as a \emph{complete} language with a standard pipeline.
 A \ac{dsl} captures the language's concrete syntax, and a parser turns \ac{dsl} instances into raw unchecked terms.

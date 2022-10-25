@@ -1,6 +1,5 @@
 \subsection{Compact Constant Folding}
 \label{sec:design:constants}
-\chcomment{Compact constant folding}
 
 Software Foundations's \emph{Programming Language Foundations} opens with a constant-folding transformation exercise~\cite[Chapter~1]{Pierce:SF2}.
 %
@@ -21,13 +20,13 @@ All builtin operators (from primitive operations on builtin types to function
 application itself) are represented using a single \IdrisData{Call} constructor
 which takes an operation and a type-indexed list of subterms.
 
-\begin{verbatim}
+\begin{Verbatim}
 data Term : (metas : List Meta) -> (ctxt : List Ty) -> Ty -> Type where
-  {- ... -}
-  Call : {tys : _} -> (operator : Prim                  tys  ty)
+  -- ...
+  Call : \{tys : _\} -> (operator : Prim                  tys  ty)
                    -> (operans  : All (Term metas ctxt) tys)
                                -> Term      metas ctxt       ty
-\end{verbatim}
+\end{Verbatim}
 
 The primitives include:
 %
@@ -41,14 +40,14 @@ and
 \IdrisData{App} which takes a function and an argument of type the function's domain
 and returns a term of type the function's codomain.
 
-\begin{verbatim}
+\begin{Verbatim}
 data Prim : (args : List Ty) -> (type : Ty) -> Type
   where
     Zero : Prim []                    TyNat
     And  : Prim [TyBool, TyBool]      TyBool
     App  : Prim [TyFunc dom cod, dom] cod
-    {- ... -}
-\end{verbatim}
+    -- ...
+\end{Verbatim}
 
 Using \IdrisType{Prim} structural operations can now be implemented by handling recursive calls on \IdrisData{Call} nodes' subterms uniformly before dispatching on the operator to see whether additional simplifications can be deployed.
 
