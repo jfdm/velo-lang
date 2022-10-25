@@ -122,6 +122,15 @@ process st (Load str)
              (\err => do printLn err
                          pure st)
 
+process st Show
+  = case file st of
+      Just (MkElabResult ms tm)
+        => do printLn (pretty {ann = ()} (unelaborate tm))
+              pure st
+
+      Nothing
+        => do putStrLn "Need to load a file."
+              pure st
 export covering
 repl : Velo ()
 repl
