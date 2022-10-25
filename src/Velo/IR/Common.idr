@@ -9,6 +9,8 @@ import Velo.Types
 import public Toolkit.Item
 import Data.SnocList.Quantifiers
 
+import Toolkit.Data.Comparison.Informative
+
 %default total
 
 public export
@@ -31,6 +33,21 @@ data Prim : (args : List Ty)
     And   : Prim [TyBool, TyBool] TyBool
 
     App   : Prim [TyFunc dom cod, dom] cod
+
+public export
+funTy : {tys : _} -> Prim tys ty -> Ty
+funTy {tys = [TyFunc dom cod, dom]} App = TyFunc dom cod
+funTy _ = TyNat
+
+public export
+tag : Prim tys ty -> Nat
+tag Zero = 0
+tag Plus = 1
+tag Add = 2
+tag True = 3
+tag False = 4
+tag And = 5
+tag App = 6
 
 namespace Prim
 
@@ -65,7 +82,7 @@ namespace Prim
   headSimFullDiag And = absurd
   headSimFullDiag App = absurd
 
-  export
+  public export
   hetDecEq : {tys1, tys2 : List Ty} ->
              (p : Prim tys1 ty1) -> (q : Prim tys2 ty2) ->
              Dec (tys1 === tys2, ty1 === ty2, p ~=~ q)
@@ -85,11 +102,28 @@ namespace Prim
           _ | (_, No neq2) = No (\case (Refl, _, _) => neq2 Refl)
       _ | Nothing = No (\ (Refl, Refl, Refl) => headSimFullDiag _ hdSim)
 
-  export
+  public export
   {tys : List Ty} -> DecEq (Prim tys ty) where
     decEq p q = case hetDecEq p q of
       Yes (_, _, eq) => Yes eq
       No neq => No (\ eq => neq (Refl, Refl, eq))
+
+
+
+public export
+{tys1, tys2 : _} -> Comparable (Prim tys1 ty1) (Prim tys2 ty2) where
+  cmp p@_ q@_ with (headSim p q)
+    _ | Just Zero = EQ
+    _ | Just Plus = EQ
+    _ | Just Add = EQ
+    _ | Just True = EQ
+    _ | Just False = EQ
+    _ | Just And = EQ
+    cmp p@App q@App | Just App with (cmp (funTy p) (funTy q))
+      _ | LT = LT
+      _ | EQ = EQ
+      _ | GT = GT
+    _ | Nothing = believe_me (cmp (tag p) (tag q))
 
 ------------------------------------------------------------------------
 -- The type of meta variables
@@ -138,5 +172,15 @@ getByName n ms
   = case get n ms of
       No _ => Nothing
       Yes prf => Just (extract ms prf)
+
+export
+Show (Prim tys ty) where
+  show Zero = "zero"
+  show Plus = "inc"
+  show Add = "add"
+  show True = "true"
+  show False = "false"
+  show And = "and"
+  show App = "apply"
 
 -- [ EOF ]

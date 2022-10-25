@@ -33,7 +33,7 @@ jobs:
         with:
           path: |
             ~/.idris2
-          key: ${{ runner.os }}-idris
+          key: ${{ runner.os }}-idris-2
 
       - name: Install Chez
         run: |

@@ -7,6 +7,7 @@ module Toolkit.Data.List.Member
 
 import Decidable.Equality
 
+import Toolkit.Data.Comparison.Informative
 import Toolkit.Decidable.Informative
 
 import Toolkit.Data.List.AtIndex
@@ -31,7 +32,7 @@ export
 DecEq (IsMember ctxt type) where
   decEq (V m p) (V n q) with (decEq m n)
     decEq (V .(m) p) (V m q) | Yes Refl
-      = Yes (rewrite irrelevantAtIndex p q in Refl)
+      = Yes (irrelevantEq $ cong (\ p => V m p) (irrelevantAtIndex p q))
     _ | No neq = No (\case Refl => neq Refl)
 
 public export
@@ -71,6 +72,17 @@ view : (v : IsMember ctxt type) -> View v
 view (V 0 Here) = Here
 view (V (S n) (There prf)) = There (V n prf)
 
+public export
+Comparable (IsMember ctxt ty) (IsMember ctxt ty') where
+  cmp v@_ w@_ with (view v) | (view w)
+    _ | Here | Here = EQ
+    _ | Here | There _ = LT
+    _ | There _ | Here = GT
+    _ | There v' | There w' with (cmp v' w')
+      _ | LT = LT
+      cmp v@_ w@_ | There v' | There .(v') | EQ = EQ
+      _ | GT = GT
+
 export
 lookup : {ctxt : _} -> IsMember ctxt ty -> (ty' : _ ** ty === ty')
 lookup v = case view v of
@@ -96,14 +108,14 @@ thin v@_ (Keep Refl th) with (view v)
   _ | There w = shift (thin w th)
 
 public export
-decEqHet : (v : IsMember tys ty1) ->
+hetDecEq : (v : IsMember tys ty1) ->
            (w : IsMember tys ty2) ->
            Dec (ty1 === ty2, v ~=~ w)
-decEqHet v@_ w@_ with (view v) | (view w)
+hetDecEq v@_ w@_ with (view v) | (view w)
   _ | Here | Here = Yes (Refl, Refl)
   _ | There v' | Here = No (\ (Refl, p) => shiftNotHere p)
   _ | Here | There w' = No (\ (Refl, p) => hereNotShift p)
-  _ | There v' | There w' with (decEqHet v' w')
+  _ | There v' | There w' with (hetDecEq v' w')
     _ | Yes (Refl, eq2) = Yes (Refl, cong shift eq2)
     _ | No neq = No (\ (Refl, eq) => neq (Refl, shiftInjective eq))
 

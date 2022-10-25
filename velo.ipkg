@@ -33,6 +33,9 @@ modules = Velo.Types
         , Velo.Lexer
         , Velo.Parser
 
+        , Velo.Pass.Folding
+        , Velo.Pass.CSE
+
         , Velo.Trace
 
         , Velo.Options
