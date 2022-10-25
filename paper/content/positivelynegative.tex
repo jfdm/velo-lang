@@ -33,7 +33,7 @@ With \IdrisFunction{any} we do not know for sure why the decidable procedure fai
 Was it because the list was empty?
 or,
 was it because all elements of \IdrisBound{xs} did not satisfy \IdrisImplicit{p}!?
-More so what was the reason for any element in \IdrisBound{xs} for not satisfying \IdrisImplicit{p}?
+Furthermore, we cannot programmatically determine the reason why an element in \IdrisBound{xs} did not satisfy \IdrisImplicit{p}?
 
 To address these issues. we introduce \IdrisType{DecInfo} a variant of \IdrisType{Dec} that carries positive information in the negative case, as well as proofs-of-falsity.
 
@@ -63,14 +63,7 @@ any : (f  : (x : type) -> Dec (q x) (p x))
          -> DecInfo (All (\x => Pair (q x) (Not (p x))) xs) (Any p xs)
 \end{verbatim}
 
-\chcomment[id=gallais]
-          {Strictly positive has a very specific technical meaning.
-            I'm concerned this will give people a false impression that the datatype is malformed}
-
-\chcomment[id=jfdm]
-          {I agree, we need a better name: absolutely positive?}
-
-\IdrisType{DecInfo} is, however, not \emph{strictly} positive as it carries a proof of false.
+\IdrisType{DecInfo} does, however, carry a proof of false.
 A more interesting line of work would be to adopt \emph{constructive negation} to ensure that proofs of false arise from positive sources only~\cite{msfp/Atkey22}.
 That is, given:
 
@@ -86,21 +79,8 @@ DecInfo : Predicate -> Type
 DecInfo (pos ** neg ** no) = Either neg pos
 \end{verbatim}
 
-This is line of investigation stems back to
-producing good error messages when implementing
-elaborators~\cite{DBLP:journals/jfp/McBrideM04}.
-
-\chcomment[id=gallais]
-  {Not sure how to put back in the ``is ongoing'' part. Maybe something like:
-  \begin{quote}
-    We have yet to see a clear presentation of the underlying principles
-  \end{quote}
-  but isn't it the point of this section to give such a presentation?}
-\chcomment[id=jfdm]{I would suggest:
-  \begin{quote}
-    We are investigating the efficacy of being \emph{positively negative} and how that impacts program design in dependently-typed languages.
-  \end{quote}
-}
+This is line of investigation stems back to producing good error messages when implementing elaborators~\cite{DBLP:journals/jfp/McBrideM04}.
+We are investigating the efficacy of being \emph{positively negative} and how that impacts program design in dependently-typed languages.
 
 %%% Local Variables:
 %%% mode: latex
