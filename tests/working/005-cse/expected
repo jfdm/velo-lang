@@ -2,6 +2,9 @@ Running Test
 Velo> # Finished Parsing
 # Finished Type-Checking
 Velo> let m = zero
+in let n = (inc zero)
+   in (add (add (add m n) (add n m)) (add (add n m) (add m n)))
+Velo> let m = zero
 in let n = m
    in let p = (inc m)
       in let q = (add p n)

@@ -14,6 +14,8 @@ Velo> [:q,:quit,:exit]
 	Perform common sub-expression elimination on the loaded program.
 [:simpl] 
 	Perform constant folding on the loaded program.
+[:show] 
+	Print the loaded program.
 [:load,:l] [file]
 	Load a program.
 
@@ -35,5 +37,4 @@ c : Nat
 ----------
 ?c : Nat
 
-Velo> Not a recognised command.
-"File expected."
+Velo> Quitting, Goodbye.
