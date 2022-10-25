@@ -6,7 +6,7 @@ import Data.String
 
 import Velo.Types
 import Velo.Values
-import Velo.Semantics.Evaluation
+
 
 import Velo.Error.Pretty
 import Velo.Core

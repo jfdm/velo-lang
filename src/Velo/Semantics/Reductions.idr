@@ -67,16 +67,5 @@ data Redux : (this,that : Term metas ctxt type)
                           -> Redux (Call App [Fun body, var])
                                    (Single.subst var body)
 
-public export
-data Reduces : (this : Term metas ctxt type)
-            -> (that : Term metas ctxt type)
-            -> Type
-  where
-    Refl  : {this : Term metas ctxt type}
-                 -> Reduces this this
 
-    Trans : {this, that, end : Term metas ctxt type}
-         -> Redux this that
-         -> Reduces that end
-         -> Reduces this end
 -- [ EOF ]
