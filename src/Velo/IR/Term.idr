@@ -45,6 +45,13 @@ data Term  : (metas : List Meta) -> (ctxt : SnocList Ty) -> Ty -> Type where
          Term metas ctxt ty
 
 ------------------------------------------------------------------------
+-- Projection
+
+export
+typeOf : {ty : _} -> Term metas ctxt ty -> Ty
+typeOf _ = ty
+
+------------------------------------------------------------------------
 -- Smart constructor
 
 export
