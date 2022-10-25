@@ -3,96 +3,96 @@ Running Test
 # Finished Type Checking
 # Finished Executing
 ```
-apply (fun apply (fun apply (fun apply (fun 0)
-                                       (add 1 0))
-                            (add 1 1))
-                 (add 0 0))
-      (inc (inc zero))
+let m = (inc (inc zero))
+in let n = (add m m)
+   in let p = (add m m)
+      in let q = (add n p)
+         in q
 ```
 ### Reduce Application
 ```
-apply (fun apply (fun apply (fun 0)
-                            (add 1 0))
-                 (add (inc (inc zero)) (inc (inc zero))))
-      (add (inc (inc zero)) (inc (inc zero)))
+let m = (add (inc (inc zero)) (inc (inc zero)))
+in let n = (add (inc (inc zero)) (inc (inc zero)))
+   in let p = (add m n)
+      in p
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun apply (fun apply (fun 0)
-                            (add 1 0))
-                 (add (inc (inc zero)) (inc (inc zero))))
-      (add (inc zero) (inc (inc (inc zero))))
+let m = (add (inc zero) (inc (inc (inc zero))))
+in let n = (add (inc (inc zero)) (inc (inc zero)))
+   in let p = (add m n)
+      in p
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun apply (fun apply (fun 0)
-                            (add 1 0))
-                 (add (inc (inc zero)) (inc (inc zero))))
-      (add zero (inc (inc (inc (inc zero)))))
+let m = (add zero (inc (inc (inc (inc zero)))))
+in let n = (add (inc (inc zero)) (inc (inc zero)))
+   in let p = (add m n)
+      in p
 ```
 ### Simplify Application Variable by Reduce Add Left is Zero
 ```
-apply (fun apply (fun apply (fun 0)
-                            (add 1 0))
-                 (add (inc (inc zero)) (inc (inc zero))))
-      (inc (inc (inc (inc zero))))
+let m = (inc (inc (inc (inc zero))))
+in let n = (add (inc (inc zero)) (inc (inc zero)))
+   in let p = (add m n)
+      in p
 ```
 ### Reduce Application
 ```
-apply (fun apply (fun 0)
-                 (add (inc (inc (inc (inc zero)))) 0))
-      (add (inc (inc zero)) (inc (inc zero)))
+let m = (add (inc (inc zero)) (inc (inc zero)))
+in let n = (add (inc (inc (inc (inc zero)))) m)
+   in n
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun apply (fun 0)
-                 (add (inc (inc (inc (inc zero)))) 0))
-      (add (inc zero) (inc (inc (inc zero))))
+let m = (add (inc zero) (inc (inc (inc zero))))
+in let n = (add (inc (inc (inc (inc zero)))) m)
+   in n
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun apply (fun 0)
-                 (add (inc (inc (inc (inc zero)))) 0))
-      (add zero (inc (inc (inc (inc zero)))))
+let m = (add zero (inc (inc (inc (inc zero)))))
+in let n = (add (inc (inc (inc (inc zero)))) m)
+   in n
 ```
 ### Simplify Application Variable by Reduce Add Left is Zero
 ```
-apply (fun apply (fun 0)
-                 (add (inc (inc (inc (inc zero)))) 0))
-      (inc (inc (inc (inc zero))))
+let m = (inc (inc (inc (inc zero))))
+in let n = (add (inc (inc (inc (inc zero)))) m)
+   in n
 ```
 ### Reduce Application
 ```
-apply (fun 0)
-      (add (inc (inc (inc (inc zero)))) (inc (inc (inc (inc zero)))))
+let m = (add (inc (inc (inc (inc zero)))) (inc (inc (inc (inc zero)))))
+in m
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun 0)
-      (add (inc (inc (inc zero))) (inc (inc (inc (inc (inc zero))))))
+let m = (add (inc (inc (inc zero))) (inc (inc (inc (inc (inc zero))))))
+in m
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun 0)
-      (add (inc (inc zero)) (inc (inc (inc (inc (inc (inc zero)))))))
+let m = (add (inc (inc zero)) (inc (inc (inc (inc (inc (inc zero)))))))
+in m
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun 0)
-      (add (inc zero) (inc (inc (inc (inc (inc (inc (inc zero))))))))
+let m = (add (inc zero) (inc (inc (inc (inc (inc (inc (inc zero))))))))
+in m
 ```
 ### Simplify Application Variable by Rewriting Add
 ```
-apply (fun 0)
-      (add zero (inc (inc (inc (inc (inc (inc (inc (inc zero)))))))))
+let m = (add zero (inc (inc (inc (inc (inc (inc (inc (inc zero)))))))))
+in m
 ```
 ### Simplify Application Variable by Reduce Add Left is Zero
 ```
-apply (fun 0)
-      (inc (inc (inc (inc (inc (inc (inc (inc zero))))))))
+let m = (inc (inc (inc (inc (inc (inc (inc (inc zero))))))))
+in m
 ```
 ### Reduce Application
 ```
-inc (inc (inc (inc (inc (inc (inc (inc zero)))))))
+(inc (inc (inc (inc (inc (inc (inc (inc zero))))))))
 ```
 # Finished

@@ -3,88 +3,79 @@ Running Test
 # Finished Type Checking
 # Finished Executing
 ```
-apply (fun apply (fun apply (fun apply (fun apply (fun apply (fun apply (fun apply 0
-                                                                                   zero)
-                                                                        (fun 0))
-                                                             (and 1 0))
-                                                  False)
-                                       True)
-                            (add 1 0))
-                 (inc 0))
-      zero
+let m = zero
+in let n = (inc m)
+   in let p = (add m n)
+      in let b = true
+         in let x = false
+            in let y = (and b x)
+               in let f = (fun q : Nat => q)
+                  in (f zero)
 ```
 ### Reduce Application
 ```
-apply (fun apply (fun apply (fun apply (fun apply (fun apply (fun apply 0
-                                                                        zero)
-                                                             (fun 0))
-                                                  (and 1 0))
-                                       False)
-                            True)
-                 (add zero 0))
-      (inc zero)
+let m = (inc zero)
+in let n = (add zero m)
+   in let b = true
+      in let x = false
+         in let y = (and b x)
+            in let f = (fun p : Nat => p)
+               in (f zero)
 ```
 ### Reduce Application
 ```
-apply (fun apply (fun apply (fun apply (fun apply (fun apply 0
-                                                             zero)
-                                                  (fun 0))
-                                       (and 1 0))
-                            False)
-                 True)
-      (add zero (inc zero))
+let m = (add zero (inc zero))
+in let b = true
+   in let x = false
+      in let y = (and b x)
+         in let f = (fun n : Nat => n)
+            in (f zero)
 ```
 ### Simplify Application Variable by Reduce Add Left is Zero
 ```
-apply (fun apply (fun apply (fun apply (fun apply (fun apply 0
-                                                             zero)
-                                                  (fun 0))
-                                       (and 1 0))
-                            False)
-                 True)
-      (inc zero)
+let m = (inc zero)
+in let b = true
+   in let x = false
+      in let y = (and b x)
+         in let f = (fun n : Nat => n)
+            in (f zero)
 ```
 ### Reduce Application
 ```
-apply (fun apply (fun apply (fun apply (fun apply 0
-                                                  zero)
-                                       (fun 0))
-                            (and 1 0))
-                 False)
-      True
+let b = true
+in let x = false
+   in let y = (and b x)
+      in let f = (fun m : Nat => m)
+         in (f zero)
 ```
 ### Reduce Application
 ```
-apply (fun apply (fun apply (fun apply 0
-                                       zero)
-                            (fun 0))
-                 (and True 0))
-      False
+let b = false
+in let x = (and true b)
+   in let f = (fun m : Nat => m)
+      in (f zero)
 ```
 ### Reduce Application
 ```
-apply (fun apply (fun apply 0
-                            zero)
-                 (fun 0))
-      (and True False)
+let b = (and true false)
+in let f = (fun m : Nat => m)
+   in (f zero)
 ```
 ### Simplify Application Variable by Reduce And Right is False
 ```
-apply (fun apply (fun apply 0
-                            zero)
-                 (fun 0))
-      False
+let b = false
+in let f = (fun m : Nat => m)
+   in (f zero)
 ```
 ### Reduce Application
 ```
-apply (fun apply 0
-                 zero)
-      (fun 0)
+let f = (fun m : Nat => m)
+in (f zero)
 ```
 ### Reduce Application
 ```
-apply (fun 0)
-      zero
+let m = zero
+in m
 ```
 ### Reduce Application
 ```
