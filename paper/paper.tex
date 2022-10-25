@@ -46,71 +46,11 @@ pdfa
 {} % ORCID
 {} % TODO
 
-% TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional. Use additional curly braces to indicate the correct name splitting when the last name consists of multiple name parts.
-
-\authorrunning{J. {de Muijnck-Hughes} and Guillaume Allais and Edwin Brady}
-% TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
-
-\Copyright{Jan de Muijnck-Hughes and Guillaume Allais and Edwin Brady}
-% TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
-
-\ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}}
-% TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm
-
-\keywords{Dummy keyword}
-% TODO mandatory; please add comma-separated list of keywords
-
-\category{}
-% optional, e.g. invited paper
-
-\relatedversion{}
-
-% \supplement{}
-% optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
-% \supplementdetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93, subcategory={Description, Subcategory}, swhid={Software Heritage Identifier}]{General Classification (e.g. Software, Dataset, Model, ...)}{URL to related version}
-% linktext, cite, and subcategory are optional
-
-% \funding{(Optional) general funding statement \dots}
-% optional, to capture a funding statement, which applies to all authors. Please enter author specific funding statements as fifth argument of the \author macro.
-
-% \acknowledgements{I want to thank \dots}
-% optional
-
-%\nolinenumbers %uncomment to disable line numbering
-
-%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\EventEditors{John Q. Open and Joan R. Access}
-\EventNoEds{2}
-\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
-\EventShortTitle{CVIT 2016}
-\EventAcronym{CVIT}
-\EventYear{2016}
-\EventDate{December 24--27, 2016}
-\EventLocation{Little Whinging, United Kingdom}
-\EventLogo{}
-\SeriesVolume{42}
-\ArticleNo{23}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\acrodef{dsl}[DSL]{Domain Specific Language}
-\acrodef{edsl}[EDSL]{Embedded Domain Specific Language}
-\acrodef{stlc}[STLC]{Simply-Typed Lambda Calculus}
-\acrodef{cse}[CSE]{Common Sub-Expression Elimination}
-\acrodef{ir}[IR]{Intermediate Representation}
-
-\definechangesauthor[color=orange,name={Jan}]{jfdm}
-\definechangesauthor[color=green, name={Guillaume}]{gallais}
-\definechangesauthor[color=red, name={Edwin}]{edwin}
-
-\newcommand{\jfdm}[1]{\chcomment[id=jfdm]{#1}}
-\newcommand{\gallais}[1]{\chcomment[id=gallais]{#1}}
-
-\newcommand{\Velo}{V{\'e}lo\xspace}
-\newcommand{\Idris}{Idris~2}
+\input{./preamble}
 
 \begin{document}
 
-\input{notations}
+\input{./notations}
 
 \maketitle
 
@@ -146,20 +86,20 @@ Our ongoing work is available at:
 \section{Introduction}
 \label{sec:introduction}
 
-\input{introduction}
+\input{./content/introduction}
 
 
 \section{Introducing Velo}
 \label{sec:velo}
 
-\input{velo-intro}
+\input{./content/velo-intro}
 
 \section{Language Design}
 \label{sec:design}
 
-\input{deBruijn}
+\input{./content/deBruijn}
 
-\input{compactconstant}
+\input{./content/compactconstant}
 
 
 \subsection{Well-Typed Holes}
@@ -179,8 +119,8 @@ Our ongoing work is available at:
 Within \Velo{} there are two programming idioms that helped
 with the reporting of errors, and the ease of deciding equality.
 
-\input{positivelynegative}
-\input{efficientdeceq}
+\input{./content/positivelynegative}
+\input{./content/efficientdeceq}
 
 \section{Conclusion}
 \label{sec:conclusion}
