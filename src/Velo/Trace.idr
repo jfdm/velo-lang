@@ -188,23 +188,54 @@ namespace Velo
     Pretty (AST a) where
       pretty = ast
 
-showRedux : Redux a b -> String
-showRedux (SimplifyCall And (x !: _)) = "Simplify And Left Operand by " ++ showRedux x
-showRedux (SimplifyCall And (x :: y !: _)) = "Simplify And Right Operand by " ++ showRedux y
-showRedux (ReduceAndTT) = "Reduce And True True"
-showRedux (ReduceAndWF) = "Reduce And Right is False"
-showRedux (ReduceAndFW) = "Reduce And Left is False"
+prettyRedux : Redux a b -> Doc ()
+prettyRedux (SimplifyCall And (x !: _))
+  = pretty "Simplify And Left Operand by"
+    <++>
+    prettyRedux x
 
-showRedux (SimplifyCall Add (x !: _)) = "Simplify Add Left Operand by " ++ showRedux x
-showRedux (SimplifyCall Add (x :: y !: _)) = "Simplify Add Right Operand by " ++ showRedux y
-showRedux (ReduceAddZW vr) = "Reduce Add Left is Zero"
-showRedux (RewriteEqNatPW vl vr) = "Rewriting Add"
+prettyRedux (SimplifyCall And (x :: y !: _))
+  = pretty "Simplify And Right Operand by"
+    <++>
+    prettyRedux y
 
-showRedux (SimplifyCall Plus (x !: _)) = "Simplify Plus by " ++ showRedux x
+prettyRedux (ReduceAndTT)
+  = pretty "Reduce And True True"
+prettyRedux (ReduceAndWF)
+  = pretty "Reduce And Right is False"
+prettyRedux (ReduceAndFW)
+  = pretty "Reduce And Left is False"
 
-showRedux (SimplifyCall App (_ !: _)) = "Simplify Application Function"
-showRedux (SimplifyCall App (_ :: var !: _)) = "Simplify Application Variable by " ++ showRedux var
-showRedux (ReduceFuncApp x) = "Reduce Application"
+prettyRedux (SimplifyCall Add (x !: _))
+  = pretty "Simplify Add Left Operand by"
+    <++>
+    prettyRedux x
+
+prettyRedux (SimplifyCall Add (x :: y !: _))
+  = pretty "Simplify Add Right Operand by"
+    <++>
+    prettyRedux y
+
+prettyRedux (ReduceAddZW vr)
+  = pretty "Reduce Add Left is Zero"
+
+prettyRedux (RewriteEqNatPW vl vr)
+  = pretty "Rewriting Add"
+
+prettyRedux (SimplifyCall Plus (x !: _))
+  = pretty "Simplify Plus by"
+    <++>
+    prettyRedux x
+
+prettyRedux (SimplifyCall App (_ !: _))
+  = pretty "Simplify Application Function"
+
+prettyRedux (SimplifyCall App (_ :: var !: _))
+  = pretty "Simplify Application Variable by"
+    <++>
+    prettyRedux var
+prettyRedux (ReduceFuncApp x)
+  = pretty "Reduce Application"
 
 
 wrap : {metas, type : _} -> Term metas [<] type -> Doc ()
@@ -223,7 +254,7 @@ showSteps {a = a} {b = a} Nil
   = [wrap a]
 
 showSteps {a = a} {b = b} (x :: y)
-  = wrap a :: (pretty $ "### " <+> showRedux x) :: showSteps y
+  = wrap a :: (hsep [pretty "###", prettyRedux x]) :: showSteps y
 
 export
 prettyComputation : {metas, ty : _}
