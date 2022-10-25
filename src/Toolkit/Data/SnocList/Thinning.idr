@@ -1,5 +1,6 @@
 module Toolkit.Data.SnocList.Thinning
 
+import Toolkit.Data.Comparison.Informative
 import Toolkit.Data.SnocList.Quantifiers
 import public Toolkit.Data.SnocList.Subset
 
@@ -32,6 +33,13 @@ namespace Cover
     Keep  : Cover th ph -> Cover (Keep Refl th) (Keep Refl ph)
     SkipL : Cover th ph -> Cover (Skip th) (Keep Refl ph)
     SkipR : Cover th ph -> Cover (Keep eq th) (Skip ph)
+
+  export
+  irrelevantCover : (c, d : Cover th ph) -> c === d
+  irrelevantCover Empty Empty = Refl
+  irrelevantCover (Keep c) (Keep d) = cong Keep (irrelevantCover c d)
+  irrelevantCover (SkipL c) (SkipL d) = cong SkipL (irrelevantCover c d)
+  irrelevantCover (SkipR c) (SkipR d) = cong SkipR (irrelevantCover c d)
 
   export
   coverDec : (th : Thinning {a} sx1 sy) -> (ph : Thinning sx2 sy) -> Dec (Cover th ph)
@@ -77,12 +85,12 @@ namespace Join
     let (MkJoin middle cover) = join th ph in
     MkJoin (Skip middle) cover
 
-export
+public export
 none : {sx : SnocList a} -> Thinning [<] sx
 none {sx = [<]} = Empty
 none {sx = sx :< x} = Skip none
 
-export
+public export
 ones : {sx : SnocList a} -> Thinning sx sx
 ones {sx = [<]} = Empty
 ones {sx = sx :< x} = Keep Refl ones
@@ -99,3 +107,17 @@ eqTh (Skip _) (Keep _ _) = No (\case (_, eq) impossible)
 eqTh (Skip th) (Skip ph) = case eqTh th ph of
   Yes (Refl, Refl) => Yes (Refl, Refl)
   No nope => No (\ (Refl, Refl) => nope (Refl, Refl))
+
+public export
+Comparable (Thinning sx sa) (Thinning sy sa) where
+  cmp Empty Empty = EQ
+  cmp (Keep Refl th) (Keep Refl ph) with (cmp th ph)
+    _ | LT = LT
+    cmp (Keep Refl th) (Keep Refl .(th)) | EQ = EQ
+    _ | GT = GT
+  cmp (Keep eq th) (Skip ph) = LT
+  cmp (Skip th) (Keep eq ph) = GT
+  cmp (Skip th) (Skip ph) with (cmp th ph)
+    _ | LT = LT
+    cmp (Skip th) (Skip .(th)) | EQ = EQ
+    _ | GT = GT

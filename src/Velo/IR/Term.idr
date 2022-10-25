@@ -163,7 +163,7 @@ namespace Term
 
   decEqHeadSim (Var v w) = decEqCong (decEq v w)
 
-  decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v sg w sg') with (decEqHet v w)
+  decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v sg w sg') with (hetDecEq v w)
     _ | No neq = No (\ Refl => neq (Refl, Refl))
     decEqHeadSim (Met {m = MkMeta {}} {n = MkMeta {}} v sg v sg')
       | Yes (Refl, Refl) with (decEqSubst sg sg')
@@ -192,3 +192,15 @@ namespace Term
 public export
 DecEq (Term metas ctxt ty) where
   decEq = decEqTerm
+
+export
+{metas : _} -> Show (Term metas ctxt ty) where
+  show (Var v) = show v
+  show (Met m sg) = let (MkMeta nm _ _ ** eq) = lookup m in nm
+  show (Fun b) = "\\. " ++ show b
+  show (Call op []) = show op
+  show (Call op ts) = "(" ++ show op ++ call ts ++ ")" where
+
+    call : {0 tys : List Ty} -> All (Term metas ctxt) tys -> String
+    call [] = ""
+    call (t :: ts) = " " ++ show t ++ call ts

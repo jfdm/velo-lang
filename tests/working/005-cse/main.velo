@@ -1,0 +1,4 @@
+let m = zero in
+let n = (inc zero) in
+(add (add (add m n) (add n m))
+     (add (add n m) (add m n)))
