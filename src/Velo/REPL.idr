@@ -19,6 +19,7 @@ import Velo.Lexer
 import Velo.Elaborator.Holey
 import Velo.Elaborator.Term
 import Velo.Elaborator
+import Velo.Unelaboration
 import Velo.Eval
 import Velo.Pass.CSE
 import Velo.Pass.Folding
@@ -93,7 +94,7 @@ process st CSE
   = case file st of
       Just (MkElabResult ms tm)
         => do let tm = cse tm
-              printLn (pretty {ann = ()} tm)
+              printLn (pretty {ann = ()} (unelaborate tm))
               pure st
 
       Nothing
@@ -104,7 +105,7 @@ process st ConstantFolding
   = case file st of
       Just (MkElabResult ms tm)
         => do let tm = cfold tm
-              printLn (pretty {ann = ()} tm)
+              printLn (pretty {ann = ()} (unelaborate tm))
               pure st
 
       Nothing

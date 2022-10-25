@@ -13,6 +13,7 @@ import Velo.IR.AST
 import Velo.IR.Term
 import Velo.IR.Common
 import Velo.Values
+import Velo.Unelaboration
 
 import Velo.Semantics.Reductions
 
@@ -159,7 +160,6 @@ namespace Velo
                     , pretty n
                     , colon
                     , pretty type
-                    , pretty "=>"
                     ]
              , hang 3
              $ hsep [ pretty "=>"
@@ -241,7 +241,7 @@ prettyRedux (ReduceFuncApp x)
 wrap : {metas, type : _} -> Term metas [<] type -> Doc ()
 wrap {type} tm
   = vcat [ pretty "```"
-         , pretty tm
+         , pretty (unelaborate tm)
          , pretty "```"
          ]
 
