@@ -1,8 +1,8 @@
-\subsection{Efficient De Bruijn Representation}
+\subsection{Efficient \DeBruijn{} Representation}
 \label{sec:design:deBruijn}
 
 A common strategy for implementing well-scoped terms is to use typed
-\emph{De Bruijn} indices~\cite{MANUAL:journals/math/debruijn72}, and these indices can be easily realised as an inductive family~\cite{DBLP:journals/fac/Dybjer94}
+\emph{\DeBruijn{}} indices~\cite{MANUAL:journals/math/debruijn72}, and these indices can be easily realised as an inductive family~\cite{DBLP:journals/fac/Dybjer94}
 indicating where in the type-level context the variable is bound.
 
 Concretely, we index the \IdrisType{Elem} family by the kind of the variable it represents and a \IdrisType{SnocList} of kinds as the context to reflect the fact that,
@@ -22,11 +22,11 @@ The \IdrisData{There} constructor skips past the most local one to look for
 the variable of interest in the rest of the context.
 
 Whilst a valid definition, this approach unfortunately does not scale to
-large contexts: every \IdrisType{Elem} proof is linear in the size of the de Bruijn
+large contexts: every \IdrisType{Elem} proof is linear in the size of the \DeBruijn{}
 index that it represents.
 %
 To improve the runtime efficiency of the representation we instead opt to
-model de Bruijn indices as natural numbers, which Idris 2 will compile to
+model de Bruijn indices as natural numbers, which \Idris{} will compile to
 GMP-style unbounded integers.
 %
 Further, we need to additionally define an \IdrisType{AtIndex} family to ensure that
