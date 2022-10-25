@@ -1,24 +1,18 @@
 \subsection{Efficient De Bruijn Representation}
 \label{sec:design:deBruijn}
 
-\chcomment{Efficient De Bruijn Representation}
-
 A common strategy for implementing well-scoped terms is to use typed
-\emph{De Bruijn} indices~\cite{MANUAL:journals/math/debruijn72}.
-
-These can be easily realised as an inductive family~\cite{DBLP:journals/fac/Dybjer94}
+\emph{De Bruijn} indices~\cite{MANUAL:journals/math/debruijn72}, and these indices can be easily realised as an inductive family~\cite{DBLP:journals/fac/Dybjer94}
 indicating where in the type-level context the variable is bound.
-%
-We index the \IdrisType{Elem} family by the kind of the variable it represents and
-a \IdrisType{SnocList} of kinds as the notion of context to reflect the fact that,
+
+Concretely, we index the \IdrisType{Elem} family by the kind of the variable it represents and a \IdrisType{SnocList} of kinds as the context to reflect the fact that,
 in inference rules, the most local end of the context is always on the right hand side.
 
 \begin{verbatim}
 data Elem : (ty : kind) -> (ctxt : SnocList kind) -> Type
   where
     Here : Elem ty (ctxt :< ty)
-    There : Elem ty ctxt
-         -> Elem ty (ctxt :< not_ty)
+    There : Elem ty ctxt -> Elem ty (ctxt :< not_ty)
 \end{verbatim}
 
 The \IdrisData{Here} constructor indicates that the variable of interest is
@@ -35,25 +29,23 @@ To improve the runtime efficiency of the representation we instead opt to
 model de Bruijn indices as natural numbers, which Idris 2 will compile to
 GMP-style unbounded integers.
 %
-We need to additionnally define an \IdrisType{AtIndex} family to ensure that
-all of the natural numbers we use correspond to valid indices.%
+Further, we need to additionally define an \IdrisType{AtIndex} family to ensure that
+all of the natural numbers we use correspond to valid indices.
 %
 We pointedly reuse the \IdrisType{Elem} names because these \IdrisData{Here}
 and \IdrisData{There} play exactly the same role.
 
 \begin{verbatim}
-data AtIndex : (ty   :          kind)
-            -> (ctxt : SnocList kind)
-            -> (idx : Nat)
-                   -> Type
+data AtIndex : (ty : kind) -> (ctxt : SnocList kind) -> (idx : Nat) -> Type
   where
     Here : AtIndex ty (ctxt :< ty) Z
     There : (later : AtIndex ty  ctxt               idx)
                   -> AtIndex ty (ctxt :< not_ty) (S idx)
 \end{verbatim}
 
+\noindent
 We then define a variable as the pairing of a natural number and an \emph{erased}
-proof that it is indeed a valid de Bruijn index.
+proof that the given natural numbers is indeed a valid de~Bruijn index.
 
 \begin{verbatim}
 data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type
@@ -61,10 +53,10 @@ data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type
     V : (idx : Nat) -> (0 prf : AtIndex ty ctxt idx) -> IsVar ctxt ty
 \end{verbatim}
 
-\todo{Talk about smart constructors \& views?}
-
-We now have the best of both worlds: a well-scoped notion of de Bruijn indices
+We now have the best of both worlds: a well-scoped realisation of de~Bruijn indices
 that is guaranteed to be compiled efficiently.
+
+\todo{Talk about smart constructors \& views?}
 
 %%% Local Variables:
 %%% mode: latex

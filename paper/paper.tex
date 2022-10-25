@@ -97,8 +97,16 @@ Our ongoing work is available at:
 \section{Language Design}
 \label{sec:design}
 
-\input{./content/deBruijn}
+This section details key design rationale on realising the static and dynamic semantics of \Velo{} within Idris.
 
+We have opted to give \Velo{} an external concrete syntax (a \ac{dsl}) in which users can write their programs.
+%
+With dependently typed languages, however, we can also capture the abstract syntax and its static semantics as a well-typed \ac{edsl} directly with the host language~\cite{Augustsson1999edt}.
+%
+Using such intrinsically typed \acp{edsl} we can statically verify for free that our language's are well-structured and that any transformation (model-to-model) or interpretation (model-to-host) respects the language's static semantics.
+In fact we will describe in \Cref{sec:compiler} how we can use our \acp{edsl} to both verify our static semantics and describe our dynamic semantics.
+
+\input{./content/deBruijn}
 \input{./content/compactconstant}
 
 
