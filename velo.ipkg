@@ -36,6 +36,8 @@ modules = Velo.Types
         , Velo.Pass.Folding
         , Velo.Pass.CSE
 
+        , Velo.Unelaboration
+
         , Velo.Trace
 
         , Velo.Options
