@@ -15,8 +15,11 @@ public export
 data Cmd = Quit
          | Help
          | Holes
-         | Load String
          | TypeOfHole String
+         | Eval
+         | CSE
+         | ConstantFolding
+         | Load String
 
 export
 commands : Commands Cmd
@@ -39,6 +42,19 @@ commands
                  (options [REQ "name"])
                  TypeOfHole
                  "Show the specified hole."
+
+    , newCommand (names ["eval"])
+                 Eval
+                 "Eval the loaded program."
+
+    , newCommand (names ["cse"])
+                 CSE
+                 "Perform common sub-expression elimination on the loaded program."
+
+    , newCommand (names ["simpl"])
+                 ConstantFolding
+                 "Perform constant folding on the loaded program."
+
     , newCommand (names ["load", "l"])
                  (options [REQ "file"])
                  Load

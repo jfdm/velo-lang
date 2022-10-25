@@ -8,6 +8,10 @@ Velo> [:q,:quit,:exit]
 	Show the current list of holes.
 [:hole_type,:t] [name]
 	Show the specified hole.
+[:eval] 
+	Eval the loaded program.
+[:cse] 
+	Perform common sub-expression elimination on the loaded program.
 [:load,:l] [file]
 	Load a program.
 

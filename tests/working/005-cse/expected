@@ -1,0 +1,10 @@
+Running Test
+Velo> # Finished Parsing
+# Finished Type-Checking
+Velo> apply (fun apply (fun apply (fun apply (fun add (add 0 (add 1 2)) (add (add 1 2) 0))
+                                       (add 1 0))
+                            (inc 1))
+                 0)
+      zero
+Velo> Not a recognised command.
+"File expected."

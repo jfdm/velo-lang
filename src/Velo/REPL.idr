@@ -20,6 +20,8 @@ import Velo.Elaborator.Holey
 import Velo.Elaborator.Term
 import Velo.Elaborator
 import Velo.Eval
+import Velo.Pass.CSE
+import Velo.Pass.Folding
 import Velo.Trace
 import Velo.Options
 import Velo.Commands
@@ -72,6 +74,28 @@ process st (TypeOfHole str)
         => do let m = getByName str ms
               printLn (pretty {ann = ()} m)
               pure st
+      Nothing
+        => do putStrLn "Need to load a file."
+              pure st
+
+process st Eval
+  = case file st of
+      Just (MkElabResult ms tm)
+        => do v <- eval tm
+              prettyComputation v
+              pure st
+
+      Nothing
+        => do putStrLn "Need to load a file."
+              pure st
+
+process st CSE
+  = case file st of
+      Just (MkElabResult ms tm)
+        => do let tm = cse tm
+              printLn (pretty {ann = ()} tm)
+              pure st
+
       Nothing
         => do putStrLn "Need to load a file."
               pure st
