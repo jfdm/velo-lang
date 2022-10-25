@@ -41,6 +41,26 @@ todo : State -> Velo State
 todo st = do putStrLn "Not Yet Implemented"
              pure st
 
+onFile : (st : State )
+      -> (f  : ElabResult -> Velo State)
+            -> Velo State
+onFile st f
+  = maybe (do putStrLn "Need to load a file."
+              pure st)
+          f
+          (file st)
+
+onHoles : (st : State)
+       -> (f  : List Meta -> Velo State)
+             -> Velo State
+onHoles st f
+  = onFile st
+           (\case MkElabResult [] _
+                    => do putStrLn "No Holes"
+                          pure st
+                  MkElabResult ms _
+                    => f ms)
+
 process : State -> Cmd -> Velo State
 process st Quit
   = do putStrLn "Quitting, Goodbye."
@@ -51,66 +71,36 @@ process st Help
        pure st
 
 process st Holes
-  = case (file st) of
-
-      Just (MkElabResult [] _)
-        => do putStrLn "No holes"
-              pure st
-
-      Just (MkElabResult ms _)
-        => do prettyMetas ms
-              pure st
-      Nothing
-        => do putStrLn "Need to load a file."
-              pure st
+  = onHoles st
+            (\ms => do prettyMetas ms
+                       pure st)
 
 process st (TypeOfHole str)
-  = case (file st) of
-
-      Just (MkElabResult [] _)
-        => do putStrLn "No holes"
-              pure st
-
-      Just (MkElabResult ms _)
-        => do let m = getByName str ms
-              printLn (pretty {ann = ()} m)
-              pure st
-      Nothing
-        => do putStrLn "Need to load a file."
-              pure st
+  = onHoles st
+            (\ms => do let m = getByName str ms
+                       printLn (pretty {ann = ()} m)
+                       pure st)
 
 process st Eval
-  = case file st of
-      Just (MkElabResult ms tm)
-        => do v <- eval tm
-              prettyComputation v
-              pure st
-
-      Nothing
-        => do putStrLn "Need to load a file."
-              pure st
+  = onFile st
+           (\(MkElabResult ms tm)
+                => do v <- eval tm
+                      prettyComputation v
+                      pure st)
 
 process st CSE
-  = case file st of
-      Just (MkElabResult ms tm)
-        => do let tm = cse tm
-              printLn (pretty {ann = ()} (unelaborate tm))
-              pure st
-
-      Nothing
-        => do putStrLn "Need to load a file."
-              pure st
+  = onFile st
+           (\(MkElabResult ms tm)
+                => do let tm = cse tm
+                      printLn (pretty {ann = ()} (unelaborate tm))
+                      pure st)
 
 process st ConstantFolding
-  = case file st of
-      Just (MkElabResult ms tm)
-        => do let tm = cfold tm
-              printLn (pretty {ann = ()} (unelaborate tm))
-              pure st
-
-      Nothing
-        => do putStrLn "Need to load a file."
-              pure st
+  = onFile st
+           (\(MkElabResult ms tm)
+                => do let tm = cfold tm
+                      printLn (pretty {ann = ()} (unelaborate tm))
+                      pure st)
 
 process st (Load str)
   = tryCatch (do ast <- fromFile str
@@ -123,14 +113,12 @@ process st (Load str)
                          pure st)
 
 process st Show
-  = case file st of
-      Just (MkElabResult ms tm)
-        => do printLn (pretty {ann = ()} (unelaborate tm))
-              pure st
+  = onFile st
+           (\(MkElabResult ms tm)
+                => do printLn (pretty {ann = ()} (unelaborate tm))
+                      pure st)
 
-      Nothing
-        => do putStrLn "Need to load a file."
-              pure st
+
 export covering
 repl : Velo ()
 repl
