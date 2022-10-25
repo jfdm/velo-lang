@@ -20,28 +20,37 @@ let b = true
 in let x = false
    in let m = (inc zero)
       in let f = (fun n : Nat => n)
-         in (?hole : Nat)
+         in (let a = (inc (inc zero)) in ?hole : Nat)
 ```
 ### Reduce Application
 ```
 let b = false
 in let m = (inc zero)
    in let f = (fun n : Nat => n)
-      in (?hole : Nat)
+      in (let a = (inc (inc zero)) in let a = true in ?hole : Nat)
 ```
 ### Reduce Application
 ```
 let m = (inc zero)
 in let f = (fun n : Nat => n)
-   in (?hole : Nat)
+   in (let a = (inc (inc zero)) in let a = true in let a = false in ?hole : Nat)
 ```
 ### Reduce Application
 ```
 let f = (fun m : Nat => m)
-in (?hole : Nat)
+in (let a = (inc (inc zero))
+    in let a = true
+       in let a = false
+          in let a = (inc zero)
+             in ?hole : Nat)
 ```
 ### Reduce Application
 ```
-(?hole : Nat)
+(let a = (inc (inc zero))
+ in let a = true
+    in let a = false
+       in let a = (inc zero)
+          in let a = (fun m : Nat => m)
+             in ?hole : Nat)
 ```
 # Finished
