@@ -50,6 +50,17 @@ onFile st f
           f
           (file st)
 
+onHoles : (st : State)
+       -> (f  : List Meta -> Velo State)
+             -> Velo State
+onHoles st f
+  = onFile st
+           (\case MkElabResult [] _
+                    => do putStrLn "No Holes"
+                          pure st
+                  MkElabResult ms _
+                    => f ms)
+
 process : State -> Cmd -> Velo State
 process st Quit
   = do putStrLn "Quitting, Goodbye."
@@ -60,25 +71,15 @@ process st Help
        pure st
 
 process st Holes
-  = onFile st
-           (\case MkElabResult [] _
-                    => do putStrLn "No holes"
-                          pure st
-                  MkElabResult ms _
-                    => do prettyMetas ms
-                          pure st
-           )
+  = onHoles st
+            (\ms => do prettyMetas ms
+                       pure st)
 
 process st (TypeOfHole str)
-  = onFile st
-           (\case MkElabResult [] _
-                    => do putStrLn "No holes"
-                          pure st
-
-                  MkElabResult ms _
-                    => do let m = getByName str ms
-                          printLn (pretty {ann = ()} m)
-                          pure st)
+  = onHoles st
+            (\ms => do let m = getByName str ms
+                       printLn (pretty {ann = ()} m)
+                       pure st)
 
 process st Eval
   = onFile st
