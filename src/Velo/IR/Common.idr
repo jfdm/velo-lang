@@ -173,4 +173,14 @@ getByName n ms
       No _ => Nothing
       Yes prf => Just (extract ms prf)
 
+export
+Show (Prim tys ty) where
+  show Zero = "zero"
+  show Plus = "inc"
+  show Add = "add"
+  show True = "true"
+  show False = "false"
+  show And = "and"
+  show App = "apply"
+
 -- [ EOF ]

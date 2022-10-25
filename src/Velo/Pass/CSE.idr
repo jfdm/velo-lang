@@ -19,6 +19,9 @@ import Toolkit.Data.SnocList.Thinning
 
 import Velo.Elaborator.CoDeBruijn
 
+import Debug.Trace
+import Data.String
+
 %default total
 
 ||| abstract here (provided things match up)
@@ -74,6 +77,9 @@ record Candidate (metas : _) (ctxt : _) where
   constructor MkCandidate
   {cType : Ty}
   cTerm : Diamond (\ ctxt => CoTerm metas ctxt cType) ctxt
+
+{metas : _} -> Show (Candidate metas ctxt) where
+  show (MkCandidate (MkDiamond th tm)) = show (deBruijn tm th)
 
 toDPair : Candidate metas ctxt -> (x : Ty ** Diamond (\ ctxt => CoTerm metas ctxt x) ctxt)
 toDPair (MkCandidate {cType} cTerm) = (cType ** cTerm)
@@ -141,6 +147,7 @@ namespace CoTerm
               Diamond (\ ctxt => CoTerm metas ctxt t) ctxt
     letBind cs t =
       let cs = filter ((> 1) . snd) (toList cs) in
+      trace ("Candidates :\n" ++ unlines (map (("  " ++) . show) cs)) $
       let cs = map (\ (t, n) => (t, (n * size (t.cTerm.selected)))) cs in
       let cs = sortBy (compare `on` snd) cs in
       let (vars ** tms) = Quantifiers.unzipWith (toDPair . fst) cs in
@@ -166,7 +173,9 @@ namespace CoTerm
     go (Call op ts) =
       let (cs, ts) = gos ts in
       let tm = Call op <$> ts in
-      (insert (MkCandidate tm) 1 cs, tm)
+      let c = MkCandidate tm in
+      trace ("Inserting: " ++ show c) $
+      (insert c 1 cs, tm)
     go t = (empty, MkDiamond Identity t)
 
     gos [] = (empty, MkDiamond Identity [])

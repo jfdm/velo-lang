@@ -90,4 +90,8 @@ thin v@_ (Keep Refl th) with (view v)
   _ | Here = here
   _ | There w = shift (thin w th)
 
+export
+Show (IsVar g s) where
+  show (V n _) = show n
+
 -- [ EOF ]

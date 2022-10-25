@@ -100,6 +100,17 @@ process st CSE
         => do putStrLn "Need to load a file."
               pure st
 
+process st ConstantFolding
+  = case file st of
+      Just (MkElabResult ms tm)
+        => do let tm = cfold tm
+              printLn (pretty {ann = ()} tm)
+              pure st
+
+      Nothing
+        => do putStrLn "Need to load a file."
+              pure st
+
 process st (Load str)
   = tryCatch (do ast <- fromFile str
                  putStrLn "# Finished Parsing"

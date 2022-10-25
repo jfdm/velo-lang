@@ -192,3 +192,15 @@ namespace Term
 public export
 DecEq (Term metas ctxt ty) where
   decEq = decEqTerm
+
+export
+{metas : _} -> Show (Term metas ctxt ty) where
+  show (Var v) = show v
+  show (Met m sg) = let (MkMeta nm _ _ ** eq) = lookup m in nm
+  show (Fun b) = "\\. " ++ show b
+  show (Call op []) = show op
+  show (Call op ts) = "(" ++ show op ++ call ts ++ ")" where
+
+    call : {0 tys : List Ty} -> All (Term metas ctxt) tys -> String
+    call [] = ""
+    call (t :: ts) = " " ++ show t ++ call ts

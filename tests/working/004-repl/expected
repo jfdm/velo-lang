@@ -12,6 +12,8 @@ Velo> [:q,:quit,:exit]
 	Eval the loaded program.
 [:cse] 
 	Perform common sub-expression elimination on the loaded program.
+[:simpl] 
+	Perform constant folding on the loaded program.
 [:load,:l] [file]
 	Load a program.
 
