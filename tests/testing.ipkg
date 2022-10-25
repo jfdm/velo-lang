@@ -10,7 +10,7 @@ package testing
 
 depends = contrib, test
 
-executable = ola-tests
+executable = velo-tests
 
 main = Main
 

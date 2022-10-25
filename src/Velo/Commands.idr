@@ -18,6 +18,7 @@ data Cmd = Quit
          | TypeOfHole String
          | Eval
          | CSE
+         | Show
          | ConstantFolding
          | Load String
 
@@ -54,6 +55,10 @@ commands
     , newCommand (names ["simpl"])
                  ConstantFolding
                  "Perform constant folding on the loaded program."
+
+    , newCommand (names ["show"])
+                 Show
+                 "Print the loaded program."
 
     , newCommand (names ["load", "l"])
                  (options [REQ "file"])
