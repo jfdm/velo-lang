@@ -110,7 +110,7 @@ eqTh (Skip th) (Skip ph) = case eqTh th ph of
 
 public export
 Comparable (Thinning sx sa) (Thinning sy sa) where
-  cmp Empty Empty = LT
+  cmp Empty Empty = EQ
   cmp (Keep Refl th) (Keep Refl ph) with (cmp th ph)
     _ | LT = LT
     cmp (Keep Refl th) (Keep Refl .(th)) | EQ = EQ

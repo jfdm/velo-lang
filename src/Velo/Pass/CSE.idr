@@ -19,8 +19,10 @@ import Toolkit.Data.SnocList.Thinning
 
 import Velo.Elaborator.CoDeBruijn
 
+{-
 import Debug.Trace
 import Data.String
+-}
 
 %default total
 
@@ -146,8 +148,9 @@ namespace CoTerm
               Diamond (\ ctxt => CoTerm metas ctxt t) ctxt ->
               Diamond (\ ctxt => CoTerm metas ctxt t) ctxt
     letBind cs t =
-      let cs = filter ((> 1) . snd) (toList cs) in
-      trace ("Candidates :\n" ++ unlines (map (("  " ++) . show) cs)) $
+      let cs = toList cs in
+--      trace ("Candidates :\n" ++ unlines (map (("  " ++) . show) cs)) $
+      let cs = filter ((> 1) . snd) cs in
       let cs = map (\ (t, n) => (t, (n * size (t.cTerm.selected)))) cs in
       let cs = sortBy (compare `on` snd) cs in
       let (vars ** tms) = Quantifiers.unzipWith (toDPair . fst) cs in
@@ -174,7 +177,7 @@ namespace CoTerm
       let (cs, ts) = gos ts in
       let tm = Call op <$> ts in
       let c = MkCandidate tm in
-      trace ("Inserting: " ++ show c) $
+--      trace ("Inserting: " ++ show c) $
       (insert c 1 cs, tm)
     go t = (empty, MkDiamond Identity t)
 
