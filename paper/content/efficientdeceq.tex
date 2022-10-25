@@ -70,3 +70,9 @@ decEq s@_ t@_ with (diag s t) proof eq
     _ | _ | No neq2 = No (\case Refl => neq2 Refl)
   _ | Nothing = No (\ Refl => diagNot _ eq)
 \end{verbatim}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper"
+%%% End:
