@@ -13,7 +13,7 @@ HYPERFINE=hyperfine
 
 
 TARGETDIR = ./build/exec
-TARGET = ${TARGETDIR}/ola-tests
+TARGET = ${TARGETDIR}/velo-tests
 
 UPDATE ?= --interactive
 THREADS ?= $(shell (nproc || sysctl -n hw.ncpu) 2>/dev/null || echo 1)
