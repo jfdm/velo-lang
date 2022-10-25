@@ -7,5 +7,4 @@ in let n = m
       in let q = (add p n)
          in let m0 = (add n p)
             in (add (add m0 q) (add q m0))
-Velo> Not a recognised command.
-"File expected."
+Velo> Quitting, Goodbye.
