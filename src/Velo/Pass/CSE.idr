@@ -148,10 +148,11 @@ namespace CoTerm
               Diamond (\ ctxt => CoTerm metas ctxt t) ctxt ->
               Diamond (\ ctxt => CoTerm metas ctxt t) ctxt
     letBind cs t =
-      let cs = toList cs in
+      let cs = SortedMap.toList cs in
+      let cs = map (\ (t, n) => (t, size (selected $ cTerm t), n)) cs in
 --      trace ("Candidates :\n" ++ unlines (map (("  " ++) . show) cs)) $
-      let cs = filter ((> 1) . snd) cs in
-      let cs = map (\ (t, n) => (t, (n * size (t.cTerm.selected)))) cs in
+      let cs = filter (\ (_, m, n) => m > 1 && n > 1) cs in
+      let cs = map (\ (t, m, n) => (t, m * n)) cs in
       let cs = sortBy (compare `on` snd) cs in
       let (vars ** tms) = Quantifiers.unzipWith (toDPair . fst) cs in
       let MkDiamond th txs = abstractR {ctx = [<]} {g' = vars} tms t in
