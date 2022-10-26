@@ -9,6 +9,7 @@ DEPENDS=\
   compactconstant.tex \
   notations.tex \
   velo-intro.tex \
+  cse.tex \
   paper.bib
 
 

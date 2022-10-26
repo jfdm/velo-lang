@@ -1,0 +1,23 @@
+%TODO: comment on cost of thinning as inductive values?
+%      cite the preprint solving this & whose diagram this is?
+\input{ast}
+
+Now that our core language is well scoped by construction, our compiler passes
+need to be proven scope-preserving.
+%
+This is not a new requirement, merely the explicitation of a constraint that
+used to be enforced informally.
+
+
+The purpose of common sub-expressions elimination is to identify subterms
+that appear multiple times in the syntax tree and abstract over them so
+as to avoid needless recomputations at runtime.
+%
+In the following example for instance, we would like to let-bind $t$ before
+the application node (denoted \$) so that it may be shared by both subtrees.
+
+\cseexamplegraph{}
+
+One of the challenge of CSE exemplified above is that the term of interest
+
+\subsection{Co-De Bruijn representation}

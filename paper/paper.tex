@@ -12,6 +12,9 @@ pdfa
 \usepackage{todonotes}
 \setuptodonotes{inline}
 
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+
 \usepackage{acronym}
 \usepackage{xspace}
 \usepackage[commandnameprefix=always]{changes}
@@ -188,10 +191,15 @@ that showcases how we can use languages, such as Idris, as language workbenches.
 
 \chcomment{Well-Typed Holes}
 
-\section{Optimisation \& Execution}
-\label{sec:compiler}
-
+\section{Optimisation}
+\label{sec:compiler-pass}
 \chcomment{Co de Bruijn for CSE}
+
+\input{cse}
+
+\section{Execution}
+\label{sec:semantics}
+
 \chcomment{Evaluation as Progress (with computation rules in one separate function)}
 
 \section{Good Programming Idioms}
