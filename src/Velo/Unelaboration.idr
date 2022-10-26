@@ -41,13 +41,27 @@ var (nms :< I x _) v@_ with (view v)
   _ | Here = x
   _ | There v' = var nms v'
 
-meta : {metas : List Meta} -> IsMember metas m -> AST ()
-meta m = Hole () (metaName $ fst $ lookup m)
-
+meta : {0 m : Meta} -> {metas : _} ->
+  All Item ctxt ->
+  IsMember metas m ->
+  Subst metas ctxt (metaScope m) ->
+  AST ()
 checking : {metas, t : _} -> All Item ctxt ->
            Term metas ctxt t -> AST ()
 synthing : {metas, t : _} -> All Item ctxt ->
            Term metas ctxt t -> AST ()
+
+meta nms p sg with (lookup p)
+  _ | (MkMeta nm supp _ ** Refl) = go 0 supp sg (Hole () nm) where
+
+    go : Nat -> All Item tys -> Subst metas ctxt tys -> AST () -> AST ()
+    go n [<] _ t = t
+    go n (xs :< I x _) (sg :< u@(Var (V m p))) t
+      = ifThenElse (n == m)
+          (go (S n) xs sg t)
+          (go (S n) xs sg (Let () x (synthing nms u) t))
+    go n (xs :< I x _) (sg :< u) t
+      = go (S n) xs sg (Let () x (synthing nms u) t)
 
 calling : {metas, tys : _} -> All Item ctxt ->
           Prim tys ty -> All (Term metas ctxt) tys -> AST ()
@@ -62,11 +76,11 @@ calling nms App [f,t] = case f of
            Let () x (synthing nms t) (synthing (nms :< I x _) b)
   _ => App () (synthing nms f) (checking nms t)
 
-checking nms (Met m sg) = meta m -- TODO: unelab the substitution
+checking nms (Met m sg) = meta nms m sg
 checking nms t = synthing nms t
 
 synthing nms (Var v) = Ref () (var nms v)
-synthing nms (Met m sg) = The () t (meta m) -- TODO: unelab the substitution
+synthing nms (Met m sg) = The () t (meta nms m sg)
 synthing nms (Fun {a = dom} b)
   = let x = fresh nms dom in
     Fun () x dom (synthing (nms :< I x _) b)

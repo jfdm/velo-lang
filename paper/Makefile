@@ -3,13 +3,9 @@ DEPENDS=\
   oasics-logo-bw.pdf \
   oasics-v2021.cls \
   orcid.pdf \
-  deBruijn.tex \
-  efficientdeceq.tex \
-  positivelynegative.tex \
-  compactconstant.tex \
+  preamble.tex \
   notations.tex \
-  velo-intro.tex \
-  cse.tex \
+  ./content/*.tex \
   paper.bib
 
 
