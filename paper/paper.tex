@@ -13,6 +13,10 @@ pdfa
 \setuptodonotes{inline}
 
 \usepackage{relsize}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+
 \usepackage{acronym}
 \usepackage{xspace}
 \usepackage[commandnameprefix=always]{changes}
@@ -128,10 +132,15 @@ In fact we will describe in \Cref{sec:compiler} how we can use our \acp{edsl} to
 
 \chcomment{Well-Typed Holes}
 
-\section{Optimisation \& Execution}
-\label{sec:compiler}
-
+\section{Optimisation}
+\label{sec:compiler-pass}
 \chcomment{Co de Bruijn for CSE}
+
+\input{./content/cse}
+
+\section{Execution}
+\label{sec:semantics}
+
 \chcomment{Evaluation as Progress (with computation rules in one separate function)}
 
 \section{Good Programming Idioms}
@@ -145,7 +154,8 @@ We end our tour of \Velo{} by detailing two programming idioms that helped with 
 \section{Conclusion}
 \label{sec:conclusion}
 
-
+% we have 2 pages of refs for free
+\newpage
 \bibliography{paper}
 
 \end{document}
