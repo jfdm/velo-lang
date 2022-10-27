@@ -1,4 +1,4 @@
 (fun x : nat =>
   (add ?hole1
        let b = (inc zero)
-       in (add ?hole1 ?hole2)))
+       in (add ?hole1 (add ?hole2 ?hole3))))

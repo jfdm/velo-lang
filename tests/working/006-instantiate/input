@@ -2,5 +2,9 @@
 :show
 :holes
 :instantiate hole1 x
+:holes
 :instantiate hole2 (add x b)
+:holes
+:i hole3 (zero : nat)
+:holes
 :quit
