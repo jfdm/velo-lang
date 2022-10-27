@@ -1,0 +1,463 @@
+%% ----------------------------------------------------------- [ Begin Package ]
+% Copyright 2018 - Jan de Muijnck-Hughes
+%
+% This work may be distributed and/or modified under the  conditions
+% of the LaTeX Project Public License, either version 1.3c of this
+% license or (at your option) any later version.
+%
+% The latest version of this license can be found at:
+%    http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Jan de Muijnck-Hughes
+%
+% This work consists of the file: jfdm-plt.sty
+% ---------------------------------------------------------------------- [ EOH ]
+\ProvidesPackage{jfdm-plt}
+%
+% A LaTeX Style file containing various utilities for helping to
+% type-set various FP related things. The design of several functions
+% have been adapted from those seen with algorithm2e.
+%
+% The core principle behind the design of the utilities is the use of
+% math-mode to perform the type setting. All functions and commands
+% unless documented are to be used in math mode.
+%
+% ------------------------------------------------------------------ [ Options ]
+% Currently there are not class options.
+% ----------------------------------------------------------------- [ Packages ]
+\RequirePackage{etoolbox}
+
+\RequirePackage{xspace}
+\RequirePackage{fixmath}
+\RequirePackage[fixamsmath]{mathtools}
+\RequirePackage{stmaryrd}
+\RequirePackage{turnstile}
+\RequirePackage{upgreek}
+\RequirePackage{pgffor}
+\RequirePackage{mathpartir}
+
+% ------------------------------------------ [ Functions, Types, and Keywords. ]
+%
+% The following set of commands allow for function names, types, and
+% keywords to be typeset through definition of custom commands to
+% represent the items. The styling is controlled through macros that
+% can be redefined.
+%
+
+% ---------------------------------------------------------------- [ Enums ]
+%
+% Default Enum Style: Math TT
+\newcommand{\FPEnumSty}[1]{\mathsf{#1}}
+
+% Change the Enum Style.
+%
+% For example:
+%    \SetFPEnumSty{mathbf}
+% or
+%    \newcommand{\MySty}[1]{\underline{\mathsf{#1}}}\SetFPEnumSty{MySty}
+%
+\newcommand{\SetFPEnumSty}[1]{%
+  \renewcommand{\FPEnumSty}[1]{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}{##1}}}
+
+% Declare a Enum.
+%
+% For example: \MkEnum{\MyFoldr}{foldr}
+%
+\newcommand{\MkEnum}[2]{%
+  \newrobustcmd{#1}{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}%
+      {\ensuremath{\FPEnumSty{#2}}}\xspace}}
+
+% ---------------------------------------------------------------- [ Types ]
+%
+% Default Type Style: Math TT
+\newcommand{\FPTypeSty}[1]{\text{\textsc{#1}}}
+
+% Change the Type Style.
+%
+% For example:
+%    \SetFPTypeSty{mathbf}
+% or
+%    \newcommand{\MySty}[1]{\underline{\mathsf{#1}}}\SetFPTypeSty{MySty}
+%
+\newcommand{\SetFPTypeSty}[1]{%
+  \renewcommand{\FPTypeSty}[1]{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}{##1}}}
+
+% Declare a Type.
+%
+% For example: \MkType{\MyFoldr}{foldr}
+%
+\newcommand{\MkType}[2]{%
+  \newrobustcmd{#1}{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}%
+      {\ensuremath{\FPTypeSty{#2}}}\xspace}}
+
+
+% ---------------------------------------------------------------- [ Functions ]
+%
+% Default Function Style: Math SF
+\newcommand{\FPFuncSty}[1]{\mathsf{#1}}
+
+% Change the Function Style.
+%
+% For example:
+%    \SetFPFuncSty{mathtt}
+% or
+%    \newcommand{\MySty}[1]{\underline{\mathsf{#1}}}\SetFPFuncSty{MySty}
+
+\newcommand{\SetFPFuncSty}[1]{%
+  \renewcommand{\FPFuncSty}[1]{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}{##1}}}
+
+% Declare a Function.
+%
+% For example: \MkFunction{\MyFoldr}{foldr}
+%
+\newcommand{\MkFunction}[2]{%
+  \newrobustcmd{#1}[1]{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}%
+      {\ensuremath{\FPFuncSty{#2}\FPFuncSty{(}##1\FPFuncSty{)}}}}}
+
+
+% ----------------------------------------------------------------- [ Keywords ]
+%
+% Default Keyword Style: Underline and Math SF
+\newcommand{\FPKwSty}[1]{\underline{\mathsf{#1}}}
+
+% Change the Keyword Style.
+%
+% For example:
+%    \SetFPKwSty{mathtt}
+% or
+%    \newcommand{\MySty}[1]{\underline{\mathsf{#1}}}\SetFPKwSty{MySty}
+%
+\newcommand{\SetFPKwSty}[1]{%
+  \renewcommand{\FPKwSty}[1]{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}{##1}}}
+
+% Declare a Keyword.
+%
+% For example: \MkKeyword{\MyFoldr}{foldr}
+%
+\newcommand{\MkKeyword}[2]{%
+  \newrobustcmd{#1}{%
+    \@ifnextchar\bgroup{\csname @#1\endcsname}%
+      {\ensuremath{\FPKwSty{#2}}}\xspace}}
+
+% ---------------------------------------------------------------- [ Operators ]
+
+% Declare an infix operator.
+\newcommand{\MkInfixOp}[2]{%
+  \newrobustcmd{#1}{%
+    \ensuremath{\,{#2}\,}}}
+
+% -------------------------------------------------- [ Abstract Syntax Helpers ]
+
+% Display the pipe symbol to mean alternate with spacing
+\newcommand{\fpAlt}{\ensuremath{\mid}}
+\newcommand{\fpspace}{\ensuremath{\;}}
+
+
+\newcommand{\firstAlt}{\ensuremath{\phantom{::}\mid}}
+
+\newcommand{\StringLit}[1]{\ensuremath{\text{``#1''}}}
+
+\newcommand{\primed}[1]{\ensuremath{#1^{\prime}}}
+\newcommand{\suchthat}[1]{\ensuremath{\lbrack #1\rbrack}}
+
+\newcommand{\var}[1]{\ensuremath{\mathrm{\emph{#1}}}}
+
+% ------------------------------------------------------------- [ Math Helpers ]
+
+% Quick commands for type setting pairs, tuples, and sets.
+
+\newcommand{\tuple}[1]{\ensuremath{(#1)}}
+\newcommand{\vect}[1]{\ensuremath{\langle#1\rangle}}
+\newcommand{\pair}[2]{\ensuremath{(#1,#2)}}
+\newcommand{\set}[1]{\ensuremath{\{#1\}}}
+
+% Display a series
+%
+% Optional first argument to control counter.
+%
+% Examples:
+%
+% \series{x}    produces {x_{1},...,x_{n}}
+% \series[m]{x} produces {x_{1},...,x_{m}}
+\newcommand{\series}[2][n]{\ensuremath{\{#2_{1},\;\ldots,\;#2_{#1}\}}}
+
+% Display a series starting from Zero.
+%
+% Defined same as \series
+\newcommand{\seriesZ}[2][n]{\ensuremath{\set{#2_{0},\;\ldots,\;#2_{#1}}}}
+
+% Display an expression to be interpreted using the bracket style.
+%
+% \interpB{xs ++ ys} produces [[xs ++ ys]]
+%
+\newcommand{\interpB}[1]{\ensuremath{\llbracket\;#1\;\rrbracket}}
+
+% Display a series to be interpreted using the bracket style.
+%
+% Optional first argument to control counter.
+% \interpSB{x}    produces {[[x_{1}]],\ldots,[[x_{n}]]}
+% \interpSB[m]{x} produces {[[x_{1}]],\ldots,[[x_{m}]]}
+%
+\newcommand{\interpSB}[2][n]{\ensuremath{\{\interpB{#2_{1}},\;\ldots,\;\interpB{#2_{#1}}\}}}
+
+% Display a series to be interpreted using the bracket style and counting from zero.
+\newcommand{\interpSBZ}[2][n]{\ensuremath{\set{\interpB{#2_{0}},\;\ldots,\;\interpB{#2_{#1}}}}}
+
+
+% Same as above but using the style: L(xs ++ ys)
+
+\newcommand{\interpL}[1]{\ensuremath{\mathcal{L}(#1)}}
+\newcommand{\interpLS}[2][n]{\ensuremath{\set{\interpL{#2_{1}},\;\ldots,\;\interpL{#2_{#1}}}}}
+\newcommand{\interpLSZ}[2][n]{\ensuremath{\set{\interpL{#2_{0}},\;\ldots,\;\interpL{#2_{#1}}}}}
+
+% Display a powerset.
+\newcommand{\powerset}[1]{\ensuremath{\wp(#1)}}
+
+% ------------------------------------------------------ [ Typing Rule Helpers ]
+
+% Wrap a definition inside an environment
+%
+% \env{x:Ty} produces \Gamma \vdash x:Ty
+\newcommand{\env}[2][\Gamma]{\ensuremath{#1\vdash#2}}
+
+% Wrap a definition inside an environment with a named element.
+%
+% The named element is the first argument, the expression the second.
+%
+% \env{i:Nat}{x:Ty,i} produces \Gamma i:Nat \vdash x:Ty,i
+\newcommand{\envn}[2]{\ensuremath{\Gamma\;#1\vdash\;#2}}
+
+% Provide a type to a variable
+%
+% \ty{x}{Nat} produces x : Nat
+\newcommand{\ty}[2]{\ensuremath{#1\,\mathord{:}\,#2}}
+
+
+% Give a list of elements with the same type.
+%
+% \typeList{x}{Nat} produces {x_{1} : Nat,\ldots,x_{n}:Nat}
+\newcommand{\typeList}[2]{\ensuremath{\set{\ty{#1_{1}}{#2},\ldots,\ty{#1_{n}}{#2}}}}
+
+% ----------------------------------------------------------- [ Text Functions ]
+% Commonly used functions.
+\MkFunction{\Enqueue}{enqueue}
+\MkFunction{\EnqueueM}{enqueue^{\star}}
+\MkFunction{\Dequeue}{dequeue}
+\MkFunction{\Push}{push}
+\MkFunction{\PushM}{push^{\star}}
+\MkFunction{\Pop}{pop}
+\MkFunction{\Poll}{poll}
+\MkFunction{\Peek}{peek}
+\MkFunction{\Append}{append}
+\MkFunction{\Children}{children}
+\MkFunction{\Max}{max}
+\MkFunction{\Min}{min}
+\MkFunction{\Vertices}{vertices}
+\MkFunction{\Foldr}{foldr}
+\MkFunction{\Map}{map}
+\MkFunction{\CMap}{concatMap}
+
+% ---------------------------------------------------------------- [ Operators ]
+% Commonly used operators
+\MkInfixOp{\AND}{\wedge}
+\MkInfixOp{\IOR}{\vee}
+\MkInfixOp{\XOR}{\oplus}
+\MkInfixOp{\APPEND}{\mid\mid}
+\MkInfixOp{\TY}{:}
+\MkType{\ARR}{\rightarrow}
+\MkInfixOp{\MEQ}{\overset{?}{=}} % Maybe equal
+% -------------------------------------------------------------------- [ Types ]
+
+\newcommand{\Nat}{\ensuremath{\mathbb{N}}}
+\newcommand{\Int}{\ensuremath{\mathbb{Z}}}
+
+\MkType{\String}{String}
+\MkType{\Bool}{Bool}
+\MkType{\NatTxt}{Nat}
+\MkType{\IntTxt}{Int}
+
+\newcommand{\tyRaise}[1]{\ensuremath{\uparrow^{#1}}}
+\newcommand{\ternary}[4]{\ensuremath{%
+    #2\,?_{#1}\,#3\,\oplus\,#4
+  }}
+\newcommand{\tBool}[3]{\ternary{B}{#1}{#2}{#3}}
+\newcommand{\tMaybe}[3]{\ternary{O}{#1}{#2}{#3}}
+
+\newcommand{\ctorS}[1]{\ensuremath{\mathsf{S}(#1)}}
+\newcommand{\ctorZ}[1]{\ensuremath{\mathsf{Z}}}
+
+\newcommand{\envOp}[3][\Gamma]{\ensuremath{#1#2#3}}
+
+\newcommand{\envUp}[2][\Gamma]{\envOp[#1]{\pm}{#2}}
+\newcommand{\envDel}[2][\Gamma]{\envOp[#1]{-}{#2}}
+\newcommand{\envAdd}[2][\Gamma]{\envOp[#1]{+}{#2}}
+
+\newcommand{\envTrans}[3]{\ensuremath{#1\vdash#3\dashv#2}}
+
+\newcommand{\pred}[1]{\ensuremath{\lbrack{}#1\rbrack}}
+
+\newcommand{\newCmd}[2]{\ensuremath{#1\,(#2)}}
+\newcommand{\newExpr}[2]{\ensuremath{(#1\,#2)}}
+
+\MkType{\TypeType}{TYPE}
+
+\newcommand{\Type}{\ensuremath{\TypeType}}
+
+\MkKeyword{\KwdIf}{if}
+\MkKeyword{\KwdThen}{then}
+\MkKeyword{\KwdElse}{else}
+\MkKeyword{\KwdOf}{of}
+\MkKeyword{\KwdLet}{let}
+\MkKeyword{\KwdBe}{\;be\;}
+\MkKeyword{\KwdIn}{in}
+\MkKeyword{\KwdGiven}{given}
+
+\MkEnum{\EnumStop}{stop}
+
+\newcommand{\exprStop}{\EnumStop}
+
+\newcommand{\TyFunc}[2]{\ensuremath{#1\rightarrow{#2}}}
+
+\MkType{\TyBool}{Bool}
+\MkEnum{\EnumFalse}{False}
+\MkEnum{\EnumTrue}{True}
+
+\newcommand{\exprFalse}{\ensuremath{\EnumFalse}}
+\newcommand{\exprTrue}{\ensuremath{\EnumTrue}}
+
+\MkType{\TyNat}{Nat}
+\MkEnum{\EnumZero}{Zero}
+\newcommand{\exprZero}{\EnumZero}
+\MkEnum{\EnumInc}{Inc}
+\newcommand{\exprInc}[1]{\newExpr{\EnumInc}{#1}}
+
+\MkInfixOp{\Product}{\times}
+
+\MkType{\TyUnit}{\ensuremath{\mathbbm{1}}}
+\MkEnum{\EnumUnit}{\ensuremath{tt}}
+\newcommand{\unitValue}{\ensuremath{\star_{1}}}
+\newcommand{\valueUnit}{\ensuremath{\star_{1}}}
+
+\newcommand{\getter}[2]{\newExpr{\pi_{#1}}{#2}}
+
+\newcommand{\TyProduct}[2]{\ensuremath{#1\Product#2}}
+\newcommand{\TySum}[2]{\ensuremath{#1+#2}}
+\newcommand{\TyOpt}[1]{\ensuremath{{#1}^{?}}}
+\newcommand{\TyList}[1]{\ensuremath{#1\cdots}}
+
+\MkKeyword{\SumAS}{as}
+
+\newcommand{\valueSum}[2]{\ensuremath{#1\;\SumAS{}\;#2}}
+
+\newcommand{\valueJust}[1]{\ensuremath{(\mathsf{inr}\;#1)}}
+\newcommand{\valueNothing}{\ensuremath{(\mathsf{inl}\;\valueUnit)}}
+
+\newcommand{\valueLeft}[1]{\ensuremath{(\mathsf{inl}\;#1)}}
+\newcommand{\valueRight}[1]{\ensuremath{(\mathsf{inr}\;#1)}}
+
+
+\MkType{\TyMaybe}{Maybe}
+\MkEnum{\EnumJust}{Just}
+\MkEnum{\EnumNothing}{Nothing}
+
+
+\MkEnum{\Nil}{\emptyset}
+\MkInfixOp{\Cons}{\dblcolon}
+
+\MkInfixOp{\EvalTo}{\Downarrow}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\DeclarePairedDelimiter\abs{\mid}{\mid}
+
+\newcommand{\stmtIf}[3]{\ensuremath{\KwdIf\;#1\;\KwdThen\;#2\;\KwdElse\;#3}}
+\newcommand{\stmtLet}[3]{\ensuremath{\KwdLet\;#1\KwdBe#2\;\KwdIn\;#3}}
+\newcommand{\stmtLetTy}[4]{\ensuremath{\KwdLet\;\ty{#1}{#2}\KwdBe#3\;\KwdIn\;#4}}
+\newcommand{\stmtPure}[1]{\ensuremath{\floor{#1}}}
+
+\newcommand{\exprIf}[3]{\stmtIf{#1}{#2}{#3}}
+\newcommand{\exprLet}[3]{\stmtLet{#1}{#2}{#3}}
+\newcommand{\exprLetTy}[4]{\stmtLetTy{#1}{#2}{#3}{#4}}
+\newcommand{\exprPure}[1]{\stmtPure{#1}}
+
+
+\MkInfixOp{\SeqOp}{;}
+\newcommand{\stmtSeq}[2]{\ensuremath{#1\,\SeqOp\,#2}}
+
+\newcommand{\exprLam}[2][x]{\ensuremath{(\lambda(#1)\cdot#2)}}
+\newcommand{\exprLamTy}[3]{\ensuremath{(\lambda(\ty{#1}{#2})\cdot#3)}}
+\newcommand{\exprApp}[2]{\ensuremath{#1\,\$\,#2}}
+
+
+\newcommand{\LetStart}[2]{\ensuremath{\KwdLet\;#1\KwdBe#2\;\KwdIn}}
+\newcommand{\LamStart}[1][x]{\ensuremath{\lambda(#1)\cdot}}
+
+
+\newcommand{\cycle}[2]{%
+  \ensuremath{%
+    \foreach \index in {1, ..., #1} {%
+      #2%
+  }%
+  }%
+}
+
+\newcommand{\mIndent}[2][1]{\ensuremath{\cycle{#1}{\quad}\shoveleft{#2}}}
+
+\newcommand{\TyCont}[2]{\ensuremath{(#1\rightarrow#2)\rightarrow#2}}
+\newcommand{\TyTyCont}[3]{\ensuremath{(#1\rightarrow\TyCont{#2}{#3})}}
+
+\newcommand{\TyContRes}[2]{\ensuremath{(#1\rightarrow(#2\rightarrow#2))\rightarrow#2}}
+
+\newcommand{\lambdaLang}[1]{\ensuremath{\lambda_{#1}}}
+
+\MkInfixOp{\SubstOp}{\coloneq}
+\newcommand{\substPair}[2]{\ensuremath{#1\SubstOp#2}}
+\newcommand{\substBody}[2]{\ensuremath{#1\lbrack#2\rbrack}}
+\newcommand{\subst}[3]{\substBody{#1}{\substPair{#2}{#3}}}
+
+\MkInfixOp{\ReducesTo}{\Downarrow}
+
+\newcommand{\StepToOp}{\mapsto}
+\MkInfixOp{\StepTo}{\StepToOp}
+\MkInfixOp{\StepsTo}{\StepToOp^{*}}
+
+\newcommand*{\defeq}{\ensuremath{\stackrel{\text{def}}{=}}}
+\newcommand{\setTAPL}[2]
+{%
+  \set{#1\,^{#2}}%
+}
+
+\newcommand{\setTAPLTypes}[5]
+{%
+  \setTAPL{\ty{#4_{#1}}{#5_{#1}}}{#1\in#2..#3}%
+}
+
+\newcommand{\setTAPLValues}[5]
+{%
+  \setTAPL{#4_{#1}=#5_{#1}}{#1\in#2..#3}%
+}
+
+\newcommand{\setTAPLLabels}[4]
+{%
+  \setTAPL{#4_{#1}}{#1\in#2..#3}%
+}
+
+
+
+\endinput
+% ---------------------------------------------------------------------- [ EOF ]
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.blind.double"
+%%% End:

@@ -1,0 +1,90 @@
+\begin{mathpar}%\mprset{sep=1em}
+  %
+  % Naturals
+  %
+  \and
+  \infer*[left=Z-Val]
+  {%
+    \\
+  }{%
+    \exprZero{}\StepTo\exprZero{}
+  }
+  \and
+  \infer*[left=Inc]
+  {%
+    n\StepsTo{v}
+  }{%
+    \exprIncRule\StepsTo{\exprIncValue}
+  }
+  \and
+  \infer*[left=Add-L]
+  {%
+    a\StepsTo{v}
+  }{%
+    \exprAddRule\StepsTo{\exprAddStepL}
+  }
+  \and
+  \infer*[left=Add-LZ]
+  {%
+    b\StepsTo{v}
+  }{%
+    \exprAddValueLZ\StepsTo{v}
+  }
+  \and
+  \infer*[left=Add-RV]
+  {%
+    b\StepsTo{v_b}
+  }{%
+    \exprAddValueRV\StepsTo{\exprAddStepValue}
+  }
+  %
+  % Booleans
+  %
+  \and
+  \infer*[left=T-Val]
+  {%
+    \\
+  }{%
+    \exprTrue\StepTo\exprTrue
+  }
+  \and
+  \infer*[left=F-Val]
+  {%
+    \\
+  }{%
+    \exprFalse\StepTo\exprFalse
+  }
+  \and
+  \infer*[left=And-L]
+  {%
+    a\StepsTo{v}
+  }{%
+    \exprAndRule\StepsTo{\exprAndStepL}
+  }
+  \and
+  \infer*[left=And-TR]
+  {%
+    b\StepsTo{v}
+  }{%
+    \exprAndValueL\StepsTo{v}
+  }
+  \and
+  \infer*[left=And-FW]
+  {%
+    \\
+  }{%
+    \exprAndValueF\StepsTo{\exprFalse}
+  }
+  \and
+  \infer*[left=App]
+  {%
+    f\StepsTo{\exprLamValue}
+  }{%
+    \exprAppRule\StepsTo\subst{b}{x}{a}
+  }
+\end{mathpar}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper"
+%%% End:
