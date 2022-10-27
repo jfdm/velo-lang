@@ -29,7 +29,7 @@ to be the same.
 %
 In \Velo{}, however, we allow holes to be mentioned arbitrarily many times in
 arbitrarily different local contexts. In the following example, the hole
-\texttt{?h} occurs in two distinct contexts: $\emptyset,a,x$ and $\emptyset,x,y$.
+\texttt{?h} occurs in two distinct contexts: $\emptyset,a,x$ and $\emptyset,a,y$.
 
 \begin{center}
   \holeexamplegraph{}
@@ -37,7 +37,7 @@ arbitrarily different local contexts. In the following example, the hole
 
 As a consequence, a term will only fit in that hole if it happens to live in the
 shared common prefix of these two contexts ($\emptyset,a$) as references to $x$
-won't make sense in $\emptyset,a,x$ and vice-versa for $y$.
+won't make sense in $\emptyset,a,y$ and vice-versa for $y$.
 
 
 Our elaborator proceeds in two steps.
