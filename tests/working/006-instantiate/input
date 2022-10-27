@@ -1,0 +1,6 @@
+:load main.velo
+:show
+:holes
+:instantiate hole1 x
+:instantiate hole2 (add x b)
+:quit

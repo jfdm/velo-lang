@@ -28,6 +28,7 @@ modules = Velo.Types
         , Velo.Elaborator.Holey
         , Velo.Elaborator.Term
         , Velo.Elaborator.CoDeBruijn
+        , Velo.Elaborator.Instantiate
 
         , Velo.Lexer.Token
         , Velo.Lexer

@@ -49,6 +49,7 @@ mutual
   hole
     = do s <- Toolkit.location
          symbol "?"
+         commit
          h <- name
          e <- Toolkit.location
          pure (Hole (newFC s e) h)
@@ -58,6 +59,7 @@ mutual
       <|> do s <- Toolkit.location
              symbol "("
              keyword "inc"
+             commit
              i <- expr
              symbol ")"
              e <- Toolkit.location
@@ -68,6 +70,7 @@ mutual
     = do s <- Toolkit.location
          symbol "("
          keyword "add"
+         commit
          l <- expr
          r <- expr
          symbol ")"
@@ -79,6 +82,7 @@ mutual
     = do s <- Toolkit.location
          symbol "("
          keyword "and"
+         commit
          l <- expr
          r <- expr
          symbol ")"
@@ -90,6 +94,7 @@ mutual
     do s <- Toolkit.location
        symbol "("
        keyword "fun"
+       commit
        n <- name
        symbol ":"
        ty <- type
@@ -108,6 +113,7 @@ mutual
              symbol "="
              v <- expr
              keyword "in"
+             commit
              b <- expr
              e <- Toolkit.location
              pure (Let (newFC s e) n v b)
@@ -135,6 +141,7 @@ mutual
        symbol "("
        a <- expr
        symbol ":"
+       commit
        ty <- type
        symbol ")"
        e <- Toolkit.location

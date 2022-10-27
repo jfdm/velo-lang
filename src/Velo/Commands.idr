@@ -8,6 +8,7 @@ import Data.Maybe
 import public Toolkit.Commands
 
 import Velo.Core
+import Velo.IR.AST
 
 %default total
 
@@ -18,6 +19,7 @@ data Cmd = Quit
          | TypeOfHole String
          | Eval
          | CSE
+         | Instantiate String String
          | Show
          | ConstantFolding
          | Load String
@@ -43,6 +45,11 @@ commands
                  (options [REQ "name"])
                  TypeOfHole
                  "Show the specified hole."
+
+    , newCommand (names ["instantiate", "i"])
+                 (options [REQ "name", REQ "term"])
+                 Instantiate
+                 "Instantiate the specified hole with the given term."
 
     , newCommand (names ["eval"])
                  Eval

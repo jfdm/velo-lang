@@ -10,6 +10,7 @@ import public Toolkit.Item
 import Data.SnocList.Quantifiers
 
 import Toolkit.Data.Comparison.Informative
+import Toolkit.Data.List.Member
 
 %default total
 
@@ -167,11 +168,12 @@ extract (x :: xs) (There ltr)
 export
 getByName : (n  : String)
          -> (ms : List Meta)
-         -> Maybe Meta
-getByName n ms
-  = case get n ms of
-      No _ => Nothing
-      Yes prf => Just (extract ms prf)
+         -> Maybe (m : Meta ** IsMember ms m)
+getByName n [] = Nothing
+getByName n (MkMeta nm scp ty :: ms)
+  = ifThenElse (n == nm) (Just (_ ** here)) $ do
+    (m ** prf) <- getByName n ms
+    pure (m ** shift prf)
 
 export
 Show (Prim tys ty) where

@@ -17,8 +17,8 @@ import Toolkit.Data.List.Thinning
 
 public export
 data IsMember : (ctxt : List kind)
-          -> (type :      kind)
-                  -> Type
+             -> (type :      kind)
+                     -> Type
   where
     V : (  pos : Nat)
      -> (0 prf : AtIndex type ctxt pos)
@@ -44,6 +44,11 @@ public export
 %inline
 shift : IsMember ctxt type -> IsMember (a :: ctxt) type
 shift (V pos prf) = V (S pos) (There prf)
+
+export
+hetCongShift : {0 m : IsMember ctxt ty} -> {0 n : IsMember ctxt ty'} ->
+               m ~=~ n -> shift {a} m ~=~ shift {a} n
+hetCongShift Refl = Refl
 
 export
 hereNotShift : Not (Member.here === Member.shift v)
@@ -90,7 +95,6 @@ lookup v = case view v of
   There v => lookup v
 
 public export
-%inline
 weaken : (func : IsMember old type
               -> IsMember new type)
       -> (IsMember (type' :: old) type
@@ -118,5 +122,20 @@ hetDecEq v@_ w@_ with (view v) | (view w)
   _ | There v' | There w' with (hetDecEq v' w')
     _ | Yes (Refl, eq2) = Yes (Refl, cong shift eq2)
     _ | No neq = No (\ (Refl, eq) => neq (Refl, shiftInjective eq))
+
+public export
+drop : {ctxt : List a} -> IsMember ctxt ty -> List a
+drop m with (view m)
+  drop {ctxt = _ :: ctxt} _ | Here = ctxt
+  drop {ctxt = hd :: _} _ | There m' = hd :: drop m'
+
+export
+dropNeq : {m : IsMember ctxt ty} -> {n : IsMember ctxt ty'} ->
+          Not (ty === ty', m ~=~ n) -> IsMember (drop m) ty'
+dropNeq neq with (view m) | (view n)
+  _ | Here | Here = absurd (neq (Refl, Refl))
+  _ | Here | There n' = n'
+  _ | There m' | Here = here
+  _ | There m' | There n' = shift (dropNeq (neq . map hetCongShift))
 
 -- [ EOF ]
