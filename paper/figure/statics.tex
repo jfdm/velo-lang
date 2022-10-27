@@ -1,0 +1,98 @@
+\begin{mathpar}%\mprset{sep=1em}
+  \infer*[left=Var]
+  {%
+    \ty{x}{t}\in\Gamma
+  }{%
+    \env{\ty{x}{t}}
+  }
+  %
+  % Naturals
+  %
+  \and
+  \infer*[left=Z-Intro]
+  {%
+    \\
+  }{%
+    \env{\ty{\exprZero}{\TyNat}}
+  }
+  \and
+  \infer*[left=Inc]
+  {%
+    \env{\ty{n}{\TyNat}}
+  }{%
+    \env{\ty{\exprIncRule}{\TyNat}}
+  }
+  \and
+  \infer*[left=Add]
+  {%
+    \env{\ty{a}{\TyNat}}
+    \\
+    \env{\ty{b}{\TyNat}}
+  }{%
+    \env{\ty{\exprAddRule}{\TyNat}}
+  }
+  %
+  % Booleans
+  %
+  \and
+  \infer*[left=T-Intro]
+  {%
+    \\
+  }{%
+    \env{\ty{\exprTrue}{\TyBool}}
+  }
+  \and
+  \infer*[left=F-Intro]
+  {%
+    \\
+  }{%
+    \env{\ty{\exprFalse}{\TyBool}}
+  }
+  \and
+  \infer*[left=And]
+  {%
+    \env{\ty{a}{\TyBool}}
+    \\
+    \env{\ty{b}{\TyBool}}
+  }{%
+    \env{\ty{\exprAndRule}{\TyBool}}
+  }
+  %
+  % Lam & Apps
+  %
+  \and
+  \infer*[left=Lam]
+  {%
+    \env{\ty{x}{t_a}}
+    \\
+    \env[\envAdd{\ty{x}{t_a}}]{\ty{b}{t_b}}
+  }{%
+    \env{\ty{\exprLamRule}{\typeFuncRule}}
+  }
+  \and
+  \infer*[left=App]
+  {%
+    \env{\ty{f}{\typeFuncRule}}
+    \\
+    \env{\ty{a}{t_a}}
+  }{%
+    \env{\ty{\exprAppRule}{t_b}}
+  }
+  %
+  % Lets
+  %
+  \and
+  \infer*[left=Let]
+  {%
+    \env{\ty{e}{t_a}}
+    \\
+    \env[\envAdd{\ty{x}{t_a}}]{\ty{b}{t_b}}
+  }{%
+    \env{\ty{\exprLetRule}{t_b}}
+  }
+\end{mathpar}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper"
+%%% End:

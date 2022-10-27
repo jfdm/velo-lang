@@ -21,6 +21,8 @@ pdfa
 \usepackage{xspace}
 \usepackage[commandnameprefix=always]{changes}
 \usepackage{fancyvrb}
+\usepackage{jfdm-plt}
+\usepackage{velo}
 
 \pdfoutput=1
 \hideOASIcs %uncomment to remove references to OASIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
@@ -157,5 +159,26 @@ We end our tour of \Velo{} by detailing two programming idioms that helped with 
 % we have 2 pages of refs for free
 \newpage
 \bibliography{paper}
+
+\newpage
+\appendix
+
+\begin{figure}[ht]
+  \centering
+  \input{./figure/syntax}
+  \caption{\label{fig:velo:syntax}\Velo{} Formal Abstract Syntax}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \input{./figure/statics}
+  \caption{\label{fig:velo:statics}\Velo{} Typing Rules}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \input{./figure/dynamics-smallstep}
+  \caption{\label{fig:velo:statics}\Velo{} SmallStep Reduction Semantics}
+\end{figure}
 
 \end{document}

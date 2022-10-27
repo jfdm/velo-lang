@@ -1,0 +1,63 @@
+\begin{align*}
+  \ty{t}{\Type}
+  &
+    \Coloneqq
+    \TyNat
+    \fpAlt
+    \TyBool
+    \fpAlt
+    \typeFuncIntro{}
+  &
+    \text{Types}
+  \\
+  \ty{e}{t}
+  &
+    \Coloneqq
+    x
+    \fpAlt
+    \exprZero
+    \fpAlt
+    \exprIncIntro{}
+    \fpAlt
+    \exprAddIntro{}
+  &
+    \text{Expressions}
+  \\
+  &
+    \firstAlt
+    \exprTrue{}
+    \fpAlt
+    \exprFalse{}
+    \fpAlt
+    \exprAndIntro{}
+  &
+  \\
+  &
+    \firstAlt
+    \exprLamIntro{}
+    \fpAlt
+    \exprLetIntro{}
+    \fpAlt
+    \exprAppIntro{}
+  &
+  \\
+  \ty{v}{t}
+  &
+    \Coloneqq
+    \exprZero
+    \fpAlt
+    \exprIncValue{}
+    \fpAlt
+    \exprTrue{}
+    \fpAlt
+    \exprFalse{}
+    \fpAlt
+    \exprLamValue{}
+  &
+    \text{Values}
+\end{align*}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper"
+%%% End:
