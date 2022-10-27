@@ -1,28 +1,59 @@
 \subsection{Well-Typed Holes}
 \label{sec:design:holes}
 
-Typed-holes are a useful feature in type-driven programming~\cite{DBLP:journals/pacmpl/OmarVCH19}, and supports the \emph{dropping in} of a special term, the hole, into a program such that during elaboration the type of that term will be synthesised.
-User's can inspect the type of a hole and will be presented with the local context that will, hopefully, show useful terms to help fill the hole.
+Holes are a special kind of placeholder that programmers can use for parts of
+the program they have not yet written.
+%
+In a typed language, each hole will be assigned a type based on the context it
+is used in.\gallais{context as in $C[\cdot]$, not $\Gamma$. Better phrasing?}
 
-Within \Idris{} holes are lifted during elaboration to top-level definitions, allowing them to be placed in a position suitable for the elaborator to synthesis the hole's type.
-To avoid such term manipulation in \Velo{}'s core we have taken a different approach, and our elaboration step seeks to resolve bound holes \emph{in situ}.
+Special language support (the ability to inspect, refine, compute with,
+or fill an existing hole with an adequately typed term)
+enables \emph{type-driven programming}~\cite{DBLP:journals/pacmpl/OmarVCH19},
+a practice by which the user interactively builds the eventual finished
+program via a dialogue with the compiler.
 
-As with typing contexts we also provide a hole context to keep track of declared holes and \emph{when} they are declared.
+Barebones language support should at least include the ability to inspect the
+type of a hole and the local context it appears in, as well as the ability to
+safely evaluate programs that still contain holes.
+\todo{Implement \texttt{instantiate}? Shouldn't take too long.}
 
-\begin{Verbatim}
-data Term : (ctxt : List Meta) -> (ctxt : SnocList Ty) -> (type : Ty) -> Type where
-\end{Verbatim}
 
-Here \IdrisType{Meta} is a simple data structure to snapshot:
-the holes real name;
-current state of the typing context;
-and
-the type of the hole itself.
-This information is populated during the elaboration of \IdrisType{Raw} terms to \IdrisType{Holey} ones.
-During the second elaboration step (\IdrisType{Holey} terms to \IdrisType{Terms}), we capture, and reason about, invariants about all the holes dug and the contexts in which they were dug.
-Reasoning on these invariants supports coalescing of hole information to ensure that the reported context for the same-named holes that were dug\ldots
 
-\jfdm{not sure how best to phrase this.}
+\Idris{}'s elaborator lifts holes to top-level declarations with no associated
+definition as it encounters them.
+%
+As a consequence of this design choice, users cannot mention the same hole in
+different places to state their intention that these yet unwritten terms ought
+to be the same.
+%
+In \Velo{}, however, we allow holes to be mentioned arbitrarily many times in
+arbitrarily different local contexts. In the following example, the hole
+\texttt{?h} occurs in two distinct contexts: $\emptyset,a,x$ and $\emptyset,x,y$.
+
+\begin{center}
+  \holeexamplegraph{}
+\end{center}
+
+As a consequence, a term will only fit in that hole if it happens to live in the
+shared common prefix of these two contexts ($\emptyset,a$) as references to $x$
+won't make sense in $\emptyset,a,x$ and vice-versa for $y$.
+
+
+Our elaborator proceeds in two steps.
+%
+First, a bottom-up pass records holes as they are found and, in nodes
+with multiple subterms, reconciles conflicting hole occurrences by
+computing the appropriate local context restriction.
+%
+This process produces a list of holes together with a \IdrisType{Holey}
+term that contains invariants ensuring these collected holes do fit in the term.
+%
+Second, a top-down pass produces a core \IdrisType{Term} indexed by the list
+of \IdrisType{Meta} (a simple record type recording a hole's name, the context
+it lives in, and the hole's type). Hole occurences end up being assigned a thinning
+embedding the metavariable's actual context into the context it appears in.
+
 
 
 %%% Local Variables:
