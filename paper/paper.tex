@@ -12,12 +12,15 @@ pdfa
 \usepackage{todonotes}
 \setuptodonotes{inline}
 
+\usepackage{relsize}
+
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric}
 
 \usepackage{acronym}
 \usepackage{xspace}
 \usepackage[commandnameprefix=always]{changes}
+\usepackage{fancyvrb}
 
 \pdfoutput=1
 \hideOASIcs %uncomment to remove references to OASIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
@@ -100,8 +103,27 @@ Our ongoing work is available at:
 \section{Language Design}
 \label{sec:design}
 
-\input{./content/deBruijn}
+This section details key design rationale on realising the static and dynamic semantics of \Velo{} within Idris.
 
+We have opted to give \Velo{} an external concrete syntax (a \ac{dsl}) in which users can write their programs.
+%
+With dependently typed languages, however, we can also capture the abstract syntax and its static semantics as a well-typed \ac{edsl} directly with the host language~\cite{Augustsson1999edt}.
+Our terms will thus be implemented as a data structure with (almost) the following type:
+
+\begin{Verbatim}
+data Ty = TyNat | TyBool | TyArr Ty Ty
+data Term : (ctxt : List Ty) -> (type : Ty) -> Type where
+  Zero : Term ctxt TyNat
+  Inc : Term ctxt TyNat -> Term ctxt TyNat
+  -- ...
+\end{Verbatim}
+
+\noindent
+
+Using such intrinsically typed \acp{edsl} we can statically verify for free that our language's are well-structured and that any transformation (model-to-model) or interpretation (model-to-host) respects the language's static semantics.
+In fact we will describe in \Cref{sec:compiler} how we can use our \acp{edsl} to both verify our static semantics and describe our dynamic semantics.
+
+\input{./content/deBruijn}
 \input{./content/compactconstant}
 
 
@@ -124,8 +146,7 @@ Our ongoing work is available at:
 \section{Good Programming Idioms}
 \label{sec:idioms}
 
-Within \Velo{} there are two programming idioms that helped
-with the reporting of errors, and the ease of deciding equality.
+We end our tour of \Velo{} by detailing two programming idioms that helped with the reporting of errors, and reasoning about decidable equality of inductive data structures.
 
 \input{./content/positivelynegative}
 \input{./content/efficientdeceq}
