@@ -1,0 +1,31 @@
+\subsection{Well-Typed Holes}
+\label{sec:design:holes}
+
+Typed-holes are a useful feature in type-driven programming~\cite{DBLP:journals/pacmpl/OmarVCH19}, and supports the \emph{dropping in} of a special term, the hole, into a program such that during elaboration the type of that term will be synthesised.
+User's can inspect the type of a hole and will be presented with the local context that will, hopefully, show useful terms to help fill the hole.
+
+Within \Idris{} holes are lifted during elaboration to top-level definitions, allowing them to be placed in a position suitable for the elaborator to synthesis the hole's type.
+To avoid such term manipulation in \Velo{}'s core we have taken a different approach, and our elaboration step seeks to resolve bound holes \emph{in situ}.
+
+As with typing contexts we also provide a hole context to keep track of declared holes and \emph{when} they are declared.
+
+\begin{Verbatim}
+data Term : (ctxt : List Meta) -> (ctxt : SnocList Ty) -> (type : Ty) -> Type where
+\end{Verbatim}
+
+Here \IdrisType{Meta} is a simple data structure to snapshot:
+the holes real name;
+current state of the typing context;
+and
+the type of the hole itself.
+This information is populated during the elaboration of \IdrisType{Raw} terms to \IdrisType{Holey} ones.
+During the second elaboration step (\IdrisType{Holey} terms to \IdrisType{Terms}), we capture, and reason about, invariants about all the holes dug and the contexts in which they were dug.
+Reasoning on these invariants supports coalescing of hole information to ensure that the reported context for the same-named holes that were dug\ldots
+
+\jfdm{not sure how best to phrase this.}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper"
+%%% End:

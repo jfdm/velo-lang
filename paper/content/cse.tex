@@ -3,55 +3,57 @@
 \input{ast}
 
 Now that our core language is well scoped by construction, our compiler passes
-need to be proven scope-preserving.
+must also be shown to be scope-preserving.
 %
-This is not a new requirement, merely the explicitation of a constraint that
+This is not a new requirement, merely it makes concrete a constraint that
 used to be enforced informally.
+More importantly we show, with our compiler passes, that model-to-same-model transformation of our \ac{edsl} is possible, and that the infrastructure required is not bespoke to \Velo{}.
 
-
-The purpose of common sub-expressions elimination is to identify subterms
-that appear multiple times in the syntax tree and abstract over them so
-as to avoid needless recomputations at runtime.
+The purpose of \ac{cse} is to identify subterms that appear multiple times in the syntax tree, and to abstract over them to avoid needless recomputations at runtime.
 %
 In the following example for instance, we would like to let-bind $t$ before
-the application node (denoted \$) so that it may be shared by both subtrees.
+the application node (denoted \$) so that $t$ may be shared by both subtrees.
 
-\cseexamplegraph{}
+\begin{center}
+  \cseexamplegraph{}
+\end{center}
 
-One of the challenge of CSE exemplified above is that the term of interest
-may be burried deep inside separate contexts. In our intrinsically scoped
-representation, $t$ in scope $\Gamma, x : \sigma$ is potentially not actually
-syntactically equal to a copy living in $\Gamma, a : \tau, b : \nu$.
+One of the challenges of \ac{cse}, as exemplified above, is that the term of interest
+may be burried deep inside separate contexts.
 %
-Indeed a variable $v$ bound in $\Gamma$ will for instance be represented by
-the De Bruijn index $1+v$ in $\Gamma, x : \sigma$
-but the index $2+v$ in $\Gamma, a :  \tau, b : \nu$.
+In our intrinsically scoped representation, $t$ in scope $\Gamma, x : \sigma$ is potentially not actually syntactically equal to a copy living in $\Gamma, a : \tau, b : \nu$.
+%
+Indeed a variable $v$ bound in $\Gamma$ will, for instance, be represented by
+the \DeBruijn{} index $1+v$ in $\Gamma, x : \sigma$
+but by the index $2+v$ in $\Gamma, a :  \tau, b : \nu$.
 
-If only terms were indexed by their exact \emph{support}! We would not care
-about additional yet irrelevant variables that happen to be in scope.
+If only terms were indexed by their exact \emph{support}!
+We would not care about additional yet irrelevant variables that happen to be in scope.
 %
 The principled solution here is to switch to a different representation for
-the purpose of common sub-expression elimination: the co-De Bruijn
-representation~\cite{DBLP:journals/corr/abs-1807-04085} provides exactly this guarantee.
+the purpose of \ac{cse}.
+The co-\DeBruijn{} representation~\cite{DBLP:journals/corr/abs-1807-04085} provides exactly this guarantee.
 
 %\subsection{Co-De Bruijn representation}
 
-In the co-De Bruijn representation, every term is precisely indexed by its
+In the co-\DeBruijn{} representation, every term is precisely indexed by its
 exact support.
 %
 That is to say that every subterm explicitly throws away the bound variables
 that are not mentioned in it.
 %
-By the time we reach a variable node, a single  bound variable remains in scope:
+By the time we reach a variable node, a single bound variable remains in scope:
 precisely the one being referred to.
 
 If we think of thinnings as sequences of 0/1 bits stating whether a variable
 is kept or dropped, and admitting that such sequences can be represented as
 list of either $\bullet$ (1) or $\circ$ (0), the $S$ combinator
 ($\lambda g. \lambda f. \lambda x. g x (f x)$) is represented as follows in
-co-De Bruijn notation.
+co-\DeBruijn{} notation.
 
-\codebruijnexamplegraph{}
+\begin{center}
+  \codebruijnexamplegraph{}
+\end{center}
 
 The first three $\lambda$ abstractions only use $\bullet$ in their thinnings
 because all of $g$, $f$, and $x$ do appear in the body of the combinator.
@@ -60,9 +62,9 @@ The application node then splits the context into two: the first subterm
 ($g x$) drops $f$ while the second ($f x$) gets rid of $g$.
 %
 Further application nodes select the one variable still in scope for each
-leaf subterm, respectively $g$, $x$, $f$, and $x$.
+leaf subterm: $g$, $x$, $f$, and $x$.
 
 
-Using a co-De Bruijn representation, we can easily identify shared subterms:
+Using a co-\DeBruijn{} representation, we can easily identify shared subterms:
 they need to not be mentioning any of the most local variables and be
 syntactically equal.

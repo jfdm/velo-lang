@@ -126,13 +126,9 @@ Using such intrinsically typed \acp{edsl} we can statically verify for free that
 In fact we will describe in \Cref{sec:compiler} how we can use our \acp{edsl} to both verify our static semantics and describe our dynamic semantics.
 
 \input{./content/deBruijn}
+\input{./content/well-typed-holes}
 \input{./content/compactconstant}
 
-
-\subsection{Well-Typed Holes}
-\label{sec:design:holes}
-
-\chcomment{Well-Typed Holes}
 
 \section{Optimisation}
 \label{sec:compiler-pass}
@@ -143,7 +139,7 @@ In fact we will describe in \Cref{sec:compiler} how we can use our \acp{edsl} to
 \section{Execution}
 \label{sec:semantics}
 
-\chcomment{Evaluation as Progress (with computation rules in one separate function)}
+\input{./content/execution}
 
 \section{Good Programming Idioms}
 \label{sec:idioms}
