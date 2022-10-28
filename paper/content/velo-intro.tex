@@ -6,18 +6,37 @@ it is \emph{just} the \ac{stlc} extended with booleans and natural numbers with 
 %
 To promote the idea of interactive editing \Velo{} also supports well-typed holes.
 %
-Such a featherweight language design helps us to showcase better how we can use dependently-typed languages as language workbenches.
+Below we show an example \Velo{} program, and an extract from the \acs*{repl} session that list's the current set of holes.
+
+\begin{center}
+  \begin{minipage}[t]{0.45\linewidth}
+\begin{Verbatim}
+   let b = false
+in let double
+         = (fun x : nat
+              => (add x x))
+in let x = (double ?hole)
+in         (double ?hole)
+\end{Verbatim}
+\end{minipage}
+\hfill
+  \begin{minipage}[t]{0.45\linewidth}
+    \begin{Verbatim}
+Velo> :holes
+b : Bool
+double : Nat -> Nat
+----------
+?hole : Nat
+\end{Verbatim}
+\end{minipage}
+
+\end{center}
+
+The \emph{featherweight} language design of \Velo{} helps us to showcase better how we can use dependently-typed languages as language workbenches.
 
 \jfdm{Do we need to evidence (through citation) benefits of featherweight languages?}
 
-\begin{Verbatim}
-let a = zero in let b = (inc a) in let c = (add a b) in
-let d = true in let e = false   in let f = (and d e) in
-let foo = (fun x : nat => x)
-in (foo ?hole)
-\end{Verbatim}
-
-We have presented \Velo{} as a \emph{complete} language with a standard compiler pipeline, and REPL. % there is \ac{repl} if we need it.
+\Velo{} is as a \emph{complete} language with a standard compiler pipeline, and REPL. % there is \ac{repl} if we need it.
 %
 A \ac{dsl} captures the language's concrete syntax, and a parser turns \ac{dsl} instances into raw unchecked terms.
 %
