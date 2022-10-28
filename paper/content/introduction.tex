@@ -49,7 +49,19 @@ dependently typed languages make fine language workbenches.
 We address both the core criteria and some optional extensions
 highlighted by the language workbench challenge~\cite{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13} for what constitutes a language workbench.
 %
+%
 Although not all of the optional criteria required for a language workbench are met by dependently typed languages, we are convinced that with some additional engineering (taking advantage of existing work, for example Quickchick~\cite{DBLP:journals/pacmpl/LampropoulosPP18}) more optional criteria can be satisfied.
+
+
+Another key tenet in language workbenches, such as Spoofax, is the \emph{ease} with which languages can be created.
+%
+To that same degree, we have also sought to develop a series of reusable modules, where possible, that captures functionality common to many languages.
+%
+Thereby reducing the \emph{boilerplate} required when creating \acp{edsl} in \Idris{}.
+
+\jfdm{This claim is a bit dubious as we do not do that for everything, we also need to state limitation in that our parser/lexer is not (yet) derived/guided by the core language design.}
+
+
 
 %%% Local Variables:
 %%% mode: latex

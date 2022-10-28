@@ -52,10 +52,6 @@ Further, elaboration performs standard syntax transformations that turns let-bin
 %
 From the core representation we also provide well-scoped \ac{cse} using co-\DeBruijn{} indexing (\Cref{sec:compiler-pass}), and we provide a verified evaluator to reduce terms to values (\Cref{sec:semantics}).
 
-A key tenet in language workbenches, such as Spoofax, is the \emph{ease} with which languages can be created.
-To that same degree, we have also sought to develop a series of reusable modules, where possible, that captures functionality common to many languages.
-Thus reducing the \emph{boilerplate} required when creating \acp{edsl} in \Idris{}.
-\jfdm{This claim is a bit dubious as we do not do that for everything, we also need to state limitation in that our parser/lexer is not (yet) derived/guided by the core language design.}
 
 \todo{Show an example high-level trace of the output?}
 \jfdm{This would be useful for a full-length paper, but not here.}
