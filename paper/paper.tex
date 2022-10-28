@@ -1,4 +1,5 @@
 \documentclass[%
+%final,%
 draft, % note that the orcid.pdf logo is not included with draft mode
 a4paper,
 UKenglish,
@@ -9,9 +10,6 @@ thm-restate,
 pdfa
 ]{oasics-v2021}
 
-\usepackage{todonotes}
-\setuptodonotes{inline}
-
 \usepackage{relsize}
 
 \usepackage{tikz}
@@ -19,10 +17,12 @@ pdfa
 
 \usepackage{acronym}
 \usepackage{xspace}
-\usepackage[commandnameprefix=always]{changes}
+\usepackage[todonotes={obeyFinal},commandnameprefix=always]{changes}
 \usepackage{fancyvrb}
 \usepackage{jfdm-plt}
 \usepackage{velo}
+
+\setuptodonotes{inline}
 
 \pdfoutput=1
 \hideOASIcs %uncomment to remove references to OASIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
