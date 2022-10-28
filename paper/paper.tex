@@ -68,24 +68,33 @@ pdfa
 % 4. Say what follows from your solution
 
 \begin{abstract}
-We are planning to showcase dependently typed techniques to implement \& manipulate IRs.
+  Language Workbenches offer language designers an expressive environment in which to create their \acp*{dsl}.
+  Similarly, research into mechanised meta-theory has shown how dependently-typed languages provide expressive environments to formalise and study \acsp*{dsl} and their meta-theoretical properties.
+  But can we claim that dependently-typed languages qualify as language workbenches?
+  We argue yes!
+  We have developed an exemplar \acs*{dsl} called \Velo{} that showcases not only dependently-typed techniques to realise and manipulate \acp*{ir}, but that dependently typed languages make fine language workbenches.
+  \Velo{} is a simple verified language with well-typed holes and comes with a complete compiler pipeline: parser, elaborator, REPL, evaluator, and compiler passes.
+  Specifically, we describe our design choices for well-typed \acs*{ir} design that includes support for well-typed holes, and how we can perform \acf*{cse} in a well-typed setting.
+  We also present good programming idioms for working with dependent types.
 
-The key components we are planning to treat are:
-
-\begin{itemize}
-\item Efficient de Bruijn representations
-\item Co de Bruijn for CSE
-\item Evaluation as Progress (with computation rules in one separate function)
-\item Well scoped holes
-\item Linear (in number of cases) decidable equality
-\item Compact constant folding
-\item Positive evidence for negative statements
-\item Whole pipeline (parser, elaborator, REPL, evaluator, compiler passes)
-\end{itemize}
-
-Our ongoing work is available at:
-
-\url{https://github.com/jfdm/velo-lang}
+%  We are planning to showcase dependently typed techniques to implement \& manipulate IRs.
+%
+%The key components we are planning to treat are:
+%
+%\begin{itemize}
+%\item Efficient de Bruijn representations
+%\item Co de Bruijn for CSE
+%\item Evaluation as Progress (with computation rules in one separate function)
+%\item Well scoped holes
+%\item Linear (in number of cases) decidable equality
+%\item Compact constant folding
+%\item Positive evidence for negative statements
+%\item Whole pipeline (parser, elaborator, REPL, evaluator, compiler passes)
+%\end{itemize}
+%
+%Our ongoing work is available at:
+%
+%\url{https://github.com/jfdm/velo-lang}
 \end{abstract}
 
 \todo{Run spellcheck}
