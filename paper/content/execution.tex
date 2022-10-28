@@ -1,30 +1,58 @@
-\Velo{} is a programming language that will reduce terms down to values.
+The \Velo{} REPL will let users reduce terms down to head-normal forms.
 %
-Within the dependently typed setting we can use dependent types to reason about our language's \emph{theoretical} type-soundness proof \emph{practically} by providing the language's operational semantics.
-%
-We can realise \Velo{}'s dynamic semantics either through (definitional) interpreters~\cite{10.1145/3093333.3009866,Augustsson1999edt}, or by providing a more traditional syntactic proof of type-soundness~\cite{DBLP:journals/iandc/WrightF94} but mechanised~\cite[Part 2: Properties]{plfa22.08}.
-%
-Through consideration of the latter approach we get, for free, verification that \Velo{}'s execution is correct by reusing the correctness proof as the evaluator.
-%
-Or rather what we in fact get for free is our evaluator as it is computed from our formal proof.
+We can realise \Velo{}'s dynamic semantics either through definitional
+interpreters~\cite{10.1145/3093333.3009866,Augustsson1999edt},
+or by providing a more traditional syntactic proof of
+type-soundness~\cite{DBLP:journals/iandc/WrightF94}
+but mechanised~\cite[Part 2: Properties]{plfa22.08}.
 
-Like existing approaches~\cite[Part 2: Properties]{plfa22.08}, we have provided several data structures that capture how top-level terms reduce:
+We chose the latter approach: using inductive families, we can make explicit
+our language's operational semantics.
+%
+This enables us to study its meta-theoretical properties and in particular prove
+a progress result: every term is either already a value or can take a reduction step.
+%
+By repeatedly applying the progress result until we either reach a value or the end
+user runs out of patience and kills the process, this proof freely gives us an
+evaluator that is guaranteed to be correct with respect to \Velo{}'s operational
+semantics.
+
+Following existing approaches~\cite[Part 2: Properties]{plfa22.08}, we have defined
+have inductive families describing how terms reduce.
 
 \begin{Verbatim}
 data Redux : (this,that : Term metas ctxt type) -> Type where
+  -- (...)
+  ReduceAddZW : (value : Value right)
+             -> Redux (Call Add [Call Zero [], right]) right
+  -- (...)
 \end{Verbatim}
 
-\noindent
-and how primitive operations reduce (\Cref{sec:design:constants}):
+As can be seen above, our setting enforces call-by-value: $(0 + r)$
+only reduces to $r$ if $r$ is already known to be a value.
+%
+Furthermore, our algebraic design (\Cref{sec:design:constants}) allows
+us to easily enforce a left-to-right evaluation order by having a generic
+family describing how primitive operations' arguments reduce.
+%
+As can be seen below: when considering a type-aligned list of arguments,
+either the \texttt{hd} takes a step and the \texttt{rest} is unchanged,
+or the \texttt{hd} is already known to be a value and a further argument
+is therefore allowed to take a step.
 
 \begin{Verbatim}
-data Reduxes : \{tys : List Ty\} -> (these, those : All (Term metas ctxt) tys)
-             -> Type where
+data Reduxes : (these, those : All (Term metas ctxt) tys) -> Type where
+
+    (!:) : (hd : Redux this that)
+        -> (rest : All (Term metas ctxt) tys)
+        -> Reduxes (this :: rest) (that :: rest)
+
+    (::) : (value : Value hd)
+        -> (tl : Reduxes these those)
+        -> Reduxes (hd :: these) (hd :: those)
 \end{Verbatim}
 
-\noindent
-together with functions that compute reduction steps.
-%
+
 We differ, however, from standard approaches by genericsing our proofs of progress such that the boilerplate for computing the reflexive transitive closure when reducing terms is tidied away in a shareable module.
 %
 Our top-level progress definition is thus parameterised by reduction and value definitions:
