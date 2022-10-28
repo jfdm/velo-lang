@@ -9,10 +9,9 @@ Concretely, we index the \IdrisType{Elem} family by the kind of the variable it 
 in inference rules, the most local end of the context is always on the right hand side.
 
 \begin{Verbatim}
-data Elem : (ty : kind) -> (ctxt : SnocList kind) -> Type
-  where
-    Here : Elem ty (ctxt :< ty)
-    There : Elem ty ctxt -> Elem ty (ctxt :< not_ty)
+data Elem : (ty : kind) -> (ctxt : SnocList kind) -> Type where
+  Here : Elem ty (ctxt :< ty)
+  There : Elem ty ctxt -> Elem ty (ctxt :< _)
 \end{Verbatim}
 
 The \IdrisData{Here} constructor indicates that the variable of interest is
@@ -38,11 +37,10 @@ We pointedly reuse the \IdrisType{Elem} names because these \IdrisData{Here}
 and \IdrisData{There} play exactly the same role.
 
 \begin{Verbatim}
-data AtIndex : (ty : kind) -> (ctxt : SnocList kind) -> (idx : Nat) -> Type
-  where
-    Here : AtIndex ty (ctxt :< ty) Z
-    There : (later : AtIndex ty  ctxt               idx)
-                  -> AtIndex ty (ctxt :< not_ty) (S idx)
+data AtIndex : (ty : kind) -> (ctxt : SnocList kind) ->
+               (idx : Nat) -> Type where
+  Here : AtIndex ty (ctxt :< ty) Z
+  There : (later : AtIndex ty ctxt idx) -> AtIndex ty (ctxt :< _) (S idx)
 \end{Verbatim}
 
 \noindent
@@ -50,12 +48,13 @@ We then define a variable as the pairing of a natural number and an \emph{erased
 proof that the given natural numbers is indeed a valid \DeBruijn{} index.
 
 \begin{Verbatim}
-data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type
-  where
+data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type where
     V : (idx : Nat) -> (0 prf : AtIndex ty ctxt idx) -> IsVar ctxt ty
 \end{Verbatim}
 
-We now have the best of both worlds: a well-scoped realisation of \DeBruijn{} indices
+Thanks to Quantitative Type Theory~\cite{DBLP:conf/birthday/McBride16,DBLP:conf/lics/Atkey18}
+as implemented in \Idris{},
+we now have the best of both worlds: a well-scoped realisation of \DeBruijn{} indices
 that is guaranteed to be compiled efficiently.
 
 \todo{Talk about smart constructors \& views?}

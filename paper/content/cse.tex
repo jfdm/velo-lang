@@ -55,9 +55,10 @@ Further application nodes select the one variable still in scope for each leaf s
 Using a co-\DeBruijn{} representation, we can easily identify shared subterms:
 %
 they need to not be mentioning any of the most local variables and be syntactically equal.
-
-
-Our pass succesfully transforms the program on the left-hand side to the one on the right-hand side where the repeated expressions \texttt{(add m n)} and \texttt{(add n m)} have been let-bound.
+%
+Our pass succesfully transforms the program on the left-hand side to the one
+on the right-hand side where the repeated expressions \texttt{(add m n)}
+and \texttt{(add n m)} have been let-bound.
 
 \begin{center}
   \begin{minipage}[t]{0.4\textwidth}
@@ -77,3 +78,10 @@ in (add (add q p) (add p q))
     \end{Verbatim}
   \end{minipage}
 \end{center}
+
+This pass relies on the ability to have a compact representation of thinnings
+(as the co-\DeBruijn{} representation makes heavy use of them),
+and additionnally the existence of a quick equality test for them.
+%
+This is not the case in the implementation we include in \Velo{} but
+it is a solved problem~\cite{MANUAL:draft/Allais22}.

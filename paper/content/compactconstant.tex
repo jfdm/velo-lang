@@ -1,7 +1,7 @@
 \subsection{Compact Constant Folding}
 \label{sec:design:constants}
 
-Software Foundations's \emph{Programming Language Foundations} opens with a constant-folding transformation exercise~\cite[Chapter~1]{Pierce:SF2}.
+Software Foundations' \emph{Programming Language Foundations} opens with a constant-folding transformation exercise~\cite[Chapter~1]{Pierce:SF2}.
 %
 Starting from a small language of expressions containing natural numbers, variables, addition, subtraction, and multiplication we are to deploy the semiring properties to simplify expressions.
 %
@@ -13,13 +13,16 @@ The correction proof has just as much duplication because it needs to follow the
 %
 The only saving grace here is that Coq's tactics language lets users write scripts that apply to many similar goals thus avoiding duplication in the source file.
 
-In \Velo{}, we structured our core language's representation in such a way that this duplication is never needed.
+In \Velo{}, we structured our core language's representation in an algebraic
+manner so that this duplication is never needed.
 %
-All builtin operators (from primitive operations on builtin types to function application itself) are represented using a single \IdrisData{Call} constructor which takes an operation and a type-indexed list of subterms.
+All builtin operators (from primitive operations on builtin types to function
+application itself) are represented using a single \IdrisData{Call} constructor
+which takes an operation and a type-indexed list of subterms.
 
 \begin{Verbatim}
-data Term : (metas : List Meta) -> (ctxt : List Ty) -> Ty -> Type where
-  -- ...
+data Term : (metas : List Meta) -> (ctxt : SnocList Ty) -> Ty -> Type where
+  -- (...)
   Call : \{tys : _\} -> (operator : Prim                  tys  ty)
                    -> (operans  : All (Term metas ctxt) tys)
                                -> Term      metas ctxt       ty
@@ -37,16 +40,15 @@ and
 \IdrisData{App}---which takes a function and an argument that corresponds to the type of the function's domain and returns a term that is the type of the function's co-domain.
 
 \begin{Verbatim}
-data Prim : (args : List Ty) -> (type : Ty) -> Type
-  where
+data Prim : (args : List Ty) -> (type : Ty) -> Type where
     Zero : Prim []                    TyNat
     And  : Prim [TyBool, TyBool]      TyBool
     App  : Prim [TyFunc dom cod, dom] cod
-    -- ...
+    -- (...)
 \end{Verbatim}
 
-Using \IdrisType{Prim} structural operations can now be implemented by handling recursive calls on the subterms of \IdrisData{Call} nodes uniformly before dispatching on the operator to see whether additional simplifications can be deployed.
-
+Using \IdrisType{Prim}, structural operations can now be implemented by handling recursive calls on the subterms of \IdrisData{Call} nodes uniformly before dispatching on the operator to see whether additional simplifications can be deployed.
+%
 Similarly, all of the duplication in the correction proofs is factored out in a single place where the induction hypotheses can be invoked.
 
 %%% Local Variables:
