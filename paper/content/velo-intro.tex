@@ -13,8 +13,7 @@ happens to be used in multiple locations.
 \begin{Verbatim}
    let b = false
 in let double
-         = (fun x : nat
-              => (add x x))
+         = (fun x : nat => (add x x))
 in let x = (double ?hole)
 in         (double ?hole)
 \end{Verbatim}

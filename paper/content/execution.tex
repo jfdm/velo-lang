@@ -42,14 +42,13 @@ is therefore allowed to take a step.
 
 \begin{Verbatim}
 data Reduxes : (these, those : All (Term metas ctxt) tys) -> Type
-  where
-    (!:) : (hd   : Redux this that)
-        -> (rest : All (Term metas ctxt) tys)
-                -> Reduxes (this :: rest) (that :: rest)
+  where (!:) : (hd   : Redux this that)
+            -> (rest : All (Term metas ctxt) tys)
+                    -> Reduxes (this :: rest) (that :: rest)
 
-    (::) : (value : Value hd)
-        -> (tl    : Reduxes these those)
-                 -> Reduxes (hd :: these) (hd :: those)
+        (::) : (value : Value hd)
+            -> (tl    : Reduxes these those)
+                     -> Reduxes (hd :: these) (hd :: those)
 \end{Verbatim}
 
 
@@ -59,11 +58,10 @@ Our top-level progress definition is thus parameterised by reduction and value d
 
 \begin{Verbatim}
 data Progress : (0 value : Pred a) -> (0 redux : Rel a) -> (tm : a) -> Type
-  where
-    Done : \{0 tm : a\} -> (val : value tm) -> Progress value redux tm
+  where Done : \{0 tm : a\} -> (val : value tm) -> Progress value redux tm
 
-    Step : \{this, that : a\}
-        -> (step : redux this that) -> Progress value redux this
+        Step : \{this, that : a\}
+            -> (step : redux this that) -> Progress value redux this
 \end{Verbatim}
 
 \noindent
