@@ -137,10 +137,11 @@ Our terms will be implemented as a data structure with (almost) the following ty
 
 \begin{Verbatim}
 data Ty = TyNat | TyBool | TyArr Ty Ty
+
 data Term : (ctxt : List Ty) -> (type : Ty) -> Type where
   Zero : Term ctxt TyNat
   Inc : Term ctxt TyNat -> Term ctxt TyNat
-  -- ...
+  -- (...)
 \end{Verbatim}
 
 \noindent
@@ -151,13 +152,13 @@ or interpretation (model-to-host) respects the language's static semantics.
 In fact we will describe in \Cref{sec:semantics} how we can use our \acp{edsl}
 to both verify our static semantics whilst describing our dynamic semantics.
 
-For languages equipped with more advanced type systems that cannot be as easily
+For languages equipped with more advanced type systems, that cannot be as easily
 enforced statically, we can retain some of these guarantees by using a well
 scoped core language rather than a well typed one.
 %
 This is the approach used in \Idris{} and it has already helped eliminate an
 entire class of bugs arising when attempting to solve a metavariable with a
-term that was defined in a different context.
+term that was defined in a different context~\cite{DBLP:conf/ecoop/Brady21}.
 
 \input{./content/deBruijn}
 \input{./content/well-typed-holes}
