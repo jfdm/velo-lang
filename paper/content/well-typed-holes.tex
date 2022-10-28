@@ -5,19 +5,23 @@ Holes are a special kind of placeholder that programmers can use for parts of
 the program they have not yet written.
 %
 In a typed language, each hole will be assigned a type based on the context it
-is used in.\gallais{context as in $C[\cdot]$, not $\Gamma$. Better phrasing?}\jfdm{Perhaps: \emph{position} or \emph{placement} in the syntax tree?}
+is used in.
 
 Special language support (the ability to inspect, refine, compute with,
 or fill an existing hole with an adequately typed term)
 enables \emph{type-driven programming}~\cite{DBLP:journals/pacmpl/OmarVCH19},
-a practice by which the user interactively builds the eventual finished
-program via a dialogue with the compiler.
-
+a practice by which the user enters in a dialogue with the compiler in order
+to interactively build the program.
+%
 Barebones language support should at least include the ability to inspect the
-type of a hole and the local context it appears in, as well as the ability to
+type of a hole and the local context it appears in, to instantiate it with an
+adequately typed term, as well as the ability to
 safely evaluate programs that still contain holes.
-
-
+%
+\Velo{} provides all three.
+%
+Our treatment of evaluation and instantiation are fairly standard, but our
+elaboration process is more interesting.
 
 \Idris{}'s elaborator lifts holes to top-level declarations with no associated
 definition as it encounters them.
@@ -25,8 +29,11 @@ definition as it encounters them.
 Because of this design choice users cannot mention the same hole explicitly in
 different places to state their intention that these yet unwritten terms ought
 to be the same.
-Instead users have to use the bound holes name.
 %
+They currently can refer to the hole's solution by its name, but that hole is
+still very much placed in one specific position and it is from that position
+that \Idris{} infers its context.
+
 In \Velo{}, however, we allow holes to be mentioned arbitrarily many times in
 arbitrarily different local contexts. In the following example, the hole
 \texttt{?h} occurs in two distinct contexts: $\emptyset,a,x$ and $\emptyset,a,y$.
@@ -36,25 +43,28 @@ arbitrarily different local contexts. In the following example, the hole
 \end{center}
 
 As a consequence, a term will only fit in that hole if it happens to live in the
-shared common prefix of these two contexts ($\emptyset,a$) as references to $x$
-will not make sense in $\emptyset,a,y$ and vice-versa for $y$.
+shared common prefix of these two contexts ($\emptyset,a$).
+%
+Indeed, references to $x$ will not make sense in $\emptyset,a,y$ and vice-versa for $y$.
 
 
 Our elaborator proceeds in two steps.
 %
 First, a bottom-up pass records holes as they are found and, in nodes
 with multiple subterms, reconciles conflicting hole occurrences by
-computing the appropriate local context restriction.
+computing the appropriate local context restrictions.
 %
 This process produces a list of holes together with a \IdrisType{Holey}
 term that contains invariants ensuring these collected holes do fit in the term.
 %
 Second, a top-down pass produces a core \IdrisType{Term} indexed by the list
-of \IdrisType{Meta} (a simple record type recording a hole's name, the context
-it lives in, and the hole's type). Hole occurences end up being assigned a thinning
+of \IdrisType{Meta} (a simple record type containing the hole's name, the context
+it lives in, and its type). Hole occurences end up being assigned a thinning
 embedding the metavariable's actual context into the context it appears in.
 
-\jfdm{Should we mention that this machinery is not special to \Velo{} i.e. can be factored out?}
+Although these intermediate representations are \Velo{}-specific, the technique
+itself is general and can be reused by anyone wanting to implement a well scoped
+notion of holes.
 
 %%% Local Variables:
 %%% mode: latex
