@@ -5,9 +5,9 @@ Holes are a special kind of placeholder that programmers can use for parts of th
 %
 In a typed language, each hole will be assigned a type based on the context it is used in.
 
-Special language support (the ability to inspect, refine, compute with, or fill an existing hole with an adequately typed term) enables \emph{type-driven programming}~\cite{DBLP:journals/pacmpl/OmarVCH19},
-a practice by which the user enters in a dialogue with the compiler in order
-to interactively build the program.
+\emph{Type-Driven Programming}~\cite{DBLP:journals/pacmpl/OmarVCH19} is a practice by which the user enters in to a dialogue \emph{with} the compiler to interactively build the program.
+We can enable type-driven programming in part by providing special language support for holes and operations on them.
+Such operations will include the ability to inspect, refine, computing with, and instantiate (with an adequately typed term) holes.
 %
 Barebones language support for type-driven programming should at least include the ability to:
 %
