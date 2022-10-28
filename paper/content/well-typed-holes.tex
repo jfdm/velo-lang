@@ -5,7 +5,7 @@ Holes are a special kind of placeholder that programmers can use for parts of
 the program they have not yet written.
 %
 In a typed language, each hole will be assigned a type based on the context it
-is used in.\gallais{context as in $C[\cdot]$, not $\Gamma$. Better phrasing?}
+is used in.\gallais{context as in $C[\cdot]$, not $\Gamma$. Better phrasing?}\jfdm{Perhaps: \emph{position} or \emph{placement} in the syntax tree?}
 
 Special language support (the ability to inspect, refine, compute with,
 or fill an existing hole with an adequately typed term)
@@ -16,14 +16,13 @@ program via a dialogue with the compiler.
 Barebones language support should at least include the ability to inspect the
 type of a hole and the local context it appears in, as well as the ability to
 safely evaluate programs that still contain holes.
-\todo{Implement \texttt{instantiate}? Shouldn't take too long.}
 
 
 
 \Idris{}'s elaborator lifts holes to top-level declarations with no associated
 definition as it encounters them.
 %
-As a consequence of this design choice, users cannot mention the same hole in
+Because of this design choice users cannot mention the same hole in
 different places to state their intention that these yet unwritten terms ought
 to be the same.
 %
@@ -37,7 +36,7 @@ arbitrarily different local contexts. In the following example, the hole
 
 As a consequence, a term will only fit in that hole if it happens to live in the
 shared common prefix of these two contexts ($\emptyset,a$) as references to $x$
-won't make sense in $\emptyset,a,y$ and vice-versa for $y$.
+will not make sense in $\emptyset,a,y$ and vice-versa for $y$.
 
 
 Our elaborator proceeds in two steps.
@@ -54,7 +53,7 @@ of \IdrisType{Meta} (a simple record type recording a hole's name, the context
 it lives in, and the hole's type). Hole occurences end up being assigned a thinning
 embedding the metavariable's actual context into the context it appears in.
 
-
+\jfdm{Should we mention that this machinery is not special to \Velo{} i.e. can be factored out?}
 
 %%% Local Variables:
 %%% mode: latex
