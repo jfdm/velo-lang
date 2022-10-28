@@ -52,6 +52,30 @@
 \acrodef{repl}[REPL]{Read Eval Print Loop}
 \acrodef{lsp}[LSP]{Language Server Protocol}
 
+% Acronym & Cleverref clash is a subtle way :-(
+% Ideal would be to switch to glossaries, which is my main driver, I wanted to be lightweight this time around...
+%
+% https://tex.stackexchange.com/questions/71364/acronym-acresetall-cleveref-multiply-defined-labels
+\makeatletter
+\newcommand*{\org@overidelabel}{}
+\let\org@overridelabel\@verridelabel
+\@ifpackagelater{acronym}{2015/03/21}{% v1.41
+  \renewcommand*{\@verridelabel}[1]{%
+    \@bsphack
+    \protected@write\@auxout{}{\string\AC@undonewlabel{#1@cref}}%
+    \org@overridelabel{#1}%
+    \@esphack
+  }%
+}{% older versions
+  \renewcommand*{\@verridelabel}[1]{%
+    \@bsphack
+    \protected@write\@auxout{}{\string\undonewlabel{#1@cref}}%
+    \org@overridelabel{#1}%
+    \@esphack
+  }%
+}
+\makeatother
+
 \definechangesauthor[color=orange,name={Jan}]{jfdm}
 \definechangesauthor[color=green, name={Guillaume}]{gallais}
 \definechangesauthor[color=red, name={Edwin}]{edwin}
