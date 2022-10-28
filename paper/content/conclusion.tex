@@ -1,28 +1,48 @@
-We have shown that dependently typed languages satisfy the core requirements from the \emph{Language Workbench Challenge}~\cite{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13}, and that the optional requirement of language verification comes easily.
+\todo{Conclusion needs to conclude (pontificate and look to the horizon), and state limitations of our approach.}
+
+We have shown that dependently typed languages satisfy the core requirements from the \emph{Language Workbench Challenge}~\cite{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13}.
+
+\Velo{}'s \emph{notation} as a \ac{dsl} is, by design, textual, and the internal core bounded by \Idris{} own notation requirements.
+%
+More importantly the \emph{semantics} (statics and dynamics) of \Velo{} are verified as part of the implementation because of the dependently typed setting.
+%
+The weakest core criteria is that of \emph{editor} support.
+%
+Languages created through \Idris{} do not get an editor, they are free form languages.
+
 %
 There are, however, more criteria from the feature model to consider:
-semantic \& syntactic services;
+%
+semantic \& syntactic services for editors;
+%
 testing \& debugging;
+%
 and
+%
 composability.
 %
 
+With the rise of the \ac{lsp} it would be a good idea to look at how we can derive \ac{lsp} compatible language servers generically, thus addressing the missing provision of the optional semantic and syntactic services.
+\Idris{} itself provides an \emph{IDE-Protocol}, and there is support for the \ac{lsp} in \Idris{} itself
+\footnote{\url{https://github.com/idris-community/idris2-lsp}}
 
-Languages created through \Idris{} do not get an editor, they are free form languages.
-%
-With the rise of the \acf*{lsp} it would be a good idea to look at how we can derive language servers for our \acp{dsl}, thus addressing the provision of semantic and syntactic services missing.
-
+\jfdm{The IDE-Protocol was presented at DTP 2014 (\url{https://davidchristiansen.dk/pubs/dtp2014-idris-mode.pdf}) we could cite}
 
 Our languages also do not come with the ability to test and debug their implementation.
+These are important aspects even thought our languages are \emph{certified}.
+%
+We need to validate that our verified code is doing what we want it to do.
+
+\jfdm{I have no idea how to expand this properly without it obvious that I waffle.}
+
+Finally there is language composability, an advantageous idea to reuse existing languages when designing new ones.
+This is a hard problem
+The \emph{Effects} library~\cite{DBLP:conf/icfp/Brady13} provides clues as to how we can compose \acp{dsl} horizontally but not vertically.
 \jfdm{I have no idea how to expand this properly with it obvious I am waffling.}
-
-
-Finally there is language composability.
-\jfdm{I have no idea how to expand this properly with it obvious I am waffling.}
-
 
 With future engineering satisfying these missing criteria is permissible.
 
+\jfdm{If there is space, a paragraph on Idris2 as a workbench would be good.}
 
 %%% Local Variables:
 %%% mode: latex
