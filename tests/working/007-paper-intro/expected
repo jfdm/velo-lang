@@ -1,0 +1,9 @@
+Running Test
+Velo> # Finished Parsing
+# Finished Type-Checking
+Velo> b : Bool
+double : Nat -> Nat
+----------
+?hole : Nat
+
+Velo> Quitting, Goodbye.

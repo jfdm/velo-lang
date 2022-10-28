@@ -1,35 +1,62 @@
-\chcomment{Whole pipeline (parser, elaborator, REPL, evaluator, compiler passes)}
+The design behind \Velo{} is purposefully unsurprising:
+%
+it is \emph{just} the \ac{stlc} extended with booleans and natural numbers with binary conjunction and addition operations as primitives.
+%
+To promote the idea of interactive editing \Velo{} also supports well-typed holes.
+%
+Below we show an example \Velo{} program, and an extract from the \acs*{repl} session that list's the current set of holes.
 
-\jfdm{Do we need to provide the formal description of us the STLC \& our extensions sufficiently \emph{well known}?}
-
-The design behind \Velo{} is purposefully unsurprising, it is the \ac{stlc} extended with booleans and natural numbers with their respective conjunction and addition operations as primitives.
-To promote the idea of interactive editing \Velo{} also supports well-scoped-typed holes.
-Such a featherweight language design helps us to better showcase how we can use dependently-typed languages as language workbenches.
-\jfdm{Do we need to evidence (through citation) benefits of featherweight languages?}
-
+\begin{center}
+  \begin{minipage}[t]{0.45\linewidth}
 \begin{Verbatim}
-   let a = zero
-in let b = (inc a)
-in let c = (add a b)
-
-in let d = true
-in let e = false
-in let f = (and d e)
-
-in let foo = (fun x : nat => x)
-in (foo ?hole)
-
+   let b = false
+in let double
+         = (fun x : nat
+              => (add x x))
+in let x = (double ?hole)
+in         (double ?hole)
 \end{Verbatim}
+\end{minipage}
+\hfill
+  \begin{minipage}[t]{0.45\linewidth}
+    \begin{Verbatim}
+Velo> :holes
+b : Bool
+double : Nat -> Nat
+----------
+?hole : Nat
+\end{Verbatim}
+\end{minipage}
 
-We have presented \Velo{} as a \emph{complete} language with a standard pipeline.
+\end{center}
+
+The \emph{featherweight} language design of \Velo{} helps us showcase better \emph{how} we can use dependently-typed languages as language workbenches~\cite{DBLP:journals/toplas/IgarashiPW01}.
+%
+Regardless of language complexity, \Velo{} is nonetheless a \emph{complete} language with a standard compiler pipeline, and \acs*{repl}.
+%
 A \ac{dsl} captures the language's concrete syntax, and a parser turns \ac{dsl} instances into raw unchecked terms.
-Bidirectional type checking elaborates these raw terms into a set of well-typed well-scoped intermediate representations: \IdrisType{Holey} supports well-scoped typed holes; and \IdrisType{Terms} our core representation that captures our language's abstract syntax.
-Further, elaboration performs standard syntax transformations to turn let-bindings into function application.
-From the core representation we also provide well-scoped \ac{cse} using co-\DeBruijn{} indexing, and we provide a verified evaluator to reduce terms to values.
+%
+Bidirectional type checking keeps type annotations to a minimun in the concrete syntax, and helps to better elaborate raw un-typed terms into a set of well-typed \acp{ir}:
+%
+\IdrisType{Holey} to support well-scoped typed holes;
+%
+and
+%
+\IdrisType{Terms} that is the core representation that captures our language's abstract syntax.
+%
+We present interesting aspects of our \ac{ir} design in \Cref{sec:design:holes}.
+%
+Further, elaboration performs standard syntax transformations that turns let-bindings into function application thus reducing the size of our core.
+%
+From the core representation we also provide well-scoped \ac{cse} using co-\DeBruijn{} indexing (\Cref{sec:compiler-pass}), and we provide a verified evaluator to reduce terms to values (\Cref{sec:semantics}).
 
-\jfdm{Would it be good to show an example high-level trace of the output?}
+A key tenet in language workbenches, such as Spoofax, is the \emph{ease} at which language's can be created.
+To that same degree, we have also sought to develop a series of reusable modules, where possible, that captures functionality common to many languages.
+Thus reducing the \emph{boilerplate} required when creating \acp{edsl} in \Idris{}.
+\jfdm{This claim is a bit dubious as we do not do that for everything, we also need to state limitation in that our parser/lexer is not (yet) derived/guided by the core language design.}
 
-\jfdm{Perhaps we can use this section as an outline and forward reference the latter sections?}
+\todo{Show an example high-level trace of the output?}
+\jfdm{This would be useful for a full-length paper, but not here.}
 
 %%% Local Variables:
 %%% mode: latex

@@ -22,7 +22,9 @@ The \IdrisData{There} constructor skips past the most local one to look for
 the variable of interest in the rest of the context.
 
 Whilst a valid definition, this approach unfortunately does not scale to
-large contexts: every \IdrisType{Elem} proof is linear in the size of the \DeBruijn{}
+large contexts:
+%
+every \IdrisType{Elem} proof is linear in the size of the \DeBruijn{}
 index that it represents.
 %
 To improve the runtime efficiency of the representation we instead opt to
@@ -57,6 +59,7 @@ We now have the best of both worlds: a well-scoped realisation of \DeBruijn{} in
 that is guaranteed to be compiled efficiently.
 
 \todo{Talk about smart constructors \& views?}
+\jfdm{We should do this talking in the extended version...}
 
 %%% Local Variables:
 %%% mode: latex
