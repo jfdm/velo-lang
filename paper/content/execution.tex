@@ -16,7 +16,8 @@ data Redux : (this,that : Term metas ctxt type) -> Type where
 and constants (\Cref{sec:design:constants})
 
 \begin{Verbatim}
-data Reduxes :{tys : List Ty} -> (these, those : All (Term metas ctxt) tys) -> Type where
+data Reduxes : \{tys : List Ty\} -> (these, those : All (Term metas ctxt) tys)
+             -> Type where
 \end{Verbatim}
 
 \noindent
