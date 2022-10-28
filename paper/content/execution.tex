@@ -1,19 +1,21 @@
-\chcomment{Evaluation as Progress (with computation rules in one separate function)}
-
 \Velo{} is a programming language that will reduce terms down to values.
+%
 Within the dependently typed setting we can use dependent types to reason about our language's \emph{theoretical} type-soundness proof \emph{practically} by providing the language's operational semantics.
-We can realise \Velo{}'s dynamic semantics either through (definitional) interpreters~\cite{10.1145/3093333.3009866,Augustsson1999edt}, or by providing a more traditional syntactic proof soundness~\cite{DBLP:journals/iandc/WrightF94} but mechanised~\cite[Part 2: Properties]{plfa22.08}.
+%
+We can realise \Velo{}'s dynamic semantics either through (definitional) interpreters~\cite{10.1145/3093333.3009866,Augustsson1999edt}, or by providing a more traditional syntactic proof of type-soundness~\cite{DBLP:journals/iandc/WrightF94} but mechanised~\cite[Part 2: Properties]{plfa22.08}.
+%
 Through consideration of the latter approach we get, for free, verification that \Velo{}'s execution is correct by reusing the correctness proof as the evaluator.
+%
 Or rather what we in fact get for free is our evaluator as it is computed from our formal proof.
 
-Much like existing approaches~\cite[Part 2: Properties]{plfa22.08}, we have provided several data structures that capture how top-level terms reduce:
+Like existing approaches~\cite[Part 2: Properties]{plfa22.08}, we have provided several data structures that capture how top-level terms reduce:
 
 \begin{Verbatim}
 data Redux : (this,that : Term metas ctxt type) -> Type where
 \end{Verbatim}
 
 \noindent
-and constants (\Cref{sec:design:constants})
+and how primitive operations reduce (\Cref{sec:design:constants}):
 
 \begin{Verbatim}
 data Reduxes : \{tys : List Ty\} -> (these, those : All (Term metas ctxt) tys)
@@ -21,9 +23,11 @@ data Reduxes : \{tys : List Ty\} -> (these, those : All (Term metas ctxt) tys)
 \end{Verbatim}
 
 \noindent
-and functions that compute reduction steps.
+together with functions that compute reduction steps.
+%
 We differ, however, from standard approaches by genericsing our proofs of progress such that the boilerplate for computing the reflexive transitive closure when reducing terms is tidied away in a shareable module.
-Thus our top-level progress definition is parameterised by reductions and value definitions:
+%
+Our top-level progress definition is thus parameterised by reduction and value definitions:
 
 \begin{Verbatim}
 data Progress : (0 value : Pred a) -> (0 redux : Rel a) -> (tm : a) -> Type
@@ -44,6 +48,7 @@ data Result : (0 value : Pred a) -> (0 redux : Rel a) -> (this : a) -> Type
 \end{Verbatim}
 
 The benefit of our approach is that language designers need only to provide details of what reductions are, and how to compute a single reduction, the rest comes for free.
+%
 With the result of evaluation we also get the list of reduction steps made that can, optionally, be printed to show a trace of execution.
 
 %%% Local Variables:
