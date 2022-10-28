@@ -1,36 +1,46 @@
 \chcomment{Whole pipeline (parser, elaborator, REPL, evaluator, compiler passes)}
 
-\jfdm{Do we need to provide the formal description of us the STLC \& our extensions sufficiently \emph{well known}?}
+The design behind \Velo{} is purposefully unsurprising:
+%
+it is \emph{just} the \ac{stlc} extended with booleans and natural numbers with binary conjunction and addition operations as primitives.
+%
+To promote the idea of interactive editing \Velo{} also supports well-typed holes.
+%
+Such a featherweight language design helps us to showcase better how we can use dependently-typed languages as language workbenches.
 
-The design behind \Velo{} is purposefully unsurprising, it is the \ac{stlc} extended with booleans and natural numbers with their respective conjunction and addition operations as primitives.
-To promote the idea of interactive editing \Velo{} also supports well-scoped-typed holes.
-Such a featherweight language design helps us to better showcase how we can use dependently-typed languages as language workbenches.
 \jfdm{Do we need to evidence (through citation) benefits of featherweight languages?}
 
 \begin{Verbatim}
-   let a = zero
-in let b = (inc a)
-in let c = (add a b)
-
-in let d = true
-in let e = false
-in let f = (and d e)
-
-in let foo = (fun x : nat => x)
+let a = zero in let b = (inc a) in let c = (add a b) in
+let d = true in let e = false   in let f = (and d e) in
+let foo = (fun x : nat => x)
 in (foo ?hole)
-
 \end{Verbatim}
 
-We have presented \Velo{} as a \emph{complete} language with a standard pipeline.
+We have presented \Velo{} as a \emph{complete} language with a standard compiler pipeline, and REPL. % there is \ac{repl} if we need it.
+%
 A \ac{dsl} captures the language's concrete syntax, and a parser turns \ac{dsl} instances into raw unchecked terms.
-Bidirectional type checking elaborates these raw terms into a set of well-typed well-scoped intermediate representations: \IdrisType{Holey} supports well-scoped typed holes; and \IdrisType{Terms} our core representation that captures our language's abstract syntax.
-Further, elaboration performs standard syntax transformations to turn let-bindings into function application.
-From the core representation we also provide well-scoped \ac{cse} using co-\DeBruijn{} indexing, and we provide a verified evaluator to reduce terms to values.
+%
+Bidirectional type checking elaborates these raw terms into a set of well-typed \acp{ir}:
+%
+\IdrisType{Holey} supports well-scoped typed holes;
+%
+and
+%
+\IdrisType{Terms} our core representation that captures our language's abstract syntax.
+%
+We present the interesting aspect of our \ac{ir} design in \Cref{sec:design:holes}.
+%
+Further, elaboration performs standard syntax transformations that turns let-bindings into function application.
+%
+From the core representation we also provide well-scoped \ac{cse} using co-\DeBruijn{} indexing (\Cref{sec:compiler-pass}), and we provide a verified evaluator to reduce terms to values (\Cref{sec:semantics}).
+
+A key tenet in language workbenches, such as Spoofax, is the \emph{ease} at which language's can be created.
+To that same degree, we have also sought to develop a series of reusable modules that captures functionality common to many languages.
+Thus reducing the \emph{boilerplate} required when creating \acp{edsl} in \Idris{}.
+
 
 \jfdm{Would it be good to show an example high-level trace of the output?}
-
-\jfdm{Perhaps we can use this section as an outline and forward reference the latter sections?}
-
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../paper"
