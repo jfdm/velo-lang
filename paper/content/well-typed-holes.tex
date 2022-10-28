@@ -22,9 +22,10 @@ safely evaluate programs that still contain holes.
 \Idris{}'s elaborator lifts holes to top-level declarations with no associated
 definition as it encounters them.
 %
-Because of this design choice users cannot mention the same hole in
+Because of this design choice users cannot mention the same hole explicitly in
 different places to state their intention that these yet unwritten terms ought
 to be the same.
+Instead users have to use the bound holes name.
 %
 In \Velo{}, however, we allow holes to be mentioned arbitrarily many times in
 arbitrarily different local contexts. In the following example, the hole
