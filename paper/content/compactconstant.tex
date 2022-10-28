@@ -6,19 +6,16 @@ Software Foundations's \emph{Programming Language Foundations} opens with a cons
 Starting from a small language of expressions containing natural numbers, variables, addition, subtraction, and multiplication we are to deploy the semiring properties to simplify expressions.
 %
 The definition of the simplifying traversal contains much duplicated code due to the way the source language is structured:
+%
 all the binary operations are separate constructors, whose subterms need to be structurally simplified before we can decide whether a rule applies.
 %
-The correction proof has just as much duplication because it needs to follow
-the structure of the call graph of the function it wants to see reduce.
+The correction proof has just as much duplication because it needs to follow the structure of the call graph of the function it wants to see reduce.
 %
-The only saving grace here is that Coq's tactics language lets users write scripts that apply to many similar goals thus avoid duplication in the source file.
+The only saving grace here is that Coq's tactics language lets users write scripts that apply to many similar goals thus avoiding duplication in the source file.
 
-In \Velo{}, we structured our core language's representation in such a way that
-this duplication is never needed.
+In \Velo{}, we structured our core language's representation in such a way that this duplication is never needed.
 %
-All builtin operators (from primitive operations on builtin types to function
-application itself) are represented using a single \IdrisData{Call} constructor
-which takes an operation and a type-indexed list of subterms.
+All builtin operators (from primitive operations on builtin types to function application itself) are represented using a single \IdrisData{Call} constructor which takes an operation and a type-indexed list of subterms.
 
 \begin{Verbatim}
 data Term : (metas : List Meta) -> (ctxt : List Ty) -> Ty -> Type where
@@ -30,15 +27,14 @@ data Term : (metas : List Meta) -> (ctxt : List Ty) -> Ty -> Type where
 
 The primitives include:
 %
-\IdrisData{Zero} which takes no argument and returns a term of type \IdrisData{TyNat};
+\IdrisData{Zero}---which takes no argument and returns a term of type \IdrisData{TyNat};
 %
-\IdrisData{And} which takes two arguments of type \IdrisData{TyBool} and return a term
+\IdrisData{And}---which takes two arguments of type \IdrisData{TyBool} and return a term
 of type \IdrisData{TyBool};
 %
 and
 %
-\IdrisData{App} which takes a function and an argument of type the function's domain
-and returns a term of type the function's codomain.
+\IdrisData{App}---which takes a function and an argument that corresponds to the type of the function's domain and returns a term that is the type of the function's co-domain.
 
 \begin{Verbatim}
 data Prim : (args : List Ty) -> (type : Ty) -> Type
@@ -49,10 +45,9 @@ data Prim : (args : List Ty) -> (type : Ty) -> Type
     -- ...
 \end{Verbatim}
 
-Using \IdrisType{Prim} structural operations can now be implemented by handling recursive calls on \IdrisData{Call} nodes' subterms uniformly before dispatching on the operator to see whether additional simplifications can be deployed.
+Using \IdrisType{Prim} structural operations can now be implemented by handling recursive calls on the subterms of \IdrisData{Call} nodes uniformly before dispatching on the operator to see whether additional simplifications can be deployed.
 
 Similarly, all of the duplication in the correction proofs is factored out in a single place where the induction hypotheses can be invoked.
-
 
 %%% Local Variables:
 %%% mode: latex
