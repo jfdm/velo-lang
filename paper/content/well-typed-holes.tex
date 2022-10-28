@@ -1,29 +1,70 @@
 \subsection{Well-Typed Holes}
 \label{sec:design:holes}
 
-Typed-holes are a useful feature in type-driven programming~\cite{DBLP:journals/pacmpl/OmarVCH19}, and supports the \emph{dropping in} of a special term, the hole, into a program such that during elaboration the type of that term will be synthesised.
-User's can inspect the type of a hole and will be presented with the local context that will, hopefully, show useful terms to help fill the hole.
+Holes are a special kind of placeholder that programmers can use for parts of
+the program they have not yet written.
+%
+In a typed language, each hole will be assigned a type based on the context it
+is used in.
 
-Within \Idris{} holes are lifted during elaboration to top-level definitions, allowing them to be placed in a position suitable for the elaborator to synthesis the hole's type.
-To avoid such term manipulation in \Velo{}'s core we have taken a different approach, and our elaboration step seeks to resolve bound holes \emph{in situ}.
+Special language support (the ability to inspect, refine, compute with,
+or fill an existing hole with an adequately typed term)
+enables \emph{type-driven programming}~\cite{DBLP:journals/pacmpl/OmarVCH19},
+a practice by which the user enters in a dialogue with the compiler in order
+to interactively build the program.
+%
+Barebones language support should at least include the ability to inspect the
+type of a hole and the local context it appears in, to instantiate it with an
+adequately typed term, as well as the ability to
+safely evaluate programs that still contain holes.
+%
+\Velo{} provides all three.
+%
+Our treatment of evaluation and instantiation are fairly standard, but our
+elaboration process is more interesting.
 
-As with typing contexts we also provide a hole context to keep track of declared holes and \emph{when} they are declared.
+\Idris{}'s elaborator lifts holes to top-level declarations with no associated
+definition as it encounters them.
+%
+Because of this design choice users cannot mention the same hole explicitly in
+different places to state their intention that these yet unwritten terms ought
+to be the same.
+%
+They currently can refer to the hole's solution by its name, but that hole is
+still very much placed in one specific position and it is from that position
+that \Idris{} infers its context.
 
-\begin{Verbatim}
-data Term : (ctxt : List Meta) -> (ctxt : SnocList Ty) -> (type : Ty) -> Type where
-\end{Verbatim}
+In \Velo{}, however, we allow holes to be mentioned arbitrarily many times in
+arbitrarily different local contexts. In the following example, the hole
+\texttt{?h} occurs in two distinct contexts: $\emptyset,a,x$ and $\emptyset,a,y$.
 
-Here \IdrisType{Meta} is a simple data structure to snapshot:
-the holes real name;
-current state of the typing context;
-and
-the type of the hole itself.
-This information is populated during the elaboration of \IdrisType{Raw} terms to \IdrisType{Holey} ones.
-During the second elaboration step (\IdrisType{Holey} terms to \IdrisType{Terms}), we capture, and reason about, invariants about all the holes dug and the contexts in which they were dug.
-Reasoning on these invariants supports coalescing of hole information to ensure that the reported context for the same-named holes that were dug\ldots
+\begin{center}
+  \holeexamplegraph{}
+\end{center}
 
-\jfdm{not sure how best to phrase this.}
+As a consequence, a term will only fit in that hole if it happens to live in the
+shared common prefix of these two contexts ($\emptyset,a$).
+%
+Indeed, references to $x$ will not make sense in $\emptyset,a,y$ and vice-versa for $y$.
 
+
+Our elaborator proceeds in two steps.
+%
+First, a bottom-up pass records holes as they are found and, in nodes
+with multiple subterms, reconciles conflicting hole occurrences by
+computing the appropriate local context restrictions.
+%
+This process produces a list of holes together with a \IdrisType{Holey}
+term that contains invariants ensuring these collected holes do fit in the term.
+%
+Second, a top-down pass produces a core \IdrisType{Term} indexed by the list
+of \IdrisType{Meta} (a simple record type containing the hole's name, the context
+it lives in, and its type). Hole occurences end up being assigned a thinning
+embedding the metavariable's actual context into the context it appears in.
+
+Although these intermediate representations are \Velo{}-specific, the technique
+itself is general and can be reused by anyone wanting to implement a well scoped
+notion of holes.
 
 %%% Local Variables:
 %%% mode: latex

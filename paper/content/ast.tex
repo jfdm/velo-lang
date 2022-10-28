@@ -1,26 +1,45 @@
+\newcommand{\holeexamplegraph}{
+\begin{tikzpicture}
+
+\draw (0,0)   circle (.4cm) node[align=center] {$\lambda a.$};
+\draw (2.5,0) circle (.4cm) node[align=center] {\$};
+
+\draw (5,.75) circle (.4cm) node[align=center] {$\lambda x.$};
+\draw[dashed] (7.5,.75) circle (.4cm) node[align=center] {$?h$};
+
+\draw (5,-.75) circle (.4cm) node[align=center] {$\lambda y.$};
+\draw[dashed] (7.5,-.75) circle (.4cm) node[align=center] {$?h$};
+
+\draw [->] (.4,0)     to [out=0,in=180]  (2.1,0);
+\draw [->] (2.8,.25)  to [out=45,in=180] (4.6,.75);
+\draw [->] (2.8,-.25) to [out=-45,in=180] (4.6,-.75);
+
+\draw [->] (5.4,.75)  to [out=0,in=180] (7.1,.75);
+\draw [->] (5.4,-.75) to [out=0,in=180] (7.1,-.75);
+
+\end{tikzpicture}}
+
 \newcommand{\cseexamplegraph}{
 \begin{tikzpicture}
-% \draw (0,0)      node[draw,dashed,regular polygon, regular polygon sides=3, shape border rotate=270]{$E[\cdot]$};
-\draw (1.6,0)    node[draw,diamond,align=center] {\$};
+\draw (1.6,0)    circle (.4cm) node[align=center] {\$};
 
-\draw (3.75,.75) node[draw, diamond,align=center] {$\lambda x.$};
+\draw (3.75,.75) circle (.4cm) node[align=center] {$\lambda x.$};
 \draw (6.90,.75) node[draw,dashed,regular polygon, regular polygon sides=3, shape border rotate=90]
       {\phantom{b}$t$\phantom{g}};
 
-\draw (3.75,-.75) node[draw, diamond,align=center] {$\lambda a.$};
-\draw (5.90,-.75) node[draw, diamond,align=center] {$\lambda b.$};
-\draw (9.05,-.75) node[draw,dashed,regular polygon, regular polygon sides=3, shape border rotate=90]
+\draw (3.75,-.75) circle (.4cm) node[align=center] {$\lambda a.$};
+\draw (5.90,-.75) circle (.4cm) node[align=center] {$\lambda b.$};
+\draw (9,-.75) node[draw,dashed,regular polygon, regular polygon sides=3, shape border rotate=90]
       {\phantom{b}$t$\phantom{g}};
 
-\draw [->] (1.83,.23)  to [out=45,in=180] (3.2,.75);
-\draw [->] (1.83,-.23) to [out=-45,in=180] (3.2,-.75);
+\draw [->] (1.9,.27)  to [out=45,in=180] (3.35,.75);
+\draw [->] (1.9,-.27) to [out=-45,in=180] (3.35,-.75);
 
-\draw [->] (4.35,-.75) to [out=0,in=180]  (5.35,-.75);
-\draw [->] (4.35,.75)  to [out=0,in=180]  (5.9,.75);
+\draw [->] (4.15,-.75) to [out=0,in=180]  (5.5,-.75);
+\draw [->] (4.15,.75)  to [out=0,in=180]  (5.9,.75);
 
-\draw [->] (6.5,-.75) to [out=0,in=180]  (8,-.75);
+\draw [->] (6.3,-.75) to [out=0,in=180]  (8,-.75);
 
-% \draw [->] (.23,-.23) to [out=-45,in=180]
 \end{tikzpicture}}
 
 \newcommand{\codebruijnexamplegraph}{

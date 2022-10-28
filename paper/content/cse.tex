@@ -1,6 +1,4 @@
 %TODO: comment on cost of thinning as inductive values?
-%      cite the preprint solving this & whose diagram this is?
-\input{ast}
 
 Now that our core language is well scoped by construction, our compiler passes
 must also be shown to be scope-preserving.
@@ -21,11 +19,12 @@ the application node (denoted \$) so that $t$ may be shared by both subtrees.
 One of the challenges of \ac{cse}, as exemplified above, is that the term of interest
 may be burried deep inside separate contexts.
 %
-In our intrinsically scoped representation, $t$ in scope $\Gamma, x : \sigma$ is potentially not actually syntactically equal to a copy living in $\Gamma, a : \tau, b : \nu$.
+In our intrinsically scoped representation, $t$ in scope $\Gamma, x : \sigma$
+is potentially not actually syntactically equal to a copy living in $\Gamma, a : \tau, b : \nu$.
 %
 Indeed a variable $v$ bound in $\Gamma$ will, for instance, be represented by
-the \DeBruijn{} index $1+v$ in $\Gamma, x : \sigma$
-but by the index $2+v$ in $\Gamma, a :  \tau, b : \nu$.
+the \DeBruijn{} index ($1+v$) in $\Gamma, x : \sigma$
+but by the index ($2+v$) in $\Gamma, a :  \tau, b : \nu$.
 
 If only terms were indexed by their exact \emph{support}!
 We would not care about additional yet irrelevant variables that happen to be in scope.
@@ -34,7 +33,7 @@ The principled solution here is to switch to a different representation for
 the purpose of \ac{cse}.
 The co-\DeBruijn{} representation~\cite{DBLP:journals/corr/abs-1807-04085} provides exactly this guarantee.
 
-%\subsection{Co-De Bruijn representation}
+%\subsection{Co-\DeBruijn{} representation}
 
 In the co-\DeBruijn{} representation, every term is precisely indexed by its
 exact support.
@@ -49,7 +48,7 @@ If we think of thinnings as sequences of 0/1 bits stating whether a variable
 is kept or dropped, and admitting that such sequences can be represented as
 list of either $\bullet$ (1) or $\circ$ (0), the $S$ combinator
 ($\lambda g. \lambda f. \lambda x. g x (f x)$) is represented as follows in
-co-\DeBruijn{} notation.
+co-\DeBruijn{} notation (diagram taken from~\cite{MANUAL:draft/Allais22}).
 
 \begin{center}
   \codebruijnexamplegraph{}
@@ -58,13 +57,34 @@ co-\DeBruijn{} notation.
 The first three $\lambda$ abstractions only use $\bullet$ in their thinnings
 because all of $g$, $f$, and $x$ do appear in the body of the combinator.
 %
-The application node then splits the context into two: the first subterm
+The first application node then splits the context into two: the first subterm
 ($g x$) drops $f$ while the second ($f x$) gets rid of $g$.
 %
 Further application nodes select the one variable still in scope for each
 leaf subterm: $g$, $x$, $f$, and $x$.
 
-
 Using a co-\DeBruijn{} representation, we can easily identify shared subterms:
 they need to not be mentioning any of the most local variables and be
 syntactically equal.
+
+
+Our pass succesfully transforms the program on the left-hand side to the
+one on the right-hand side where the repeated expressions
+\texttt{(add m n)} and \texttt{(add n m)} have been let-bound.
+
+\begin{minipage}[t]{0.4\textwidth}
+\begin{Verbatim}
+let m = zero in
+let n = (inc zero) in
+(add (add (add m n) (add n m))
+     (add (add n m) (add m n)))
+\end{Verbatim}
+\end{minipage}\hfill\begin{minipage}[t]{0.4\textwidth}
+\begin{Verbatim}
+let m = zero in
+let n = (inc zero) in
+let p = (add n m) in
+let q = (add m n) in
+(add (add q p) (add p q))
+\end{Verbatim}
+\end{minipage}

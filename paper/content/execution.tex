@@ -1,7 +1,7 @@
 \chcomment{Evaluation as Progress (with computation rules in one separate function)}
 
 \Velo{} is a programming language that will reduce terms down to values.
-Within the dependently typed setting we can use dependent types to reason about our language's \emph{theoretical} type-soundness proof \emph{practically} by providing the language's operation semantics.
+Within the dependently typed setting we can use dependent types to reason about our language's \emph{theoretical} type-soundness proof \emph{practically} by providing the language's operational semantics.
 We can realise \Velo{}'s dynamic semantics either through (definitional) interpreters~\cite{10.1145/3093333.3009866,Augustsson1999edt}, or by providing a more traditional syntactic proof soundness~\cite{DBLP:journals/iandc/WrightF94} but mechanised~\cite[Part 2: Properties]{plfa22.08}.
 Through consideration of the latter approach we get, for free, verification that \Velo{}'s execution is correct by reusing the correctness proof as the evaluator.
 Or rather what we in fact get for free is our evaluator as it is computed from our formal proof.
@@ -16,7 +16,8 @@ data Redux : (this,that : Term metas ctxt type) -> Type where
 and constants (\Cref{sec:design:constants})
 
 \begin{Verbatim}
-data Reduxes :{tys : List Ty} -> (these, those : All (Term metas ctxt) tys) -> Type where
+data Reduxes : \{tys : List Ty\} -> (these, those : All (Term metas ctxt) tys)
+             -> Type where
 \end{Verbatim}
 
 \noindent
