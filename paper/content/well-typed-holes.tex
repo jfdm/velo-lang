@@ -5,9 +5,9 @@ Holes are a special kind of placeholder that programmers can use for parts of th
 %
 In a typed language, each hole will be assigned a type based on the context it is used in.
 
-\emph{Type-Driven Programming}~\cite{DBLP:journals/pacmpl/OmarVCH19} is a practice by which the user enters in to a dialogue \emph{with} the compiler to interactively build the program.
+\emph{Type-Driven Programming}~\cite{DBLP:journals/pacmpl/OmarVCH19} is a practice by which the user enters into a dialogue \emph{with} the compiler to interactively build the program.
 We can enable type-driven programming in part by providing special language support for holes and operations on them.
-Such operations will include the ability to inspect, refine, computing with, and instantiate (with an adequately typed term) holes.
+Such operations will include the ability to inspect, refine, compute with, and instantiate (with an adequately typed term) holes.
 %
 Barebones language support for type-driven programming should at least include the ability to:
 %
@@ -23,7 +23,8 @@ and as well
 %
 Our treatment of evaluation and instantiation are fairly standard, but our elaboration process is more interesting.
 
-\Idris{}'s elaborator lifts holes to top-level declarations with no associated definition as it encounters them.
+\Idris{} elaborates holes as it encounters them by turning them into
+global declarations with no associated definition.
 %
 Because of this design choice users cannot mention the same hole explicitly in different places to state their intention that these yet unwritten terms ought to be the same.
 %
@@ -47,14 +48,17 @@ Our elaborator proceeds in two steps.
 %
 First, a bottom-up pass records holes as they are found and, in nodes with multiple subterms, reconciles conflicting hole occurrences by computing the appropriate local context restrictions.
 %
-This process produces a list of holes together with a \IdrisType{Holey} term that contains invariants ensuring these collected holes do fit in the term.
+This process produces a list of holes, their types, and local contexts,
+together with a \IdrisType{Holey} term that contains invariants ensuring
+these collected holes do fit in the term.
 %
 Second, a top-down pass produces a core \IdrisType{Term} indexed by the list of \IdrisType{Meta} (a simple record type containing the hole's name, the context it lives in, and its type).
 %
 Hole occurences end up being assigned a thinning embedding the metavariable's actual context into the context it appears in.
 
 Although these intermediate representations are \Velo{}-specific, the technique
-itself is general and can be reused by anyone wanting to implement well-scoped holes.
+and invariants are general and can be reused by anyone wanting to implement
+well-scoped holes in their functional DSL.
 
 %%% Local Variables:
 %%% mode: latex
