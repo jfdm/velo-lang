@@ -59,19 +59,21 @@ they need to not be mentioning any of the most local variables and be syntactica
 
 Our pass succesfully transforms the program on the left-hand side to the one on the right-hand side where the repeated expressions \texttt{(add m n)} and \texttt{(add n m)} have been let-bound.
 
-\begin{minipage}[t]{0.4\textwidth}
-\begin{Verbatim}
+\begin{center}
+  \begin{minipage}[t]{0.4\textwidth}
+    \begin{Verbatim}
 let m = zero in
+let n = (inc zero)
+in (add (add (add m n) (add n m))
+        (add (add n m) (add m n)))
+    \end{Verbatim}
+  \end{minipage}\hfill\begin{minipage}[t]{0.4\textwidth}
+    \begin{Verbatim}
+let m = zero       in
 let n = (inc zero) in
-(add (add (add m n) (add n m))
-     (add (add n m) (add m n)))
-\end{Verbatim}
-\end{minipage}\hfill\begin{minipage}[t]{0.4\textwidth}
-\begin{Verbatim}
-let m = zero in
-let n = (inc zero) in
-let p = (add n m) in
-let q = (add m n) in
-(add (add q p) (add p q))
-\end{Verbatim}
-\end{minipage}
+let p = (add n m)  in
+let q = (add m n)
+in (add (add q p) (add p q))
+    \end{Verbatim}
+  \end{minipage}
+\end{center}
