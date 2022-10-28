@@ -70,12 +70,21 @@ pdfa
 
 \begin{abstract}
   Language Workbenches offer language designers an expressive environment in which to create their \acp*{dsl}.
+  %
   Similarly, research into mechanised meta-theory has shown how dependently-typed languages provide expressive environments to formalise and study \acsp*{dsl} and their meta-theoretical properties.
+  %
   But can we claim that dependently-typed languages qualify as language workbenches?
+  %
   We argue yes!
-  We have developed an exemplar \acs*{dsl} called \Velo{} that showcases not only dependently-typed techniques to realise and manipulate \acp*{ir}, but that dependently typed languages make fine language workbenches.
-  \Velo{} is a simple verified language with well-typed holes and comes with a complete compiler pipeline: parser, elaborator, REPL, evaluator, and compiler passes.
-  Specifically, we describe our design choices for well-typed \acs*{ir} design that includes support for well-typed holes, and how we can perform \acf*{cse} in a well-typed setting.
+
+
+  We have developed an exemplar \acs*{dsl} called \Velo{} that showcases not only dependently-typed techniques to realise and manipulate \acp*{ir}, but that dependently-typed languages make fine language workbenches.
+  %
+  \Velo{} is a simple verified language with well-typed holes and comes with a complete compiler pipeline: parser, elaborator, \acs*{repl}, evaluator, and compiler passes.
+  %
+  Specifically, we describe our design choices for well-typed \acs*{ir} design that includes support for well-typed holes, how \acf*{cse} is achieved in a well-typed setting, and how the mechanised type-soundness proof for \Velo{} is the source of the evaluator.
+\end{abstract}
+
 %  We also present good programming idioms for working with dependent types.
 
 %  We are planning to showcase dependently typed techniques to implement \& manipulate IRs.
@@ -96,7 +105,6 @@ pdfa
 %Our ongoing work is available at:
 %
 %\url{https://github.com/jfdm/velo-lang}
-\end{abstract}
 
 \todo{Run spellcheck}
 \todo{Use Katla to typeset Idris 2 code}
