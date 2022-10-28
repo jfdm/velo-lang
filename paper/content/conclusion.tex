@@ -4,7 +4,8 @@ We have shown that dependently typed languages satisfy the core requirements fro
 
 \Velo{}'s \emph{notation} as a \ac{dsl} is, by design, textual, and the internal core bounded by \Idris{} own notation requirements.
 %
-More importantly the \emph{semantics} (statics and dynamics) of \Velo{} are verified as part of the implementation because of the dependently typed setting.
+More importantly the \emph{semantics} (statics and dynamics) of \Velo{}
+are verified as part of the implementation thanks to the dependently typed setting.
 %
 The weakest core criteria is that of \emph{editor} support.
 %
@@ -28,12 +29,18 @@ With the rise of the \ac{lsp} it would be a good idea to look at how we can deri
 
 \jfdm{The IDE-Protocol was presented at DTP 2014 (\url{https://davidchristiansen.dk/pubs/dtp2014-idris-mode.pdf}) we could cite}
 
-Our languages also do not come with the ability to test and debug their implementation.
-These are important aspects even thought our languages are \emph{certified}.
-%
-We need to validate that our verified code is doing what we want it to do.
 
-\jfdm{I have no idea how to expand this properly without it obvious that I waffle.}
+Our languages also do not come with the ability to test and debug their
+implementation.
+%
+If some of the features we have presented are fully formalised (e.g. execution),
+others are only known to be scope-and-type preserving (e.g. \ac{cse}).
+%
+Therefore the dependently typed setting does not mean we do not need testing
+anymore.
+%
+Prior work on generators for inductive families~\cite{DBLP:journals/pacmpl/LampropoulosPP18}
+should allow us to bring property-based testing~\cite{DBLP:conf/icfp/ClaessenH00} to our core passes.
 
 Finally there is language composability, an advantageous idea to reuse existing languages when designing new ones.
 This is a hard problem
