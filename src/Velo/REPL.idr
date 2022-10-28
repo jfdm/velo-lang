@@ -16,6 +16,7 @@ import Velo.IR.Holey
 import Velo.IR.Term
 import Velo.Parser
 import Velo.Lexer
+import Velo.Elaborator.Instantiate
 import Velo.Elaborator.Holey
 import Velo.Elaborator.Term
 import Velo.Elaborator
@@ -32,7 +33,7 @@ import Velo.Commands
 
 record State where
   constructor MkSt
-  file : Maybe ElabResult
+  file : Maybe (SynthResult [<])
 
 defState : State
 defState = MkSt Nothing
@@ -42,7 +43,7 @@ todo st = do putStrLn "Not Yet Implemented"
              pure st
 
 onFile : (st : State )
-      -> (f  : ElabResult -> Velo State)
+      -> (f  : SynthResult [<] -> Velo State)
             -> Velo State
 onFile st f
   = maybe (do putStrLn "Need to load a file."
@@ -55,10 +56,10 @@ onHoles : (st : State)
              -> Velo State
 onHoles st f
   = onFile st
-           (\case MkElabResult [] _
+           (\case MkSynthResult [] _
                     => do putStrLn "No Holes"
                           pure st
-                  MkElabResult ms _
+                  MkSynthResult ms _
                     => f ms)
 
 process : State -> Cmd -> Velo State
@@ -76,28 +77,42 @@ process st Holes
                        pure st)
 
 process st (TypeOfHole str)
-  = onHoles st
-            (\ms => do let m = getByName str ms
-                       printLn (pretty {ann = ()} m)
-                       pure st)
+  = onHoles st $ \ms => do
+      let Just (m ** _) = getByName str ms
+        | _ => st <$ putStrLn "\{str} is not a valid hole."
+      printLn (pretty {ann = ()} m)
+      pure st
+
+process st (Instantiate hole term)
+  = onFile st $ \ (MkSynthResult ms tm) => do
+      let Just (MkMeta nm scp ty ** p) = getByName hole ms
+        | Nothing => st <$ putStrLn "\{hole} is not a valid hole"
+
+      ast <- fromString term
+      MkCheckResult [] res <- elab scp ty ast
+        | _ => st <$ putStrLn "\{term} is not hole-free"
+
+      let tm = instantiate tm p (embed res)
+      printLn (pretty {ann = ()} (unelaborate tm))
+      pure ({ file := Just (MkSynthResult _ tm) } st)
 
 process st Eval
   = onFile st
-           (\(MkElabResult ms tm)
+           (\(MkSynthResult ms tm)
                 => do v <- eval tm
                       prettyComputation v
                       pure st)
 
 process st CSE
   = onFile st
-           (\(MkElabResult ms tm)
+           (\(MkSynthResult ms tm)
                 => do let tm = cse tm
                       printLn (pretty {ann = ()} (unelaborate tm))
                       pure st)
 
 process st ConstantFolding
   = onFile st
-           (\(MkElabResult ms tm)
+           (\(MkSynthResult ms tm)
                 => do let tm = cfold tm
                       printLn (pretty {ann = ()} (unelaborate tm))
                       pure st)
@@ -105,7 +120,7 @@ process st ConstantFolding
 process st (Load str)
   = tryCatch (do ast <- fromFile str
                  putStrLn "# Finished Parsing"
-                 res <- elab ast
+                 res <- elab [<] ast
                  putStrLn "# Finished Type-Checking"
                  pure ({ file := Just res} st)
                  )
@@ -114,7 +129,7 @@ process st (Load str)
 
 process st Show
   = onFile st
-           (\(MkElabResult ms tm)
+           (\(MkSynthResult ms tm)
                 => do printLn (pretty {ann = ()} (unelaborate tm))
                       pure st)
 

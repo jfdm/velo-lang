@@ -39,7 +39,7 @@ pipeline opts
        ast <- fromFile fname
        putStrLn "# Finished Parsing"
 
-       res <- elab ast
+       res <- elab [<] ast
 
        putStrLn "# Finished Type Checking"
 

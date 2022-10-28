@@ -8,6 +8,8 @@ Velo> [:q,:quit,:exit]
 	Show the current list of holes.
 [:hole_type,:t] [name]
 	Show the specified hole.
+[:instantiate,:i] [name] {term}
+	Instantiate the specified hole with the given term.
 [:eval] 
 	Eval the loaded program.
 [:cse] 

@@ -35,7 +35,7 @@ Show (Evaluating.Error) where
 
 Show (Elaborating.Error) where
   show (Hole msg)
-    = "Hole eror:\n\t\{show msg}"
+    = "Hole error:\n\t\{show msg}"
   show (Err fc err)
     = unlines [show fc
               , show err]

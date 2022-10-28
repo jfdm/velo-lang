@@ -8,6 +8,7 @@ import Data.Maybe
 import public Toolkit.Commands
 
 import Velo.Core
+import Velo.IR.AST
 
 %default total
 
@@ -18,6 +19,7 @@ data Cmd = Quit
          | TypeOfHole String
          | Eval
          | CSE
+         | Instantiate String String
          | Show
          | ConstantFolding
          | Load String
@@ -44,6 +46,11 @@ commands
                  TypeOfHole
                  "Show the specified hole."
 
+    , newCommand (names ["instantiate", "i"])
+                 (options [REQ "name", REST "term"])
+                 Instantiate
+                 "Instantiate the specified hole with the given term."
+
     , newCommand (names ["eval"])
                  Eval
                  "Eval the loaded program."
@@ -67,9 +74,16 @@ commands
     ]
 
 export
-Show OptDesc where
+Show (OptDesc b) where
   show (REQ str) = "[\{str}]"
   show (OPT str str1) = "<\{str1}> [DEFAULT \{str}]"
+  show (REST str) = "{\{str}}"
+
+export
+Show (OptDescs b) where
+  show [] = ""
+  show [o] = show o
+  show (o :: os) = "\{show o} \{show os}"
 
 export
 Show Commands.Error where
@@ -87,14 +101,13 @@ Show Commands.Error where
 show : CommandDesc a -> String
 show cmd
     = trim $ unlines [unwords ["[\{concat $ intersperse "," (map (":" <+>) $ forget $ name cmd)}]"
-                              , maybe "" (unwords . map show . forget) (argsDesc cmd)
+                              , show (argsDesc cmd)
                               ]
                      , "\t" <+> maybe "" id (help cmd)
                      ]
 
 export
 helpStr : String
-helpStr
-  = unlines (map show (forget commands))
+helpStr = unlines (map show $ forget commands) where
 
 -- [ EOF ]

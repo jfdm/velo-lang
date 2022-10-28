@@ -7,8 +7,8 @@ import Toolkit.Decidable.Informative
 import public Data.List
 import        Data.List.Quantifiers
 import public Data.List1
-import        Data.List1.Quantifiers
 import        Data.Maybe
+import        Data.String
 import        Text.Lexer
 import        Text.Parser
 
@@ -21,42 +21,49 @@ import Toolkit.Text.Parser.Run
 -- ## Definitions
 
 public export
-data OptDesc
-  = REQ String
-  | OPT String String
+data OptDesc : Bool -> Type where
+  REQ : String -> OptDesc b
+  OPT : String -> String -> OptDesc b
+  REST : String -> OptDesc False
+
+namespace OptDescs
+
+  public export
+  data OptDescs : Bool -> Type where
+    (::) : {b : Bool} -> OptDesc b -> OptDescs b -> OptDescs True
+    Nil : OptDescs False
 
 public export
-Options : Type
-Options = List1 OptDesc
+options : OptDescs True -> OptDescs True
+options = id
+
+namespace All
+
+  public export
+  data All : (p : forall b. OptDesc b -> Type) -> OptDescs b -> Type where
+    (::) : {0 p : forall b. OptDesc b -> Type} ->
+           p o -> Commands.All.All p opts -> All p (o :: opts)
+    Nil  : {0 p : forall b. OptDesc b -> Type} ->
+           All p []
 
 public export
-options : (xs       : List OptDesc)
-       -> {auto prf : NonEmpty xs}
-                   -> Options
-options (x::xs) {prf = IsNonEmpty}
-  = x:::xs
-
-public export
-BuildArg : OptDesc -> Type
+BuildArg : OptDesc b -> Type
 BuildArg (REQ str) = String
 BuildArg (OPT _ str) = String
+BuildArg (REST str) = String
 
 public export
-BuildArgs : (a : Type) -> List OptDesc -> Type
+BuildArgs : (a : Type) -> OptDescs b -> Type
 BuildArgs a [] = a
 BuildArgs a (x :: xs) = BuildArg x -> BuildArgs a xs
-
-public export
-BuildArgs1 : (a : Type) -> Maybe (List1 OptDesc) -> Type
-BuildArgs1 a Nothing = a
-BuildArgs1 a (Just d) = BuildArgs a (forget d)
 
 public export
 record CommandDesc (a : Type) where
   constructor MkCDesc
   name      : List1 String
-  argsDesc  : Maybe (List1 OptDesc)
-  argsBuild : BuildArgs1 a argsDesc
+  {nonEmpty : Bool}
+  argsDesc  : OptDescs nonEmpty
+  argsBuild : BuildArgs a argsDesc
   help      : Maybe String
 
 -- ## Factories
@@ -70,29 +77,28 @@ names (x::xs) {prf = IsNonEmpty} = x ::: xs
 namespace Enum
   export
   newCommand : List1 String -> a -> String -> CommandDesc a
-  newCommand ns f mhelp = MkCDesc ns Nothing f (Just mhelp)
+  newCommand ns f mhelp = MkCDesc ns [] f (Just mhelp)
 
   export
   newCommandNoHelp : List1 String -> a -> CommandDesc a
-  newCommandNoHelp ns f = MkCDesc ns Nothing f Nothing
-
+  newCommandNoHelp ns f = MkCDesc ns [] f Nothing
 
 export
 newCommand : List1 String
-          -> (desc : Options)
-          -> BuildArgs a (forget desc)
+          -> (desc : OptDescs True)
+          -> BuildArgs a desc
           -> String
           -> CommandDesc a
 newCommand ns desc f mstr
-  = MkCDesc ns (Just desc) f (Just mstr)
+  = MkCDesc ns desc f (Just mstr)
 
 export
 newCommandNoHelp : List1 String
-                -> (desc : Options)
-                -> BuildArgs a (forget desc)
+                -> (desc : OptDescs True)
+                -> BuildArgs a desc
                 -> CommandDesc a
 newCommandNoHelp ns desc f
-  = MkCDesc ns (Just desc) f Nothing
+  = MkCDesc ns desc f Nothing
 
 public export
 Commands : Type -> Type
@@ -163,30 +169,30 @@ Lexer = MkLexer Commands.tokenMap keep EndInput
 public export
 data Error = ExpectedOption
            | ArgsEmpty (List (WithBounds Token))
-           | ToksExpected (List OptDesc)
+           | ToksExpected (OptDescs True)
            | WrongName (List String)
            | IsVoid
            | ColonExpected
            | NameExpected
-           | ArgsExpected (List1 OptDesc)
+           | ArgsExpected (OptDescs True)
            | UnRecognised
            | LError LexError
 
 -- ### Process a token describing an option
 
-data View : (o : OptDesc) -> (tok : WithBounds Token) -> Type where
+data View : (o : OptDesc b) -> (tok : WithBounds Token) -> Type where
   IsOptReq : (a : String) -> View (REQ d) (MkBounded (CmdTok a) l q)
   IsOptOpt : (ma : String) -> (a : String) -> View (OPT ma d) (MkBounded (CmdTok a) l q)
   IsOptNot : View o tok
 
-view : (o : OptDesc) -> (tok : WithBounds Token) -> View o tok
+view : (o : OptDesc b) -> (tok : WithBounds Token) -> View o tok
 
 view (REQ str) (MkBounded (CmdTok str1) l q) = IsOptReq str1
 view (OPT str str1) (MkBounded (CmdTok str2) l q) = IsOptOpt str str2
 view o t = IsOptNot
 
 -- ### Process tokens
-processArgs : (o : List OptDesc)
+processArgs : (o : OptDescs b)
            -> List (WithBounds Token)
            -> Either Error (All BuildArg o)
 
@@ -198,6 +204,17 @@ processArgs [] xs
 
 processArgs (x :: xs) []
   = Left (ToksExpected (x::xs))
+
+processArgs [REST desc] xs = collect [<] xs where
+
+  collect : SnocList String
+           -> List (WithBounds Token)
+           -> Either Error (Commands.All.All BuildArg [REST desc])
+  collect acc [] = pure [unwords (acc <>> [])]
+  collect acc [MkBounded EndInput _ _] = collect acc []
+  collect acc (MkBounded Colon _ _ :: ys) = collect (acc :< ":") ys
+  collect acc (MkBounded (CmdTok a) _ _ :: ys) = collect (acc :< a) ys
+  collect acc (x :: xs) = Left (ToksExpected [REST desc])
 
 processArgs (x :: xs) (y :: ys) with (view x y)
   processArgs ((REQ _) :: xs) ((MkBounded (CmdTok a) l q) :: ys) | (IsOptReq a)
@@ -282,34 +299,34 @@ isColon (MkBounded EndInput isIrrelevant bounds)
 isColon (MkBounded Colon isIrrelevant bounds)
   = ItIs
 
-data Result : Maybe (List1 OptDesc) -> List (WithBounds Token) -> Type where
-  Empty : Result Nothing [MkBounded EndInput l q]
+data Result : OptDescs b -> List (WithBounds Token) -> Type where
+  Empty : Result [] [MkBounded EndInput l q]
 
-  Args  : All BuildArg (o::os)
-       -> Result (Just (o:::os)) (toks)
+  Args  : {0 os : OptDescs True}
+       -> All BuildArg os
+       -> Result os toks
 
-processArgsM : (a  : Maybe (List1 OptDesc) )
+processArgsM : (a  : OptDescs b)
             -> (os : List (WithBounds Token))
                    -> Either Error (Result a os)
-processArgsM Nothing [MkBounded EndInput l q]
+processArgsM [] [MkBounded EndInput l q]
   = pure Empty
-processArgsM Nothing xs
+processArgsM [] xs
   = Left (ArgsEmpty xs)
 
-processArgsM (Just (head ::: tail)) os with (processArgs (head :: tail) os)
-  processArgsM (Just (head ::: tail)) os | (Left x)
+processArgsM (head :: tail) os with (processArgs (head :: tail) os)
+  processArgsM (head :: tail) os | (Left x)
     = Left x
-  processArgsM (Just (head ::: tail)) os | (Right x)
+  processArgsM (head :: tail) os | (Right x)
     = Right (Args x)
 
-buildArgs : All BuildArg (o::os)
-         -> BuildArgs1 a (Just $ o:::os)
+buildArgs : All BuildArg os
+         -> BuildArgs a os
          -> a
-buildArgs (x :: []) f = f x
+buildArgs [] f = f
 
-buildArgs (x :: (y :: z)) f
-  = buildArgs (y :: z) (f x)
-
+buildArgs (x :: xs) f
+  = buildArgs xs (f x)
 
 processCmd : CommandDesc a
           -> List (WithBounds Token)

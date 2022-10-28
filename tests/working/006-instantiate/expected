@@ -1,0 +1,40 @@
+Running Test
+Velo> # Finished Parsing
+# Finished Type-Checking
+Velo> (fun m : Nat
+=> (add ?hole1 let n = (inc zero)
+   in (add let x = m in ?hole1 (add ?hole2 ?hole3))))
+Velo> x : Nat
+----------
+?hole1 : Nat
+
+x : Nat
+b : Nat
+----------
+?hole2 : Nat
+
+x : Nat
+b : Nat
+----------
+?hole3 : Nat
+
+Velo> (fun m : Nat => (add m let n = (inc zero) in (add m (add ?hole2 ?hole3))))
+Velo> x : Nat
+b : Nat
+----------
+?hole2 : Nat
+
+x : Nat
+b : Nat
+----------
+?hole3 : Nat
+
+Velo> (fun m : Nat => (add m let n = (inc zero) in (add m (add (add m n) ?hole3))))
+Velo> x : Nat
+b : Nat
+----------
+?hole3 : Nat
+
+Velo> (fun m : Nat => (add m let n = (inc zero) in (add m (add (add m n) zero))))
+Velo> No Holes
+Velo> Quitting, Goodbye.
