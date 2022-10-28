@@ -1,76 +1,63 @@
-%TODO: comment on cost of thinning as inductive values?
+\todo{comment on cost of thinning as inductive values?}
+\jfdm{We should do this in the extended edition}
 
-Now that our core language is well scoped by construction, our compiler passes
-must also be shown to be scope-preserving.
+Now that our core language is well-scoped by construction, our compiler passes must also be shown to be scope-preserving.
 %
-This is not a new requirement, merely it makes concrete a constraint that
-used to be enforced informally.
+This is not a new requirement, merely it makes concrete a constraint that used to be enforced informally.
+%
 More importantly we show, with our compiler passes, that model-to-same-model transformation of our \ac{edsl} is possible, and that the infrastructure required is not bespoke to \Velo{}.
 
 The purpose of \ac{cse} is to identify subterms that appear multiple times in the syntax tree, and to abstract over them to avoid needless recomputations at runtime.
 %
-In the following example for instance, we would like to let-bind $t$ before
-the application node (denoted \$) so that $t$ may be shared by both subtrees.
+In the following example for instance, we would like to let-bind $t$ before the application node (denoted \$) so that $t$ may be shared by both subtrees.
 
 \begin{center}
   \cseexamplegraph{}
 \end{center}
 
-One of the challenges of \ac{cse}, as exemplified above, is that the term of interest
-may be burried deep inside separate contexts.
+One of the challenges of \ac{cse}, as exemplified above, is that the term of interest may be burried deep inside separate contexts.
 %
-In our intrinsically scoped representation, $t$ in scope $\Gamma, x : \sigma$
-is potentially not actually syntactically equal to a copy living in $\Gamma, a : \tau, b : \nu$.
+In our intrinsically scoped representation, $t$ in scope $\Gamma, x : \sigma$ is potentially not actually syntactically equal to a copy living in $\Gamma, a : \tau, b : \nu$.
 %
-Indeed a variable $v$ bound in $\Gamma$ will, for instance, be represented by
-the \DeBruijn{} index ($1+v$) in $\Gamma, x : \sigma$
-but by the index ($2+v$) in $\Gamma, a :  \tau, b : \nu$.
+Indeed a variable $v$ bound in $\Gamma$ will, for instance, be represented by the \DeBruijn{} index ($1+v$) in $\Gamma, x : \sigma$ but by the index ($2+v$) in $\Gamma, a :  \tau, b : \nu$.
 
-If only terms were indexed by their exact \emph{support}!
+If only terms were indexed by their exact \emph{support}!\jfdm{Is the technical term \emph{support} sufficiently well-known to not explain?}
+%
 We would not care about additional yet irrelevant variables that happen to be in scope.
 %
-The principled solution here is to switch to a different representation for
-the purpose of \ac{cse}.
+The principled solution here is to switch to a different representation for the purpose of \ac{cse}.
+%
 The co-\DeBruijn{} representation~\cite{DBLP:journals/corr/abs-1807-04085} provides exactly this guarantee.
 
 %\subsection{Co-\DeBruijn{} representation}
 
-In the co-\DeBruijn{} representation, every term is precisely indexed by its
-exact support.
+In the co-\DeBruijn{} representation, every term is precisely indexed by its exact support.
 %
-That is to say that every subterm explicitly throws away the bound variables
-that are not mentioned in it.
+That is to say that every subterm explicitly throws away the bound variables that are not mentioned in it.
 %
 By the time we reach a variable node, a single bound variable remains in scope:
+%
 precisely the one being referred to.
 
-If we think of thinnings as sequences of 0/1 bits stating whether a variable
-is kept or dropped, and admitting that such sequences can be represented as
-list of either $\bullet$ (1) or $\circ$ (0), the $S$ combinator
-($\lambda g. \lambda f. \lambda x. g x (f x)$) is represented as follows in
-co-\DeBruijn{} notation (diagram taken from~\cite{MANUAL:draft/Allais22}).
+If we think of thinnings as sequences of 0/1 bits, stating whether a variable is kept or dropped, and admitting that such sequences can be represented as a list of either $\bullet$ (1) or $\circ$ (0).
+Consider, for example, the $S$ combinator ($\lambda g. \lambda f. \lambda x. g x (f x)$) which is represented as follows in co-\DeBruijn{} notation (diagram taken from~\cite{MANUAL:draft/Allais22}).
 
 \begin{center}
   \codebruijnexamplegraph{}
 \end{center}
 
-The first three $\lambda$ abstractions only use $\bullet$ in their thinnings
-because all of $g$, $f$, and $x$ do appear in the body of the combinator.
+The first three $\lambda$ abstractions only use $\bullet$ in their thinnings because all of $g$, $f$, and $x$ do appear in the body of the combinator.
 %
-The first application node then splits the context into two: the first subterm
-($g x$) drops $f$ while the second ($f x$) gets rid of $g$.
+The first application node then splits the context into two: the first subterm ($g x$) drops $f$ while the second ($f x$) gets rid of $g$.
 %
-Further application nodes select the one variable still in scope for each
-leaf subterm: $g$, $x$, $f$, and $x$.
+Further application nodes select the one variable still in scope for each leaf subterm: $g$, $x$, $f$, and $x$.
 
 Using a co-\DeBruijn{} representation, we can easily identify shared subterms:
-they need to not be mentioning any of the most local variables and be
-syntactically equal.
+%
+they need to not be mentioning any of the most local variables and be syntactically equal.
 
 
-Our pass succesfully transforms the program on the left-hand side to the
-one on the right-hand side where the repeated expressions
-\texttt{(add m n)} and \texttt{(add n m)} have been let-bound.
+Our pass succesfully transforms the program on the left-hand side to the one on the right-hand side where the repeated expressions \texttt{(add m n)} and \texttt{(add n m)} have been let-bound.
 
 \begin{minipage}[t]{0.4\textwidth}
 \begin{Verbatim}
