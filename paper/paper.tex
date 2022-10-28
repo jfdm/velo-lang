@@ -133,7 +133,7 @@ With dependently typed languages, however, we can also capture
 the abstract syntax and its static semantics as a well-typed \ac{edsl}
 directly within the host language~\cite{Augustsson1999edt}.
 %
-Our terms will be implemented as a data structure with (almost) the following type:
+Our terms will be implemented as an inductive family with (almost) the following type:
 
 \begin{Verbatim}
 data Ty = TyNat | TyBool | TyArr Ty Ty
