@@ -1,11 +1,11 @@
 Running Test
-# Finished Parsing
-# Finished Type Checking
+[ INFO  ] # Finished Parsing
+[ INFO  ] # Finished Type Checking
 a : Nat -> Nat
 ----------
 ?hole : Nat
 
-# Finished Executing
+[ INFO  ] # Finished Executing
 ```
 let m = (inc (inc zero))
 in let b = true
@@ -53,4 +53,4 @@ in (let a = (inc (inc zero))
           in let a = (fun m : Nat => m)
              in ?hole : Nat)
 ```
-# Finished
+[ INFO  ] # Finished

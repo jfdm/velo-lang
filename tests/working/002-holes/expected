@@ -1,6 +1,6 @@
 Running Test
-# Finished Parsing
-# Finished Type Checking
+[ INFO  ] # Finished Parsing
+[ INFO  ] # Finished Type Checking
 a : Nat
 ----------
 ?a : Nat

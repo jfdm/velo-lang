@@ -1,7 +1,7 @@
 Running Test
-# Finished Parsing
-# Finished Type Checking
-# Finished Executing
+[ INFO  ] # Finished Parsing
+[ INFO  ] # Finished Type Checking
+[ INFO  ] # Finished Executing
 ```
 let m = (inc (inc zero))
 in let n = (add m m)
@@ -95,4 +95,4 @@ in m
 ```
 (inc (inc (inc (inc (inc (inc (inc (inc zero))))))))
 ```
-# Finished
+[ INFO  ] # Finished

@@ -1,7 +1,7 @@
 Running Test
-# Finished Parsing
-# Finished Type Checking
-# Finished Executing
+[ INFO  ] # Finished Parsing
+[ INFO  ] # Finished Type Checking
+[ INFO  ] # Finished Executing
 ```
 let m = zero
 in let n = (inc m)
@@ -81,4 +81,4 @@ in m
 ```
 zero
 ```
-# Finished
+[ INFO  ] # Finished
