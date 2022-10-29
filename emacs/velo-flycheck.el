@@ -26,13 +26,14 @@
             (source ".velo"))
   :error-patterns
   (;(error line-start
-   ;       "[ ERROR ]"
+   ;       "[ ERROR ] "
    ;       (file-name) ":" line ":" column "-" end-column ":"
    ;       (message)
-   ;       line-end
+   ;
    ;       )
    (error line-start "[ ERROR ] " (file-name) ":" line ":" column "-" end-column ":"
-                 (message (and (* nonl) (* "\n" (not (any "/" "~")) (* nonl))))))
+          (message (and (* nonl) (* "\n" (* nonl)))))
+   )
 
   :modes velo-mode
   )
