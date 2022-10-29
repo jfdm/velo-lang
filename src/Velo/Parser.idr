@@ -6,6 +6,7 @@ module Velo.Parser
 
 import Data.List1
 
+import System.Path
 import Velo.Core
 
 import public Velo.Lexer
@@ -181,7 +182,8 @@ namespace Velo
                 Velo.Lexer
                 velo
                 fname
-         pure (map (setSource fname) ast)
+         pure $ (map (setSource fname) ast)
+
 
 
 -- [ EOF ]

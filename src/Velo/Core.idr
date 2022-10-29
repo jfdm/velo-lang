@@ -5,6 +5,7 @@ import        System
 import        Data.String
 
 import public Toolkit.TheRug
+import public Toolkit.TheRug.Logging.Simple
 import        Toolkit.System
 
 import public Velo.Error
@@ -39,8 +40,8 @@ namespace Velo
   whenErr : (msg : Velo.Error)
                 -> IO ()
   whenErr err
-    = do putStrLn (show err)
-         exitWith (ExitFailure 1)
+    = do putStrLn $ trim $ unwords [toString ERROR, (show err)]
+         exitFailure
 
   %inline
   whenOK : a -> IO ()

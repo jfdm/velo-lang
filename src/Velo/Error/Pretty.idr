@@ -62,17 +62,17 @@ Show (Velo.Error) where
     = show err
 
   show (Opts r)
-    = "Option Error\n" ++ show r
+    = show r
 
   show (Lex x)
-    = "Lexing Error\n" ++ show x
+    = show x
 
   show (Parse x)
-    = "Parsing Error\n" ++ show x
+    = show x
 
   show (Elab x)
-    = "Type Checking Error\n" ++ show x
+    = show x
   show (Eval x)
-    = "Evaluation Error\n" ++ show x
+    = show x
 
 -- [ EOF ]

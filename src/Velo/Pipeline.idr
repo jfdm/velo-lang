@@ -31,17 +31,22 @@ pipeline opts
                   (Generic "File expected.")
                   (file opts)
 
+       let level = if justCheck opts
+                     then OFF
+                     else ALL
+
+
        when (justLex opts)
          $ do toks <- lexFile fname
               putStrLn (show @{veloWBs} toks)
               exitSuccess
 
        ast <- fromFile fname
-       putStrLn "# Finished Parsing"
+       logWhen INFO level "# Finished Parsing"
 
        res <- elab [<] ast
 
-       putStrLn "# Finished Type Checking"
+       logWhen INFO level "# Finished Type Checking"
 
        unless (null res.metas) $
          prettyMetas res.metas
@@ -50,9 +55,9 @@ pipeline opts
          $ exitSuccess
 
        v <- eval res.term
-       putStrLn "# Finished Executing"
+       log INFO "# Finished Executing"
 
        prettyComputation v
-       putStrLn "# Finished"
+       log INFO "# Finished"
 
 -- [ EOF ]

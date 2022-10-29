@@ -1,0 +1,18 @@
+;; this should be inserted in your .emacs
+;; be careful to replace PATH/TO/ with the path...
+
+(use-package velo
+  :load-path "PATH/TO/DIR" ;; for velo.el
+  :mode
+  ("\\.velo\\'" . velo-mode)
+  :config
+  (setq velo-command "PATH/TO/EXEC" ;; for velo
+        velo-options ""
+        )
+  )
+(use-package velo-flycheck
+  :load-path "PATH/TO/DIR" ;; for velo-flycheck
+    (setq flycheck-velo-check-executable velo-command)
+  )
+
+;; EOF

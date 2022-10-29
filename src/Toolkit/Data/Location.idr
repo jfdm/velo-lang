@@ -90,7 +90,7 @@ Show Location where
 
 export
 Show FileContext where
-  show (MkFC Nothing (MkLoc _ l scol) (MkLoc _ _ ecol)) = with List concat ["global:", show l, ":", show scol, "-", show ecol, ":"]
-  show (MkFC (Just x) (MkLoc _ l scol) (MkLoc _ _ ecol)) = with List concat [x, ":", show l, ":", show scol, "-", show ecol, ":"]
+  show (MkFC Nothing (MkLoc _ l scol) (MkLoc _ _ ecol)) = with List concat ["global:", show (S l), ":", show (S scol), "-", show (S ecol), ":"]
+  show (MkFC (Just x) (MkLoc _ l scol) (MkLoc _ _ ecol)) = with List concat [x, ":", show (S l), ":", show (S scol), "-", show (S ecol), ":"]
 
 -- [ EOF ]
