@@ -40,7 +40,7 @@ namespace Velo
   whenErr : (msg : Velo.Error)
                 -> IO ()
   whenErr err
-    = do putStrLn $ trim $ unwords [toString ERROR, (show err)]
+    = do printLn err
          exitFailure
 
   %inline

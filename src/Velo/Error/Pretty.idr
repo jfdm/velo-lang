@@ -33,11 +33,26 @@ Show (Parsing.Error) where
 Show (Evaluating.Error) where
   show OOF = "Out of Fuel"
 
+
+[veloFC] Show FileContext where
+  show (MkFC fname (MkLoc _ l scol) (MkLoc _ _ ecol))
+    = concat [ maybe "global" id fname
+             , ":"
+             , show (S l)
+             , ":"
+             , show (S scol)
+             , "-"
+             , show (S ecol)
+             , ":"
+             ]
+
+
 Show (Elaborating.Error) where
   show (Hole msg)
     = "Hole error:\n\t\{show msg}"
+
   show (Err fc err)
-    = unlines [show fc
+    = unlines [show @{veloFC} fc
               , show err]
 
   show (FuncExpected ty)

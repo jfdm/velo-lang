@@ -10,34 +10,36 @@
 (require 'flycheck)
 
 (flycheck-def-executable-var
- flycheck-velo-check
+ flycheck-velo
  velo-command
  )
 
+;; TODO
 ;;(flycheck-def-option-var
 ;;    flycheck-velo-opts
 ;;    '(velo-options)
-;;    velo-check
+;;    velo
 ;;    "Options")
 
-(flycheck-define-checker velo-check
+(flycheck-define-checker velo
   "A linter for Velo"
   :command ("velo" "--checkOnly"
             (source ".velo"))
   :error-patterns
-  (;(error line-start
-   ;       "[ ERROR ] "
-   ;       (file-name) ":" line ":" column "-" end-column ":"
-   ;       (message)
-   ;
-   ;       )
-   (error line-start "[ ERROR ] " (file-name) ":" line ":" column "-" end-column ":"
-          (message (and (* nonl) (* "\n" (* nonl)))))
+  ((error line-start
+          (file-name) ":" line ":" column "-" end-column ":\n"
+          (message (and (* nonl) (* "\n" (* nonl))))
+          )
    )
 
   :modes velo-mode
   )
-(add-to-list 'flycheck-checkers 'velo-check)
+(add-to-list 'flycheck-checkers 'velo)
 
 (provide 'velo-flycheck)
 ;;; velo-flycheck.el ends here
+
+;;;(flycheck-parse-error-with-patterns
+;;; "test.velo:13:1-2:\nsksksk"
+;;; (flycheck-checker-get 'velo 'error-patterns)
+;;; 'velo-check)
