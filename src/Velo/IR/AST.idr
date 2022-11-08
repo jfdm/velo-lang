@@ -1,10 +1,11 @@
 module Velo.IR.AST
 
 import Data.String
-
+import public Data.Singleton
 import Data.List1
 
 import public Toolkit.Data.Location
+import public Toolkit.AST
 
 import Velo.Types
 
@@ -13,90 +14,112 @@ import Velo.Types
 
 namespace Velo
   public export
-  data AST a = Ref a String
+  data Shape : Nat -> Type where
+    Ref, Hole  : String -> Shape 0
 
-             | Hole a String
-             | Zero a
-             | Plus a (AST a)
+    Zero,T,F : Shape 0
 
-             | Add a (AST a) (AST a)
+    Plus : Shape 1
+    Fun : String -> Ty -> Shape 1
+    The : Ty -> Shape 1
 
-             | T a
-             | F a
-
-             | And a (AST a) (AST a)
-
-             | Let a String (AST a) (AST a)
-
-             | Fun a String Ty (AST a)
-             | App a (AST a) (AST a)
-
-             | The a Ty (AST a)
+    Add,And,App : Shape 2
+    Let : String -> Shape 2
 
   public export
   Raw : Type
-  Raw = AST FileContext
-
-
-map : (a -> b) -> AST a -> AST b
-map f (Ref x str)
-  = Ref (f x) str
-
-map f (Hole x str)
-  = Hole (f x) str
-
-map f (Zero x)
-  = Zero (f x)
-
-map f (Plus x y)
-  = Plus (f x) (map f y)
-
-map f (Add x y z)
-  = Add (f x) (map f y) (map f z)
-
-map f (T x)
-  = T (f x)
-
-map f (F x)
-  = F (f x)
-
-map f (And x y z)
-  = And (f x) (map f y) (map f z)
-
-map f (Let x str w z)
-  = Let (f x) str (map f w) (map f z)
-
-map f (Fun x str y z)
-  = Fun (f x)
-        str
-        y
-        (map f z)
-
-map f (App x y z)
-  = App (f x) (map f y) (map f z)
-
-map f (The x y z)
-  = The (f x) y (map f z)
-
+  Raw = AST Shape FileContext
 
 export
-Functor AST where
-  map f a = map f a
+getFC : Raw -> FileContext
+getFC = getAnnotation
 
-export
-getFC : AST FileContext -> FileContext
-getFC (Ref x str)       = x
-getFC (Hole x str)      = x
-getFC (Zero x)          = x
-getFC (Plus x y)        = x
-getFC (Add x y z)       = x
-getFC (T x)             = x
-getFC (F x)             = x
-getFC (And x y z)       = x
-getFC (Let x str z w)   = x
-getFC (Fun x str y z)   = x
-getFC (App x y z)       = x
-getFC (The x y z)       = x
+namespace View
+  public export
+  data View : Raw -> Type where
+    Ref : (fc : FileContext)
+       -> (s  : String)
+             -> View (Branch (Ref s) fc Nil)
+
+    Hole : (fc : FileContext)
+        -> (s  : String)
+              -> View (Branch (Hole s) fc Nil)
+
+    Zero : (fc : FileContext)
+              -> View (Branch Zero fc Nil)
+
+    Plus : (fc   : FileContext)
+        -> (this : View n)
+              -> View (Branch Plus fc [n])
+
+    Add : (fc : FileContext)
+       -> (left  : View l)
+       -> (right : View r)
+                -> View (Branch Add fc [l,r])
+
+    True : (fc : FileContext)
+              -> View (Branch T fc Nil)
+
+    False : (fc : FileContext)
+               -> View (Branch F fc Nil)
+
+    And : (fc : FileContext)
+       -> (left  : View l)
+       -> (right : View r)
+                -> View (Branch And fc [l,r])
+
+    Fun : (fc    : FileContext)
+       -> (n     : String)
+       -> (ty    : Ty)
+       -> (scope : View s)
+                -> View (Branch (Fun n ty) fc [s])
+
+    App : (fc  : FileContext)
+       -> (fun : View f)
+       -> (arg : View a)
+              -> View (Branch App fc [f, a])
+
+    Let : (fc    : FileContext)
+       -> (n     : String)
+       -> (tm    : View expr)
+       -> (scope : View body)
+                -> View (Branch (Let n) fc [expr, body])
+
+    The : (fc : FileContext)
+       -> (ty : Ty)
+       -> (tm : View expr)
+             -> View (Branch (The ty) fc [expr])
+
+  export
+  view : (r : Raw) -> View r
+  view (Branch (Ref str) fc Nil)
+    = Ref fc str
+  view (Branch (Hole str) fc Nil)
+    = Hole fc str
+  view (Branch Zero fc Nil)
+    = Zero fc
+  view (Branch T fc Nil)
+    = True fc
+  view (Branch F fc Nil)
+    = False fc
+  view (Branch Plus fc [n])
+    = Plus fc (view n)
+  view (Branch (Fun str ty) fc [scope])
+    = Fun fc str ty (view scope)
+  view (Branch (The ty) fc [tm])
+    = The fc ty (view tm)
+  view (Branch Add fc [l,r])
+    = Add fc (view l) (view r)
+  view (Branch And fc [l,r])
+    = And fc (view l) (view r)
+  view (Branch App fc [f,a])
+    = App fc (view f) (view a)
+  view (Branch (Let str) fc [expr,scope])
+    = Let fc str (view expr) (view scope)
+
+  export
+  getFC : {r : Raw} -> AST.View.View r -> Singleton (getFC r)
+  getFC {r} x = Val (getAnnotation r)
 
 
 -- [ EOF ]

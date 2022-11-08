@@ -102,7 +102,7 @@ namespace Velo
 
   namespace AST
 
-    ast : AST a -> Doc ann
+    ast : AST.View.View a -> Doc ann
     ast (Ref _ n)
       = pretty n
 
@@ -127,10 +127,10 @@ namespace Velo
              , ast r
              ]
 
-    ast (T _)
+    ast (True _)
       = pretty "true"
 
-    ast (F _)
+    ast (False _)
       = pretty "false"
 
     ast (And _ l r)
@@ -185,8 +185,8 @@ namespace Velo
              ]
 
     export
-    Pretty (AST a) where
-      pretty = ast
+    Pretty (AST Shape a) where
+      pretty this = ast (view $ map (const emptyFC) this)
 
 prettyRedux : Redux a b -> Doc ()
 prettyRedux (SimplifyCall And (x !: _))

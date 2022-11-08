@@ -31,15 +31,17 @@ isVar fc (xs :< I x ty) nm = case decEq x nm of
   Yes Refl => pure (ty ** here)
   No _ => bimap id shift <$> isVar fc xs nm
 
-export
-check : All Item ctxt ->
+
+check : {r : Raw} ->
+        All Item ctxt ->
         (ty : Ty) ->
-        Raw ->
+        (View r) ->
         Velo (holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
 
-export
-synth : All Item ctxt ->
-        Raw ->
+
+synth : {r : Raw} ->
+        All Item ctxt ->
+        (View r) ->
         Velo (ty : Ty ** holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
 
 check scp ty (Hole fc nm)
@@ -62,9 +64,9 @@ check scp ty (App fc f t)
        (holes ** mg) <- merge fc holes1 holes2
        pure (holes ** Call App (Cons f mg (Cons t NilR Empty)))
 check scp ty t
-  = do let fc = getFC t
+  = do let Val (getFC r) = getFC t
        (ty' ** holes ** t) <- synth scp t
-       Refl <- compare fc ty ty'
+       Refl <- compare (getFC r) ty ty'
        pure (holes ** t)
 
 synth scp (Ref fc str)
@@ -81,9 +83,9 @@ synth scp (Add fc m n)
        (holes2 ** n) <- check scp TyNat n
        (holes ** mg) <- merge fc holes1 holes2
        pure (TyNat ** holes ** Call Add (Cons m mg (Cons n NilR Empty)))
-synth scp (T fc)
+synth scp (True fc)
   = pure (TyBool ** [] ** Call True Empty)
-synth scp (F fc)
+synth scp (False fc)
   = pure (TyBool ** [] ** Call False Empty)
 synth scp (And fc b c)
   = do (holes1 ** b) <- check scp TyBool b
@@ -110,5 +112,22 @@ synth scp (The fc ty t)
   = do (holes ** t) <- check scp ty t
        pure (ty ** holes ** t)
 
+namespace Raw
+  export
+  check : All Item ctxt ->
+          (ty : Ty) ->
+          (r : Raw) ->
+          Velo (holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
+
+  export
+  synth : All Item ctxt ->
+          (r : Raw) ->
+          Velo (ty : Ty ** holes : List (HoleIn ctxt) ** Holey ctxt holes ty)
+
+  check scp ty r
+    = check scp ty (view r)
+
+  synth scp r
+    = synth scp (view r)
 
 -- [ EOF ]

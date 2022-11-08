@@ -19,10 +19,10 @@ import Velo.IR.AST
 
 %default total
 
-ref : Rule (AST FileContext)
+ref : Rule Raw
 ref
-  = do r <- Velo.ref
-       pure (Ref (span r) (get r))
+  = map (\r => Branch (Ref (get r)) (span r) Nil)
+        $ Velo.ref
 
 mutual
 
@@ -41,22 +41,26 @@ mutual
       <|> gives "bool" TyBool
       <|> typeFunc
 
-bool : Rule (AST FileContext)
-bool =  givesWithLoc "true"  (T)
-    <|> givesWithLoc "false" (F)
+null : Shape 0 -> FileContext -> Raw
+null k fc = Branch k fc Nil
+
+bool : Rule Raw
+bool
+   =  givesWithLoc "true"  (null T)
+  <|> givesWithLoc "false" (null F)
 
 mutual
-  hole : Rule (AST FileContext)
+  hole : Rule Raw
   hole
     = do s <- Toolkit.location
          symbol "?"
          commit
          h <- name
          e <- Toolkit.location
-         pure (Hole (newFC s e) h)
+         pure (null (Hole h) (newFC s e))
 
-  nat : Rule (AST FileContext)
-  nat = givesWithLoc "zero" Zero
+  nat : Rule Raw
+  nat = givesWithLoc "zero" (null Zero)
       <|> do s <- Toolkit.location
              symbol "("
              keyword "inc"
@@ -64,9 +68,9 @@ mutual
              i <- expr
              symbol ")"
              e <- Toolkit.location
-             pure (Plus (newFC s e) i)
+             pure (Branch Plus (newFC s e) [i])
 
-  add : Rule (AST FileContext)
+  add : Rule Raw
   add
     = do s <- Toolkit.location
          symbol "("
@@ -76,9 +80,9 @@ mutual
          r <- expr
          symbol ")"
          e <- Toolkit.location
-         pure (Add (newFC s e) l r)
+         pure (Branch Add (newFC s e) [l, r])
 
-  and : Rule (AST FileContext)
+  and : Rule Raw
   and
     = do s <- Toolkit.location
          symbol "("
@@ -88,9 +92,9 @@ mutual
          r <- expr
          symbol ")"
          e <- Toolkit.location
-         pure (And (newFC s e) l r)
+         pure (Branch And (newFC s e) [l, r])
 
-  funAnon : Rule (AST FileContext)
+  funAnon : Rule Raw
   funAnon =
     do s <- Toolkit.location
        symbol "("
@@ -103,12 +107,12 @@ mutual
        body <- expr
        symbol ")"
        e <- Toolkit.location
-       pure (Fun (newFC s e) n ty body)
+       pure (Branch (Fun n ty) (newFC s e) [body])
 
-  let_ : Rule (AST FileContext)
+  let_ : Rule Raw
   let_ = letNonRec
     where
-      body : Location -> Bool -> Rule (AST FileContext)
+      body : Location -> Bool -> Rule Raw
       body s isRec
         = do n <- name
              symbol "="
@@ -117,16 +121,16 @@ mutual
              commit
              b <- expr
              e <- Toolkit.location
-             pure (Let (newFC s e) n v b)
+             pure (Branch (Let n) (newFC s e) [v, b])
 
 
-      letNonRec : Rule (AST FileContext)
+      letNonRec : Rule Raw
       letNonRec
         = do s <- Toolkit.location
              keyword "let"
              body s False
 
-  app : Rule (AST FileContext)
+  app : Rule Raw
   app =
     do s <- Toolkit.location
        symbol "("
@@ -134,9 +138,9 @@ mutual
        a <- expr
        symbol ")"
        e <- Toolkit.location
-       pure (App (newFC s e) f a)
+       pure (Branch App (newFC s e) [f, a])
 
-  ann : Rule (AST FileContext)
+  ann : Rule Raw
   ann =
     do s <- Toolkit.location
        symbol "("
@@ -146,10 +150,10 @@ mutual
        ty <- type
        symbol ")"
        e <- Toolkit.location
-       pure (The (newFC s e) ty a)
+       pure (Branch (The ty) (newFC s e) [a])
 
 
-  expr : Rule (AST FileContext)
+  expr : Rule Raw
   expr =   ref
        <|> hole
        <|> nat <|> bool <|> and <|> add
@@ -158,7 +162,7 @@ mutual
        <|> funAnon
        <|> ann
 
-velo : Rule (AST FileContext)
+velo : Rule Raw
 velo
   = expr
 
@@ -166,7 +170,7 @@ velo
 namespace Velo
   export
   fromString : (str : String)
-                   -> Velo (AST FileContext)
+                   -> Velo Raw
   fromString str
     = do ast <- parseString (\p => Parse (PError "REPL" p))
                 Velo.Lexer
@@ -176,7 +180,7 @@ namespace Velo
 
   export
   fromFile : (fname : String)
-                   -> Velo (AST FileContext)
+                   -> Velo Raw
   fromFile fname
     = do ast <- parseFile (\p => Parse (PError fname p))
                 Velo.Lexer

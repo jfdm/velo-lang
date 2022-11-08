@@ -45,47 +45,59 @@ meta : {0 m : Meta} -> {metas : _} ->
   All Item ctxt ->
   IsMember metas m ->
   Subst metas ctxt (metaScope m) ->
-  AST ()
+  AST Shape ()
+
 checking : {metas, t : _} -> All Item ctxt ->
-           Term metas ctxt t -> AST ()
+           Term metas ctxt t -> AST Shape ()
 synthing : {metas, t : _} -> All Item ctxt ->
-           Term metas ctxt t -> AST ()
+           Term metas ctxt t -> AST Shape ()
 
 meta nms p sg with (lookup p)
-  _ | (MkMeta nm supp _ ** Refl) = go 0 supp sg (Hole () nm) where
+  _ | (MkMeta nm supp _ ** Refl) = go 0 supp sg (Branch (Hole nm) () Nil) where
 
-    go : Nat -> All Item tys -> Subst metas ctxt tys -> AST () -> AST ()
+    go : Nat -> All Item tys -> Subst metas ctxt tys -> AST Shape () -> AST Shape ()
     go n [<] _ t = t
     go n (xs :< I x _) (sg :< u@(Var (V m p))) t
       = ifThenElse (n == m)
           (go (S n) xs sg t)
-          (go (S n) xs sg (Let () x (synthing nms u) t))
+          (go (S n) xs sg (Branch (Let x) () [(synthing nms u), t]))
     go n (xs :< I x _) (sg :< u) t
-      = go (S n) xs sg (Let () x (synthing nms u) t)
+      = go (S n) xs sg (Branch (Let x) () [(synthing nms u), t])
 
 calling : {metas, tys : _} -> All Item ctxt ->
-          Prim tys ty -> All (Term metas ctxt) tys -> AST ()
-calling nms Zero ts = Zero ()
-calling nms Plus [t] = Plus () (checking nms t)
-calling nms Add [s,t] = Add () (checking nms s) (checking nms t)
-calling nms True ts = T ()
-calling nms False ts = F ()
-calling nms And [s,t] = And () (checking nms s) (checking nms t)
-calling nms App [f,t] = case f of
-  Fun b => let x = fresh nms (typeOf t) in
-           Let () x (synthing nms t) (synthing (nms :< I x _) b)
-  _ => App () (synthing nms f) (checking nms t)
+          Prim tys ty -> All (Term metas ctxt) tys -> AST Shape ()
+calling nms Zero ts
+  = Branch Zero () Nil
+calling nms Plus [t]
+  = Branch Plus () [(checking nms t)]
+calling nms Add [s,t]
+  = Branch Add () [(checking nms s), (checking nms t)]
+calling nms True ts
+  = Branch T () Nil
+calling nms False ts
+  = Branch F () Nil
+calling nms And [s,t]
+  = Branch And () [(checking nms s), (checking nms t)]
+
+calling nms App [f,t]
+  = case f of
+    Fun b => let x = fresh nms (typeOf t) in
+             Branch (Let x) () [(synthing nms t), (synthing (nms :< I x _) b)]
+    _ => Branch App () [(synthing nms f), (checking nms t)]
 
 checking nms (Met m sg) = meta nms m sg
 checking nms t = synthing nms t
 
-synthing nms (Var v) = Ref () (var nms v)
-synthing nms (Met m sg) = The () t (meta nms m sg)
+synthing nms (Var v)
+  = Branch (Ref (var nms v)) () Nil
+synthing nms (Met m sg)
+  = Branch (The t) () [meta nms m sg]
 synthing nms (Fun {a = dom} b)
   = let x = fresh nms dom in
-    Fun () x dom (synthing (nms :< I x _) b)
-synthing nms (Call op ts) = calling nms op ts
+    Branch (Fun x dom) () [synthing (nms :< I x _) b]
+synthing nms (Call op ts)
+  = calling nms op ts
 
 export
-unelaborate : {metas, t : _} -> Term metas [<] t -> AST ()
+unelaborate : {metas, t : _} -> Term metas [<] t -> AST Shape ()
 unelaborate = synthing [<]
