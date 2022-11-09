@@ -185,7 +185,7 @@ namespace Velo
              ]
 
     export
-    Pretty (AST Shape a) where
+    Pretty (AST Shape EXP a) where
       pretty this = ast (view $ map (const emptyFC) this)
 
 prettyRedux : Redux a b -> Doc ()

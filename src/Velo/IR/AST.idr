@@ -14,21 +14,33 @@ import Velo.Types
 
 namespace Velo
   public export
-  data Shape : Nat -> Type where
-    Ref, Hole  : String -> Shape 0
+  data Kind = EXP
 
-    Zero,T,F : Shape 0
+  public export
+  data Shape : Kind -> (n : Nat) -> (ss : Vect n Kind)-> Type where
+    Ref, Hole  : String -> Shape EXP 0 Nil
 
-    Plus : Shape 1
-    Fun : String -> Ty -> Shape 1
-    The : Ty -> Shape 1
+    Zero,T,F : Shape EXP 0 Nil
 
-    Add,And,App : Shape 2
-    Let : String -> Shape 2
+    Plus : Shape EXP 1 [EXP]
+    Fun : String -> Ty -> Shape EXP 1 [EXP]
+    The : Ty -> Shape EXP 1 [EXP]
+
+    Add,And,App : Shape EXP 2 [EXP, EXP]
+    Let : String -> Shape EXP 2 [EXP, EXP]
+
+  public export
+  RawUnAnn : Type -> Type
+  RawUnAnn = AST Shape EXP
 
   public export
   Raw : Type
-  Raw = AST Shape FileContext
+  Raw = AST Shape EXP FileContext
+
+  public export
+  RawEmpty : Type
+  RawEmpty = AST Shape EXP ()
+
 
 export
 getFC : Raw -> FileContext

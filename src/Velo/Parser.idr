@@ -41,7 +41,7 @@ mutual
       <|> gives "bool" TyBool
       <|> typeFunc
 
-null : Shape 0 -> FileContext -> Raw
+null : Shape EXP 0 Nil -> FileContext -> Raw
 null k fc = Branch k fc Nil
 
 bool : Rule Raw

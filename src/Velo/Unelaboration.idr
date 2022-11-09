@@ -45,17 +45,17 @@ meta : {0 m : Meta} -> {metas : _} ->
   All Item ctxt ->
   IsMember metas m ->
   Subst metas ctxt (metaScope m) ->
-  AST Shape ()
+  RawEmpty
 
 checking : {metas, t : _} -> All Item ctxt ->
-           Term metas ctxt t -> AST Shape ()
+           Term metas ctxt t -> RawEmpty
 synthing : {metas, t : _} -> All Item ctxt ->
-           Term metas ctxt t -> AST Shape ()
+           Term metas ctxt t -> RawEmpty
 
 meta nms p sg with (lookup p)
   _ | (MkMeta nm supp _ ** Refl) = go 0 supp sg (Branch (Hole nm) () Nil) where
 
-    go : Nat -> All Item tys -> Subst metas ctxt tys -> AST Shape () -> AST Shape ()
+    go : Nat -> All Item tys -> Subst metas ctxt tys -> RawEmpty -> RawEmpty
     go n [<] _ t = t
     go n (xs :< I x _) (sg :< u@(Var (V m p))) t
       = ifThenElse (n == m)
@@ -65,7 +65,7 @@ meta nms p sg with (lookup p)
       = go (S n) xs sg (Branch (Let x) () [(synthing nms u), t])
 
 calling : {metas, tys : _} -> All Item ctxt ->
-          Prim tys ty -> All (Term metas ctxt) tys -> AST Shape ()
+          Prim tys ty -> All (Term metas ctxt) tys -> RawEmpty
 calling nms Zero ts
   = Branch Zero () Nil
 calling nms Plus [t]
@@ -99,5 +99,5 @@ synthing nms (Call op ts)
   = calling nms op ts
 
 export
-unelaborate : {metas, t : _} -> Term metas [<] t -> AST Shape ()
+unelaborate : {metas, t : _} -> Term metas [<] t -> RawEmpty
 unelaborate = synthing [<]
