@@ -45,15 +45,30 @@
 (setq velo-syntax-table
   (let ((synTable (make-syntax-table)))
 
-  ;; comments
-  (modify-syntax-entry ?\{  "(}1nb" synTable)
-  (modify-syntax-entry ?\}  "){4nb" synTable)
-  (modify-syntax-entry ?-  "_ 123" synTable)
+  (modify-syntax-entry ?\( "()" synTable)
+  (modify-syntax-entry ?\) ")(" synTable)
+  (modify-syntax-entry ?\[ "(]" synTable)
+  (modify-syntax-entry ?\] ")[" synTable)
+
+    ;; comments
+  (modify-syntax-entry ?\-  ". 123" synTable)
+  (modify-syntax-entry ?\n  ">"    synTable)
+
+  (modify-syntax-entry ?\{  "(} 1nb" synTable)
+  (modify-syntax-entry ?\}  "){ 4nb" synTable)
 
   (mapc (lambda (x)
             (modify-syntax-entry x "_" synTable))
           ;; Some of these are actually OK by default.
             "?=:")
+
+  ;; Whitespace is whitespace
+  (modify-syntax-entry ?\  " " synTable)
+  (modify-syntax-entry ?\t " " synTable)
+
+  ;; ;; Strings
+  (modify-syntax-entry ?\" "\"" synTable)
+  (modify-syntax-entry ?\\ "/"  synTable)
 
   synTable))
 
