@@ -1,0 +1,188 @@
+
+We begin our discussion by detailing the key design rationale on
+realising the static semantics of \Velo{} within \Idris{}.
+
+We have opted to give \Velo{} an external concrete syntax (a \ac{dsl})
+in which users can write their programs.
+%
+With dependently typed languages, however, we can also capture
+the abstract syntax and its static semantics as an intrinsically
+scoped and typed \ac{edsl}
+directly within the host language~\cite{Augustsson1999edt}.
+
+\textbf{Types} are usually introduced using their context free grammar.
+%
+We present it here on the left-hand side, it gives user the choice between
+two base types (\TyNat, and \TyBool) and a type former for function types
+(\TyFunc{\cdot}{\cdot}).
+%
+On the right hand side, we give its representation as an inductive
+type in Idris 2.
+
+\begin{minipage}{0.45\textwidth}
+\syntaxtypes
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{Verbatim}
+
+data Ty = TyNat
+        | TyBool
+        | TyArr Ty Ty
+\end{Verbatim}
+\end{minipage}
+
+\textbf{Contexts} can be similarly given by a context free grammar:
+a context is either empty ($\epsilon$), or an existing context ($\Gamma$)
+extended on the right with a new type ($t$) using a comma.
+%
+In Idris 2, we will adopt a nameless representation and so we represent
+these contexts by using a \IdrisData{SnocList} of types
+(i.e. lists that grow on the right).
+
+\begin{minipage}{0.45\textwidth}
+\syntaxcontexts
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{Verbatim}
+
+data SnocList a
+        = Lin
+        | (:<) (SnocList a) a
+\end{Verbatim}
+\end{minipage}
+
+\todo{play with spaces, reread descriptions}
+
+\textbf{Typing Judgements} are given by relations, and encoded in
+Idris 2 using inductive families, a generalisation of inductive
+types~\cite{DBLP:journals/fac/Dybjer94}.
+%
+Each rule will become a constructor for the family, and so every
+proof \inferenceRule{} will correspond to a term $t$ of type
+(\texttt{Term} $\Gamma$ $a$).
+
+\begin{minipage}{0.10\textwidth}
+\varRule
+\inferenceRule
+\end{minipage}\hfill
+\begin{minipage}{0.80\textwidth}
+\begin{Verbatim}
+data Elem : (ctxt : SnocList a) -> (type : a) -> Type where
+data Term : (ctxt : SnocList Ty) -> (type : Ty) -> Type where
+\end{Verbatim}
+\end{minipage}
+
+We leave the definition of \IdrisData{Elem} to the next section,
+focusing instead on \IdrisData{Term}.
+
+The most basic of typing rules are axioms. They have no premise
+and are mapped to constructors with no subterm. We use Idris 2
+comments \texttt{----} to format our constructor's type in such
+a way that they resemble the corresponding inference rule.
+%
+Here we show the rule stating that $0$ is a natural number.
+
+\begin{minipage}{0.45\textwidth}
+\inferenceZero
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{Verbatim}
+  Zero : ------------------
+          Term ctxt TyNat
+\end{Verbatim}
+\end{minipage}
+
+Then come typing rules with a single premise which is not a subderivation.
+They are mapped to constructor with a single argument. Here we show the
+typing rule variables.
+
+\begin{minipage}{0.45\textwidth}
+\inferenceVar
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{Verbatim}
+  Var :  Elem ctxt a ->
+        --------------
+         Term ctxt a
+\end{Verbatim}
+\end{minipage}
+
+Next, we have typing rules with a single premise which is a subderivation.
+They are mapped to constructor with a single subterm of the inductive family
+representing the subderivation.
+%
+Here we show the typing rule for successor.
+
+\begin{minipage}{0.45\textwidth}
+\inferenceInc
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{Verbatim}
+  Inc :  Term ctxt TyNat ->
+        ------------------
+         Term ctxt TyNat
+\end{Verbatim}
+\end{minipage}
+
+Similarly, rules with two premises are translated to constructors
+with two subterms, one for each subderivation.
+%
+Here we present the typing rule for application nodes: provided that
+the function has a function type, and the argument has a type matching
+the function's domain, the application has a type corresponding to the
+function's codomain.
+Note that the context $\Gamma$ is the same across the whole rule and,
+correspondingly, the same \texttt{ctxt} is being referenced everywhere.
+
+\begin{minipage}{0.35\textwidth}
+\inferenceApp
+\end{minipage}\hfill
+\begin{minipage}{0.55\textwidth}
+\begin{Verbatim}
+  App :  Term ctxt (TyArr a b) ->
+         Term ctxt a ->
+        ------------------------
+         Term ctxt b
+\end{Verbatim}
+\end{minipage}
+
+Finally, we have a rule where the premise's context has been extended:
+a function of type (\TyFunc{a}{b}) can be introduced by building a term
+of type $b$ in a context extended with a new variable of type $a$.
+
+\begin{minipage}{0.35\textwidth}
+\inferenceFunc
+\end{minipage}\hfill
+\begin{minipage}{0.55\textwidth}
+\begin{Verbatim}
+  Func :  Term (ctxt :< a) b ->
+         ------------------------
+          Term ctxt (TyArr a b)
+\end{Verbatim}
+\end{minipage}
+
+
+
+
+%%           Inc  :  Term ctxt TyNat ->
+%%          -------------------
+%%           Term ctxt TyNat
+%%   -- (...)
+%% \end{Verbatim}
+
+
+\noindent
+Using such intrinsically typed \acp{edsl} we can statically verify for free
+that our languages are well-structured and that any transformation (model-to-model)
+or interpretation (model-to-host) respects the language's static semantics.
+%
+In fact we will describe in \Cref{sec:semantics} how we can use our \acp{edsl}
+to both verify our static semantics whilst describing our dynamic semantics.
+
+For languages equipped with more advanced type systems, that cannot be as easily
+enforced statically, we can retain some of these guarantees by using a well
+scoped core language rather than a well typed one.
+%
+This is the approach used in \Idris{} and it has already helped eliminate an
+entire class of bugs arising when attempting to solve a metavariable with a
+term that was defined in a different context~\cite{DBLP:conf/ecoop/Brady21}.
