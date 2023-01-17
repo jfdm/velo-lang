@@ -22,10 +22,23 @@ inductive families describing how terms reduce.
 
 \begin{Verbatim}
 data Redux : (this,that : Term metas ctxt type) -> Type where
-  -- (...)
+  SimplifyCall : (p    : Prim tys ty)
+              -> (step : Reduxes these those)
+                      -> Redux (Call p these) (Call p those)
+
   ReduceAddZW : (value : Value right)
-             -> Redux (Call Add [Call Zero [], right]) right
-  -- (...)
+                      -> Redux (Call Add [Call Zero [], right]) right
+
+  RewriteEqNatPW : (valueL : Value (Call Plus [this]))
+                -> (valueR : Value right)
+                          -> Redux (Call Add [Call Plus [this], right])
+                                   (Call Add [this, Call Plus [right]])
+
+  ReduceFuncApp : \{body  : Term metas (ctxt :< type) return\}
+               -> \{var   : Term metas ctxt type\}
+               -> (value : Value var)
+                        -> Redux (Call App [Fun body, var])
+                                 (Single.subst var body)
 \end{Verbatim}
 
 As can be seen above, our setting enforces call-by-value: $(0 + r)$
