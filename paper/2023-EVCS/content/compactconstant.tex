@@ -24,9 +24,9 @@ which takes an operation and a type-indexed list of subterms.
 data Term : (ctxt : SnocList Ty) -> Ty -> Type where
   Var : IsVar ctxt ty -> Term ctxt ty
   Fun : Term (ctxt :< a) b -> Term ctxt (TyFunc a b)
-  Call : \{tys : _\} -> (operator : Prim                  tys  ty)
+  Call : \{tys : _\} -> (operator : Prim            tys  ty)
                    -> (operands : All (Term ctxt) tys)
-                              -> Term      ctxt       ty
+                               -> Term      ctxt       ty
 \end{Verbatim}
 
 
