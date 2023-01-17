@@ -137,7 +137,7 @@ Here we show the typing rule for successor.
   \end{minipage}\hfill
   \begin{minipage}{0.45\textwidth}
     \begin{Verbatim}
-      Inc :  Term ctxt TyNat ->
+Inc : Term ctxt TyNat ->
       ------------------
       Term ctxt TyNat
     \end{Verbatim}
@@ -160,7 +160,7 @@ correspondingly, the same \texttt{ctxt} is being referenced everywhere.
   \end{minipage}\hfill
   \begin{minipage}{0.55\textwidth}
     \begin{Verbatim}
-      App :  Term ctxt (TyArr a b) ->
+App : Term ctxt (TyArr a b) ->
       Term ctxt a ->
       ------------------------
       Term ctxt b
@@ -178,9 +178,9 @@ of type $b$ in a context extended with a new variable of type $a$.
   \end{minipage}\hfill
   \begin{minipage}{0.55\textwidth}
     \begin{Verbatim}
-      Func :  Term (ctxt :< a) b ->
-      ------------------------
-      Term ctxt (TyArr a b)
+Func : Term (ctxt :< a) b ->
+       ------------------------
+       Term ctxt (TyArr a b)
     \end{Verbatim}
   \end{minipage}
 \end{center}
