@@ -1,15 +1,79 @@
-\begin{align*}
+\newcommand{\syntaxtypes}{
+\[\begin{array}{lcl}
   \ty{t}{\Type}
-  &
-    \Coloneqq
-    \TyNat
-    \fpAlt
-    \TyBool
-    \fpAlt
-    \typeFuncIntro{}
-  &
-    \text{Types}
-  \\
+  & \Coloneqq
+  & \TyNat \\
+  & \fpAlt
+  & \TyBool \\
+  & \fpAlt
+  & \typeFuncIntro{}
+\end{array}\]}
+
+\newcommand{\syntaxcontexts}{
+\[\begin{array}{lcl}
+  \ty{\Gamma}{\Context}
+  & \Coloneqq
+  & \epsilon \\
+  & \fpAlt
+  & \Gamma,\, \ty{x}{t}
+\end{array}\]}
+
+\newcommand{\varRule}{
+  $\Gamma \ni \ty{x}{a}$
+}
+
+\newcommand{\varZero}{
+  \[
+  \infer{ }{\Gamma \,, \ty{x}{a} \ni \ty{x}{a}}
+  \]
+}
+
+\newcommand{\varSuc}{
+  \[
+  \infer{\Gamma \ni \ty{x}{a}}{\Gamma \,, \ty{y}{b} \ni \ty{x}{a}}
+  \]
+}
+
+\newcommand{\inferenceRule}{
+  $\Gamma \vdash \ty{t}{a}$
+}
+
+\newcommand{\inferenceZero}{
+  \[
+  \infer{ }{\Gamma \vdash \ty{\exprZero}{\TyNat}}
+  \]
+}
+
+\newcommand{\inferenceVar}{
+  \[
+  \infer{\Gamma \ni \ty{x}{a}}{\Gamma \vdash \ty{x}{a}}
+  \]
+}
+
+\newcommand{\inferenceInc}{
+  \[
+  \infer{\Gamma \vdash \ty{n}{\TyNat}
+    }{\Gamma \vdash \ty{\exprInc{n}}{\TyNat}}
+  \]
+}
+
+\newcommand{\inferenceApp}{
+  \[
+  \infer{\Gamma \vdash \ty{f}{\TyFunc{a}{b}}
+        \\ \Gamma \vdash \ty{t}{a}
+    }{\Gamma \vdash \ty{\exprApp{f}{t}}{b}}
+  \]
+}
+
+\newcommand{\inferenceFunc}{
+  \[
+  \infer{\Gamma,\, \ty{x}{a} \vdash \ty{t}{b}
+    }{\Gamma \vdash \ty{\exprLam{t}}{\TyFunc{a}{b}}}
+  \]
+}
+
+\newcommand{\syntaxlang}{
+\begin{align*}
   \ty{e}{t}
   &
     \Coloneqq
@@ -56,6 +120,7 @@
   &
     \text{Values}
 \end{align*}
+}
 
 %%% Local Variables:
 %%% mode: latex
