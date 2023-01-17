@@ -1,4 +1,9 @@
-DEPENDS=\
+CODE:=\
+  Code/MiniVelo.tex \
+  Code/MiniDeBruijn.tex \
+  Code/MiniCompact.tex
+
+DEPENDS:=\
   cc-by.pdf \
   oasics-logo-bw.pdf \
   oasics-v2021.cls \
@@ -7,14 +12,21 @@ DEPENDS=\
   notations.tex \
   ./content/*.tex \
   ./figure/*.tex \
+  $(patsubst %.tex,%.idr.tex,$(CODE)) \
   paper.bib
 
 
 all: paper.pdf
 
+build/ttc/*/%.ttm build/ttc/*/%.ttc: Code/%.tex
+	idris2 -c $^
+
+Code/%.idr.tex: Code/%.tex build/ttc/*/%.ttm build/ttc/*/%.ttc
+	katla literate Code/$*.tex build/ttc/*/Code/$*.ttm > $@
 
 %.pdf : %.tex $(DEPENDS)
 	mkdir -p __build
+	echo $(DEPENDS)
 	latexmk -pdf -bibtex -outdir="__build" $*.tex
 	ln -sf __build/$*.pdf $*.pdf
 

@@ -1,0 +1,28 @@
+\begin{code}
+module Code.MiniCompact
+
+import Data.List.Quantifiers
+
+import Code.MiniVelo
+import Code.MiniDeBruijn
+\end{code}
+
+%<*PrimDef>
+\begin{code}
+data Prim : (args : List Ty) -> (type : Ty) -> Type where
+    Zero : Prim []                   TyNat
+    Inc  : Prim [TyNat, TyNat]       TyNat
+    App  : Prim [TyArr dom cod, dom] cod
+\end{code}
+%</PrimDef>
+
+%<*TermDef>
+\begin{code}
+data Term : (ctxt : SnocList Ty) -> Ty -> Type where
+  Var : IsVar ctxt ty -> Term ctxt ty
+  Fun : Term (ctxt :< a) b -> Term ctxt (TyArr a b)
+  Call : {tys : _} -> (operator : Prim            tys  ty)
+                   -> (operands : All (Term ctxt) tys)
+                   -> Term                  ctxt       ty
+\end{code}
+%</TermDef>
