@@ -8,42 +8,48 @@ indicating where in the type-level context the variable is bound.
 Concretely, we index the \IdrisType{Elem} family by the kind of the variable it represents and a \IdrisType{SnocList} of kinds as the context to reflect the fact that,
 in inference rules, the most local end of the context is always on the right hand side.
 
-\begin{minipage}{0.10\textwidth}
-\varRule
-\end{minipage}\hfill
-\begin{minipage}{0.80\textwidth}
+\begin{center}
+  \begin{minipage}{0.10\textwidth}
+    \varRule
+  \end{minipage}\hfill
+  \begin{minipage}{0.80\textwidth}
 \begin{Verbatim}
 data Elem : (ctxt : SnocList a) -> (type : a) -> Type where
 \end{Verbatim}
-\end{minipage}
+  \end{minipage}
+\end{center}
 
 The \IdrisData{Here} constructor indicates that the variable of interest is
 the most local one in scope.
 %
 
-\begin{minipage}{0.35\textwidth}
-  \varZero
-\end{minipage}\hfill
-\begin{minipage}{0.55\textwidth}
+\begin{center}
+  \begin{minipage}{0.35\textwidth}
+    \varZero
+  \end{minipage}\hfill
+  \begin{minipage}{0.55\textwidth}
 \begin{Verbatim}
   Here : ----------------------
           Elem ty (ctxt :< ty)
 \end{Verbatim}
-\end{minipage}
+  \end{minipage}
+\end{center}
 
 The \IdrisData{There} constructor skips past the most local one to look for
 the variable of interest in the rest of the context.
 
-\begin{minipage}{0.35\textwidth}
-  \varSuc
-\end{minipage}\hfill
-\begin{minipage}{0.55\textwidth}
+\begin{center}
+  \begin{minipage}{0.35\textwidth}
+    \varSuc
+  \end{minipage}\hfill
+  \begin{minipage}{0.55\textwidth}
 \begin{Verbatim}
   There :  Elem ty ctxt ->
           ---------------------
            Elem ty (ctxt :< _)
 \end{Verbatim}
-\end{minipage}
+  \end{minipage}
+\end{center}
 
 
 Whilst a valid definition, this approach unfortunately does not scale to
