@@ -6,6 +6,7 @@ DEPENDS=\
   preamble.tex \
   notations.tex \
   ./content/*.tex \
+  ./figure/*.tex \
   paper.bib
 
 
