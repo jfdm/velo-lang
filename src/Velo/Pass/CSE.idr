@@ -75,7 +75,7 @@ abstractRs ses (MkDiamond th (Cons (MkRelevant {th = left, ph = right} t _ ts)))
     let ts = assert_total $ abstractRs ses (MkDiamond (right <.> th) ts) in
     Cons <$> relevant t ts
 
-record Candidate (metas : _) (ctxt : _) where
+record Candidate metas ctxt where
   constructor MkCandidate
   {cType : Ty}
   cTerm : Diamond (\ ctxt => CoTerm metas ctxt cType) ctxt
