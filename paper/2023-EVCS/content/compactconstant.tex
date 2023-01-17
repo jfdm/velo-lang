@@ -20,34 +20,21 @@ All builtin operators (from primitive operations on builtin types to function
 application itself) are represented using a single \IdrisData{Call} constructor
 which takes an operation and a type-indexed list of subterms.
 
-\begin{Verbatim}
-data Term : (ctxt : SnocList Ty) -> Ty -> Type where
-  Var : IsVar ctxt ty -> Term ctxt ty
-  Fun : Term (ctxt :< a) b -> Term ctxt (TyFunc a b)
-  Call : \{tys : _\} -> (operator : Prim                  tys  ty)
-                   -> (operands : All (Term ctxt) tys)
-                              -> Term      ctxt       ty
-\end{Verbatim}
-
+\ExecuteMetaData[Code/MiniCompact.idr.tex]{TermDef}
 
 The primitive operations can now be described in a single datatype \IdrisData{Prim} which lists the primitive operation's arguments and return type.
 \begin{comment}
 \IdrisData{Zero}---which takes no argument and returns a term of type \IdrisData{TyNat};
 %
-\IdrisData{And}---which takes two arguments of type \IdrisData{TyBool} and return a term
-of type \IdrisData{TyBool};
+\IdrisData{Inc}---which takes an arguments of type \IdrisData{TyNat} and returns a term
+of type \IdrisData{TyNat};
 %
 and
 %
 \IdrisData{App}---which takes a function and an argument that corresponds to the type of the function's domain and returns a term that is the type of the function's co-domain.
 \end{comment}
 
-\begin{Verbatim}
-data Prim : (args : List Ty) -> (type : Ty) -> Type where
-    Zero : Prim []                    TyNat
-    Inc  : Prim [TyNat, TyNat]        TyNat
-    App  : Prim [TyFunc dom cod, dom] cod
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniCompact.idr.tex]{PrimDef}
 
 Using \IdrisType{Prim}, structural operations can now be implemented by handling recursive calls on the subterms of \IdrisData{Call} nodes uniformly before dispatching on the operator to see whether additional simplifications can be deployed.
 %

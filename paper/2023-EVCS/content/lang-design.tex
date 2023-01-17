@@ -26,12 +26,7 @@ type in Idris 2.
 \syntaxtypes
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
-\begin{Verbatim}
-
-data Ty = TyNat
-        | TyBool
-        | TyArr Ty Ty
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{TyDef}
 \end{minipage}
 
 \textbf{Contexts} can be similarly given by a context free grammar:
@@ -39,18 +34,14 @@ a context is either empty ($\epsilon$), or an existing context ($\Gamma$)
 extended on the right with a new type assignment (\ty{x}{t}) using a comma.
 %
 In Idris 2, we will adopt a nameless representation and so we represent
-these contexts by using a \IdrisData{SnocList} of types
+these contexts by using a \IdrisType{SnocList} of types
 (i.e. lists that grow on the right).
 
 \begin{minipage}{0.35\textwidth}
 \syntaxcontexts
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
-\begin{Verbatim}
-
-data SnocList a = Lin
-                | (:<) (SnocList a) a
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{SnocListDef}
 \end{minipage}
 
 \todo{play with spaces, reread descriptions}
@@ -68,10 +59,7 @@ proof \inferenceRule{} will correspond to a term $t$ of type
 \inferenceRule
 \end{minipage}\hfill
 \begin{minipage}{0.80\textwidth}
-\begin{Verbatim}
-data Elem : (ctxt : SnocList a) -> (type : a) -> Type where
-data Term : (ctxt : SnocList Ty) -> (type : Ty) -> Type where
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{ElemTermDecl}
 \end{minipage}
 
 We leave the definition of \IdrisType{Elem} to the next section,
@@ -89,10 +77,7 @@ its translation as the \IdrisData{Zero} constructor.
 \inferenceZero
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
-\begin{Verbatim}
-  Zero : ------------------
-          Term ctxt TyNat
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceZero}
 \end{minipage}
 
 Then come typing rules with a single premise which is not a subderivation
@@ -107,11 +92,7 @@ $a$ in said context.
 \inferenceVar
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
-\begin{Verbatim}
-  Var :  Elem ctxt a ->
-        --------------
-         Term ctxt a
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceVar}
 \end{minipage}
 
 Next, we have typing rules with a single premise which is a subderivation.
@@ -124,11 +105,7 @@ Here we show the typing rule for successor.
 \inferenceInc
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
-\begin{Verbatim}
-  Inc :  Term ctxt TyNat ->
-        ------------------
-         Term ctxt TyNat
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceInc}
 \end{minipage}
 
 Similarly, rules with two premises are translated to constructors
@@ -145,12 +122,7 @@ correspondingly, the same \texttt{ctxt} is being referenced everywhere.
 \inferenceApp
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
-\begin{Verbatim}
-  App :  Term ctxt (TyArr a b) ->
-         Term ctxt a ->
-        ------------------------
-         Term ctxt b
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceApp}
 \end{minipage}
 
 Finally, we have a rule where the premise's context has been extended:
@@ -161,21 +133,46 @@ of type $b$ in a context extended with a new variable of type $a$.
 \inferenceFunc
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
-\begin{Verbatim}
-  Func :  Term (ctxt :< a) b ->
-         ------------------------
-          Term ctxt (TyArr a b)
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceFunc}
 \end{minipage}
 
+Using this intrinsically typed representation, we can readily represent
+entire typing derivations.
+%
+The following example shows that \IdrisFunction{Plus2} is an internal
+representation of the fact that we can demonstrate that the term
+$\exprLam{\exprInc{\exprInc{x}}}$ is assigned type ($\TyFunc{\TyNat}{\TyNat}$).
 
+\begin{center}
+\begin{minipage}{0.45\textwidth}
+\infer
+  {\infer{\vdots}{\epsilon\,, \ty{x}{\TyNat} \vdash \ty{\exprInc{\exprInc{x}}}{\TyNat}}}
+  {\epsilon \vdash \ty{\exprLam{\exprInc{\exprInc{x}}}}{\TyFunc{\TyNat}{\TyNat}}}
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{Plus2Def}
+\end{minipage}
+\end{center}
 
+By using \IdrisType{Term} as an Intermediate Representation in our compiler
+we will have made an entire class of invalid programs unrepresentable.
+%
+Indeed, trying to write an ill scoped or an ill typed leads to static errors
+as demonstrated by the \IdrisKeyword{failing} blocks below.
+%
+In this first example we try to refer to a variable in an empty context.
+Idris 2 correctly complains that this is not possible.
 
-%%           Inc  :  Term ctxt TyNat ->
-%%          -------------------
-%%           Term ctxt TyNat
-%%   -- (...)
-%% \end{Verbatim}
+\begin{center}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{IllScoped}
+\end{center}
+
+In this second example we try to type the identity function as a function
+from \TyNat to \TyBool. This is indeed statically rejected as nonsensical.
+
+\begin{center}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{IllTyped}
+\end{center}
 
 
 \noindent
