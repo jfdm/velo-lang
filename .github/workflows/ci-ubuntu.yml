@@ -13,16 +13,18 @@ on:
 ########################################################################
 
 env:
+  IDRIS2_COMMIT: 24ac56de8809ae7a2cd0126f01110d4b762389fc
+  COLLIE_COMMIT: ed2eda5e04fbd02a7728e915d396e14cc7ec298e
+  IDRALL_COMMIT: 62a455894b1db5134c8b56d31aadb31d483a4b2c
+  KATLA_COMMIT:  4c1c8f3b049a5c2e245e3904ee746844de27c709
   SCHEME: scheme
 
 jobs:
-  build:
+  cache:
     runs-on: ubuntu-latest
     steps:
-
       - name: Initialise variables
         run: |
-          # Only deploy if the build follows from pushing to main
           echo "$HOME/.idris2/bin" >> $GITHUB_PATH
 
       # This caching step allows us to save a lot of building time by only
@@ -33,19 +35,74 @@ jobs:
         with:
           path: |
             ~/.idris2
-          key: ${{ runner.os }}-idris-2
+          key: ${{ runner.os }}-${{ env.IDRIS2_COMMIT }}-${{ env.COLLIE_COMMIT }}-${{ env.IDRALL_COMMIT }}-${{ env.KATLA_COMMIT }}
+
+      # If the cache was not retrieved, we need to build idris
+      - name: Install Chez
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chezscheme
+
+      - name: Install Idris2 & its API
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/idris-lang/idris2
+          cd idris2
+          git checkout ${{ env.IDRIS2_COMMIT }}
+          make bootstrap && make install
+          make clean
+          make && make install
+          idris2 --install idris2api.ipkg
+
+      - name: Download and install Collie from github
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/ohad/collie
+          cd collie
+          git checkout ${{ env.COLLIE_COMMIT }}
+          make install
+          cd ..
+
+      - name: Download and install Idrall from github
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/alexhumphreys/idrall/
+          cd idrall
+          git checkout ${{ env.IDRALL_COMMIT }}
+          make install
+          cd ..
+
+      - name: Download and install Katla from github
+        if: steps.cache-idris2.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/idris-community/katla/
+          cd katla
+          git checkout ${{ env.KATLA_COMMIT }}
+          make install
+          cd ..
+
+  build:
+    runs-on: ubuntu-latest
+    needs: cache
+    steps:
+
+      - name: Initialise variables
+        run: |
+          echo "$HOME/.idris2/bin" >> $GITHUB_PATH
+
+      - name: Get Idris2 from cache
+        uses: actions/cache@v2
+        id: cache-idris2
+        with:
+          path: |
+            ~/.idris2
+          key: ${{ runner.os }}-${{ env.IDRIS2_COMMIT }}-${{ env.COLLIE_COMMIT }}-${{ env.IDRALL_COMMIT }}-${{ env.KATLA_COMMIT }}
 
       - name: Install Chez
         run: |
           sudo apt-get update
           sudo apt-get install -y chezscheme
-
-      - name: Install Idris2
-        if: steps.cache-idris2.outputs.cache-hit != 'true'
-        run: |
-          git clone https://github.com/idris-lang/idris2
-          cd idris2
-          make bootstrap && make install
 
       - name: Checkout Project.
         uses: actions/checkout@v2
@@ -55,5 +112,39 @@ jobs:
 
       - name: Run Tests
         run: make velo-test-run
+
+  katla:
+    runs-on: ubuntu-latest
+    needs: cache
+    steps:
+
+      - name: Initialise variables
+        run: |
+          echo "$HOME/.idris2/bin" >> $GITHUB_PATH
+
+      - name: Get Idris2 from cache
+        uses: actions/cache@v2
+        id: cache-idris2
+        with:
+          path: |
+            ~/.idris2
+          key: ${{ runner.os }}-${{ env.IDRIS2_COMMIT }}-${{ env.COLLIE_COMMIT }}-${{ env.IDRALL_COMMIT }}-${{ env.KATLA_COMMIT }}
+
+      - name: Install Chez
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chezscheme
+
+      - name: Install TexLive
+        run: |
+          sudo apt-get install -y texlive-latex-extra texlive-fonts-extra texlive-science texlive-bibtex-extra latexmk
+
+      - name: Checkout Project.
+        uses: actions/checkout@v2
+
+      - name: Build paper
+        run: |
+          cd paper/2023-EVCS/
+          make
 
 # -- [ EOF ]

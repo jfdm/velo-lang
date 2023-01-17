@@ -1,3 +1,4 @@
+\PassOptionsToPackage{x11names}{xcolor}
 \documentclass[%
 final,%
 %draft, % note that the orcid.pdf logo is not included with draft mode
@@ -15,10 +16,14 @@ pdfa
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric}
 
+\usepackage{idris2}
+\usepackage{catchfilebetweentags}
+\input{robust-catch}
+
 \usepackage{acronym}
 \usepackage{xspace}
 \usepackage[todonotes={obeyFinal},commandnameprefix=always]{changes}
-\usepackage{fancyvrb}
+%\usepackage{fancyvrb}
 \usepackage{jfdm-plt}
 \usepackage{velo}
 
@@ -61,7 +66,7 @@ pdfa
 
 \begin{document}
 
-\input{./notations}
+%\input{./notations}
 
 \maketitle
 

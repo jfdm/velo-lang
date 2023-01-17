@@ -9,46 +9,39 @@ Concretely, we index the \IdrisType{Elem} family by the kind of the variable it 
 in inference rules, the most local end of the context is always on the right hand side.
 
 \begin{center}
-  \begin{minipage}{0.10\textwidth}
-    \varRule
-  \end{minipage}\hfill
-  \begin{minipage}{0.80\textwidth}
-\begin{Verbatim}
-data Elem : (ctxt : SnocList a) -> (type : a) -> Type where
-\end{Verbatim}
-  \end{minipage}
-\end{center}
+\begin{minipage}{0.10\textwidth}
+\varRule
+\end{minipage}\hfill
+\begin{minipage}{0.80\textwidth}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{ElemDecl}
+\end{minipage}
+\end{center
+
 
 The \IdrisData{Here} constructor indicates that the variable of interest is
 the most local one in scope.
 %
 
+
 \begin{center}
-  \begin{minipage}{0.35\textwidth}
-    \varZero
-  \end{minipage}\hfill
-  \begin{minipage}{0.55\textwidth}
-\begin{Verbatim}
-  Here : ----------------------
-          Elem ty (ctxt :< ty)
-\end{Verbatim}
-  \end{minipage}
+\begin{minipage}{0.35\textwidth}
+  \varZero
+\end{minipage}\hfill
+\begin{minipage}{0.55\textwidth}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{varZero}
+\end{minipage}
 \end{center}
 
 The \IdrisData{There} constructor skips past the most local one to look for
 the variable of interest in the rest of the context.
 
 \begin{center}
-  \begin{minipage}{0.35\textwidth}
-    \varSuc
-  \end{minipage}\hfill
-  \begin{minipage}{0.55\textwidth}
-\begin{Verbatim}
-  There :  Elem ty ctxt ->
-          ---------------------
-           Elem ty (ctxt :< _)
-\end{Verbatim}
-  \end{minipage}
+\begin{minipage}{0.35\textwidth}
+  \varSuc
+\end{minipage}\hfill
+\begin{minipage}{0.55\textwidth}
+\ExecuteMetaData[Code/MiniVelo.idr.tex]{varSuc}
+\end{minipage}
 \end{center}
 
 
@@ -68,21 +61,13 @@ all of the natural numbers we use correspond to valid indices.
 We pointedly reuse the \IdrisType{Elem} names because these \IdrisData{Here}
 and \IdrisData{There} play exactly the same role.
 
-\begin{Verbatim}
-data AtIndex : (ty : kind) -> (ctxt : SnocList kind) ->
-               (idx : Nat) -> Type where
-  Here : AtIndex ty (ctxt :< ty) Z
-  There : (later : AtIndex ty ctxt idx) -> AtIndex ty (ctxt :< _) (S idx)
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniDeBruijn.idr.tex]{AtIndexDef}
 
 \noindent
 We then define a variable as the pairing of a natural number and an \emph{erased}
 proof that the given natural numbers is indeed a valid \DeBruijn{} index.
 
-\begin{Verbatim}
-data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type where
-    V : (idx : Nat) -> (0 prf : AtIndex ty ctxt idx) -> IsVar ctxt ty
-\end{Verbatim}
+\ExecuteMetaData[Code/MiniDeBruijn.idr.tex]{IsVarDef}
 
 Thanks to Quantitative Type Theory~\cite{DBLP:conf/birthday/McBride16,DBLP:conf/lics/Atkey18}
 as implemented in \Idris{},

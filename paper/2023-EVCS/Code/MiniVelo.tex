@@ -1,0 +1,129 @@
+\begin{code}
+module Code.MiniVelo
+
+public export
+\end{code}
+
+%<*TyDef>
+\begin{code}
+data Ty = TyNat
+        | TyBool
+        | TyArr Ty Ty
+\end{code}
+%</TyDef>
+
+\begin{code}
+%hide Prelude.SnocList
+\end{code}
+
+%<*SnocListDef>
+\begin{code}
+data SnocList a = Lin
+                | (:<) (SnocList a) a
+\end{code}
+%</SnocListDef>
+
+%<*ElemTermDecl>
+\begin{code}
+data Elem : (ctxt : SnocList a) -> (type : a) -> Type
+data Term : (ctxt : SnocList Ty) -> (type : Ty) -> Type
+\end{code}
+%</ElemTermDecl>
+
+%<*ElemDecl>
+\begin{code}
+data Elem : (ctxt : SnocList a) -> (type : a) -> Type
+\end{code}
+%</ElemDecl>
+\begin{code}
+ where
+\end{code}
+%<*varZero>
+\begin{code}
+  Here : ----------------------
+          Elem (ctxt :< ty) ty
+\end{code}
+%</varZero>
+
+\end{code}
+%<*varSuc>
+\begin{code}
+  There :  Elem ctxt ty ->
+          ---------------------
+           Elem (ctxt :< _) ty
+\end{code}
+%</varSuc>
+
+\begin{code}
+data Term : (ctxt : SnocList Ty) -> (type : Ty) -> Type where
+\end{code}
+
+%<*inferenceZero>
+\begin{code}
+  Zero : ------------------
+          Term ctxt TyNat
+\end{code}
+%</inferenceZero>
+
+
+%<*inferenceVar>
+\begin{code}
+  Var :  Elem ctxt a ->
+        --------------
+         Term ctxt a
+\end{code}
+%</inferenceVar>
+
+
+%<*inferenceInc>
+\begin{code}
+  Inc :  Term ctxt TyNat ->
+        ------------------
+         Term ctxt TyNat
+\end{code}
+%</inferenceInc>
+
+
+%<*inferenceApp>
+\begin{code}
+  App :  Term ctxt (TyArr a b) ->
+         Term ctxt a ->
+        ------------------------
+         Term ctxt b
+\end{code}
+%</inferenceApp>
+
+
+%<*inferenceFunc>
+\begin{code}
+  Func :  Term (ctxt :< a) b ->
+         ------------------------
+          Term ctxt (TyArr a b)
+\end{code}
+%</inferenceFunc>
+
+
+%<*Plus2Def>
+\begin{code}
+Plus2 : Term [<] (TyArr TyNat TyNat)
+Plus2 = Func (Inc (Inc (Var Here)))
+\end{code}
+%</Plus2Def>
+
+%<*IllScoped>
+\begin{code}
+failing "Mismatch between: ?ctxt :< TyNat and [<]."
+
+  Ouch : Term [<] TyNat
+  Ouch = Var Here
+\end{code}
+%</IllScoped>
+
+%<*IllTyped>
+\begin{code}
+failing "Mismatch between: TyBool and TyNat."
+
+  Ouch : Term [<] (TyArr TyNat TyBool)
+  Ouch = Func (Var Here)
+\end{code}
+%</IllTyped>

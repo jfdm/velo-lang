@@ -1,0 +1,22 @@
+\begin{code}
+module Code.MiniDeBruijn
+\end{code}
+
+%<*AtIndexDef>
+\begin{code}
+data AtIndex : (ty : kind) -> (ctxt : SnocList kind) ->
+               (idx : Nat) -> Type where
+  Here : AtIndex ty (ctxt :< ty) Z
+  There : AtIndex ty ctxt idx -> AtIndex ty (ctxt :< _) (S idx)
+\end{code}
+%</AtIndexDef>
+
+\begin{code}
+export
+\end{code}
+%<*IsVarDef>
+\begin{code}
+data IsVar : (ctxt : SnocList kind) -> (ty : kind) -> Type where
+    V : (idx : Nat) -> (0 prf : AtIndex ty ctxt idx) -> IsVar ctxt ty
+\end{code}
+%</IsVarDef>
