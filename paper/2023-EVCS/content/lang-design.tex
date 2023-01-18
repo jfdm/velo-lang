@@ -127,7 +127,7 @@ They are mapped to constructors with a single subterm of the inductive family
 representing the subderivation.
 %
 Here we show the typing rule for successor: provided that we are given
-a natural number in a given context, its successor also is a natural
+a natural number in a given context, its successor is also a natural
 number in the same context.
 
 \begin{center}
@@ -191,16 +191,15 @@ assigned the type ($\TyFunc{\TyNat}{\TyNat}$).
 \end{minipage}
 \end{center}
 
-By using \IdrisType{Term} as an Intermediate Representation in our compiler
-we have made an entire class of invalid programs unrepresentable.
+By using \IdrisType{Term} as an \ac{ir} in our compiler
+we will have made an entire class of invalid programs unrepresentable.
 %
 Indeed, trying to write an ill scoped or an ill typed program leads to a
-static error as demonstrated by the \IdrisKeyword{failing} blocks
-below\footnote{Failing blocks are only accepted by \Idris{} if checking
-their content yields an error matching the provided string.}.
+static error as demonstrated by the following \IdrisKeyword{failing} blocks\footnote{\Idris{} only accepts failing blocks if checking
+their content yields an error matching the given string.}.
 %
 In this first example we try to refer to a variable in an empty context.
-Idris 2 correctly complains that this is not possible.
+\Idris{} correctly complains that this is not possible.
 
 \begin{center}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{IllScoped}
@@ -217,7 +216,7 @@ from \TyNat to \TyBool. This is statically rejected as nonsensical:
 
 \noindent
 Using such intrinsically typed \acp{edsl} we can statically enforce that
-our elaborators do check that the raw terms obtained by parsing user inputs
+our elaborators do check that the raw terms obtained by parsing user input
 are well scoped and well typed.
 %
 Writing our compiler passes (model-to-model transformations) and
