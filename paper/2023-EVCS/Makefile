@@ -15,7 +15,6 @@ DEPENDS:=\
   $(patsubst %.tex,%.idr.tex,$(CODE)) \
   paper.bib
 
-
 all: paper.pdf
 
 build/ttc/*/%.ttm build/ttc/*/%.ttc: Code/%.tex
