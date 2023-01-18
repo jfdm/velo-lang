@@ -17,9 +17,13 @@ In the following example for instance, we would like to let-bind $t$ before the 
 
 One of the challenges of \ac{cse}, as exemplified above, is that the term of interest may be burried deep inside separate contexts.
 %
-In our intrinsically scoped representation, $t$ in scope $\Gamma, x : \sigma$ is potentially not actually syntactically equal to a copy living in $\Gamma, a : \tau, b : \nu$.
+In our intrinsically scoped representation, $t$ in scope
+$\Gamma,\, \ty{x}{\sigma}$ is potentially not actually
+syntactically equal to a copy living in $\Gamma,\, \ty{a}{\tau},\, \ty{b}{\nu}$.
 %
-Indeed a variable $v$ bound in $\Gamma$ will, for instance, be represented by the \DeBruijn{} index ($1+v$) in $\Gamma, x : \sigma$ but by the index ($2+v$) in $\Gamma, a :  \tau, b : \nu$.
+Indeed a variable $v$ bound in $\Gamma$ will, for instance, be
+represented by the \DeBruijn{} index ($1+v$) in $\Gamma,\, \ty{x}{\sigma}$
+but by the index ($2+v$) in $\Gamma,\, \ty{a}{\tau},\, \ty{b}{\nu}$.
 
 If only terms were indexed by their exact \emph{support}!\jfdm{Is the technical term \emph{support} sufficiently well-known to not explain?}
 %
