@@ -46,7 +46,7 @@ and
 %
 We present interesting aspects of our \ac{ir} design in \Cref{sec:design}.
 %
-Further, elaboration performs standard syntax transformations that turns let-bindings into function application thus reducing the size of our core.
+Further, elaboration performs standard desugarings that e.g. turns let-bindings into function application thus reducing the size of our core.
 %
 From the core representation we also provide well-scoped \ac{cse} using co-\DeBruijn{} indexing (\Cref{sec:compiler-pass}), and we provide a verified evaluator to reduce terms to values (\Cref{sec:semantics}).
 
