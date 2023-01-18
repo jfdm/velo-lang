@@ -1,0 +1,74 @@
+\begin{code}
+module Code.MiniExecute
+
+import Code.MiniVelo
+import Code.MiniCompact
+
+%hide MiniVelo.Term
+
+subst : Term ctxt a -> Term (ctxt :< a) b -> Term ctxt b
+
+data Value : Term ctxt ty -> Type
+\end{code}
+
+\begin{code}
+data Reduxes : (these,those : Terms ctxt tys) -> Type where
+\end{code}
+
+%<*ReduxDef>
+\begin{code}
+data Redux : (this,that : Term ctxt type) -> Type where
+  SimplifyCall : (op   : Prim tys ty)
+              -> (step : Reduxes these those)
+                      -> Redux (Call p these) (Call p those)
+
+  ReduceFuncApp : {body  : Term (ctxt :< type) return}
+               -> {arg   : Term ctxt type}
+               -> (value : Value arg)
+                        -> Redux (Call App [Fun body, arg])
+                                 (subst arg body)
+\end{code}
+%</ReduxDef>
+
+%<*ReducesDef>
+\begin{code}
+data Reduxes : (these, those : Terms ctxt tys) -> Type where
+  (!:) : (hd   : Redux this that)
+      -> (rest : Terms ctxt tys)
+              -> Reduxes (this :: rest) (that :: rest)
+
+  (::) : (value : Value hd)
+      -> (tl    : Reduxes these those)
+               -> Reduxes (hd :: these) (hd :: those)
+\end{code}
+%</ReducesDef>
+
+\begin{code}
+Pred : Type -> Type
+Pred a = a -> Type
+
+Rel : Type -> Type
+Rel a = a -> Pred a
+\end{code}
+
+%<*ProgressDef>
+\begin{code}
+data Progress : (0 value : Pred a) -> (0 redux : Rel a) -> (tm : a) -> Type
+  where Done : {0 tm : a} -> (val : value tm) -> Progress value redux tm
+
+        Step : {this, that : a}
+            -> (step : redux this that) -> Progress value redux this
+\end{code}
+%</ProgressDef>
+
+\begin{code}
+data RTList : Rel a -> Rel a where
+\end{code}
+
+%<*ResultDef>
+\begin{code}
+data Result : (0 value : Pred a) -> (0 redux : Rel a) -> (this : a) -> Type
+  where R : (that : a) -> (val : value that)
+         -> (steps : RTList redux this that) -> Result value redux this
+\end{code}
+%</ResultDef>
