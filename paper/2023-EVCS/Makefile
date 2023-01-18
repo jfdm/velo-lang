@@ -3,7 +3,8 @@
 CODE:=\
   Code/MiniVelo.tex \
   Code/MiniDeBruijn.tex \
-  Code/MiniCompact.tex
+  Code/MiniCompact.tex \
+  Code/MiniExecute.tex
 
 DEPENDS:=\
   cc-by.pdf \

@@ -3,6 +3,8 @@ module Code.MiniCompact
 
 import Code.MiniVelo
 import Code.MiniDeBruijn
+
+public export
 \end{code}
 
 
@@ -16,9 +18,14 @@ data Prim : (args : List Ty) -> (ret : Ty) -> Type where
 %</PrimDef>
 
 \begin{code}
+public export
 data Terms : (ctxt : SnocList Ty) -> List Ty -> Type
 \end{code}
 
+
+\begin{code}
+public export
+\end{code}
 %<*TermDef>
 \begin{code}
 data Term : (ctxt : SnocList Ty) -> Ty -> Type where
@@ -30,6 +37,9 @@ data Term : (ctxt : SnocList Ty) -> Ty -> Type where
 \end{code}
 %</TermDef>
 
+\begin{code}
+public export
+\end{code}
 %<*AllDef>
 \begin{code}
 data Terms : (ctxt : SnocList Ty) -> List Ty -> Type where

@@ -8,10 +8,10 @@ With dependently typed languages, however, we can also capture
 the abstract syntax and its static semantics as an intrinsically
 scoped and typed \ac{edsl}
 directly within the host language~\cite{Augustsson1999edt}.
-
-To keep the exposition concise, we focus on a core subset of \Velo{}.
 %
-The interested reader can find the whole implementation in the accompanying material\todo{Add DOI}.
+To keep the exposition concise, we focus on a core subset of the
+language. The interested reader can find the whole definition
+in the accompanying material\todo{Add DOI}.
 
 \textbf{Types} are usually introduced using their context free grammar.
 %
@@ -146,8 +146,8 @@ Here we present the typing rule for application nodes: provided that
 the function has a function type, and the argument has a type matching
 the function's domain, the application has a type corresponding to the
 function's codomain.
-Note that the context $\Gamma$ is the same across the whole rule and,
-correspondingly, the same \IdrisBound{ctxt} is being referenced everywhere.
+Note that the context $\Gamma$ is the same across the whole rule and
+so the same \IdrisBound{ctxt} is used everywhere.
 
 
 \begin{center}
@@ -160,8 +160,8 @@ correspondingly, the same \IdrisBound{ctxt} is being referenced everywhere.
 \end{center}
 
 Finally, we have a rule where the premise's context has been extended:
-a function of type (\TyFunc{a}{b}) can be introduced by building a term
-of type $b$ in a context extended with a new variable of type $a$.
+a function of type (\TyFunc{a}{b}) is built by providing a term
+of type $b$ defined in a context extended with a new variable of type $a$.
 
 \begin{center}
 \begin{minipage}{0.35\textwidth}
