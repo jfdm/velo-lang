@@ -7,12 +7,11 @@ are verified as part of the implementation thanks to the dependently typed setti
 %
 The weakest supported core criteria, unfortunately, is that for \emph{editor} support.
 %
-Languages created through \Idris{} do not get an editor, they are free form languages.
-\Velo{}, and other languages, require that their parsers and elaborators be hand written.
+Languages created through \Idris{} do not get an editor, they are free form languages which require their parsers and elaborators be hand written.
 This can change with future investigation.
 \Idris{} has support for elaborator reflection
 % ~\cite{DBLP:conf/icfp/ChristiansenB16} -- removed due to restrictions on bibliography.
-which may provide a vehicle through which deriving parsers and elaborators can happen.
+which provides a vehicle through which deriving parsers and elaborators can happen.
 
 
 There are, however, more criteria from the language workbench feature model to consider:
@@ -29,13 +28,13 @@ composability.
 With the rise of the \ac{lsp} it would be a good idea to look at how we can derive \ac{lsp} compatible language servers generically, thus addressing the missing provision of the optional semantic and syntactic services.
 \Idris{} itself provides an \emph{IDE-Protocol}
 % ~\cite{MANUAL:dtp/Christiansen2014} -- removed due to space limitations on bibliography
-, and there is support for the \ac{lsp} in \Idris{} itself.
+, and there is support for the \ac{lsp} in \Idris{}.
 %\footnote{\url{https://github.com/idris-community/idris2-lsp}}
 
 Our languages also do not come with the ability to test and debug their
 implementation.
 %
-If some of the features we have presented are fully formalised (e.g.\ execution),
+Some of the features we have presented are fully formalised (e.g.\ execution),
 others are only known to be scope-and-type preserving (e.g.\ \ac{cse}).
 %
 Therefore the dependently typed setting does not mean we do not need testing
