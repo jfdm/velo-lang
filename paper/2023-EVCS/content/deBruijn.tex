@@ -5,8 +5,9 @@ A common strategy for implementing well-scoped terms is to use typed
 \emph{\DeBruijn{}} indices~\cite{MANUAL:journals/math/debruijn72}, and these indices can be easily realised as an inductive family~\cite{DBLP:journals/fac/Dybjer94}
 indicating where in the type-level context the variable is bound.
 
-Concretely, we index the \IdrisType{Elem} family by the kind of the variable it represents and a \IdrisType{SnocList} of kinds as the context to reflect the fact that,
-in inference rules, the most local end of the context is always on the right hand side.
+Concretely, we index the \IdrisType{Elem} family by a context
+(once again represented as a \IdrisType{SnocList} of kinds) and
+the kind of the variable it represents.
 
 \begin{center}
 \begin{minipage}{0.10\textwidth}
@@ -17,10 +18,11 @@ in inference rules, the most local end of the context is always on the right han
 \end{minipage}
 \end{center}
 
-The \IdrisData{Here} constructor indicates that the variable of interest is
-the most local one in scope.
+We then match each context membership inference rule to a constructor.
 %
-
+The \IdrisData{Here} constructor indicates that the variable of interest is
+the most local one in scope (note the non-linear occurence of (\ty{x}{a}) on
+the left hand side, and correspondingly of \IdrisBound{ty} on the right).
 
 \begin{center}
 \begin{minipage}{0.35\textwidth}
@@ -31,8 +33,8 @@ the most local one in scope.
 \end{minipage}
 \end{center}
 
-The \IdrisData{There} constructor skips past the most local one to look for
-the variable of interest in the rest of the context.
+The \IdrisData{There} constructor skips past the most local variable in order
+to look for the variable of interest deeper in the context.
 
 \begin{center}
 \begin{minipage}{0.35\textwidth}
@@ -58,7 +60,7 @@ Further, we need to additionally define an \IdrisType{AtIndex} family to ensure 
 all of the natural numbers we use correspond to valid indices.
 %
 We pointedly reuse the \IdrisType{Elem} names because these \IdrisData{Here}
-and \IdrisData{There} play exactly the same role.
+and \IdrisData{There} constructors play exactly the same role.
 
 \ExecuteMetaData[Code/MiniDeBruijn.idr.tex]{AtIndexDef}
 
@@ -75,6 +77,14 @@ that is guaranteed to be compiled efficiently.
 
 \todo{Talk about smart constructors \& views?}
 \jfdm{We should do this talking in the extended version...}
+
+Just like the naïve definition of De Bruijn indices is not the
+best suited for a practical implementation,
+the inductive family \IdrisType{Term} described in Section~\ref{sec:design}
+is not the most convenient to use.
+%
+We will now see one of its limitations and how we remedied it in
+\Velo{}.
 
 %%% Local Variables:
 %%% mode: latex

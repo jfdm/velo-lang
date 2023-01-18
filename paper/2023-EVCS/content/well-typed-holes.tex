@@ -33,15 +33,16 @@ Users can refer to the hole's solution by its name, but that hole is still very 
 In \Velo{}, however, we allow holes to be mentioned arbitrarily many times in
 arbitrarily different local contexts.
 %
-In the following example, the hole \texttt{?h} occurs in two distinct contexts: $\emptyset,a,x$ and $\emptyset,a,y$.
+In the following example, the hole \texttt{?h} occurs in two distinct contexts:
+$\epsilon,\,a,\,x$ and $\epsilon,\,a,\,y$.
 
 \begin{center}
   \holeexamplegraph{}
 \end{center}
 
-As a consequence, a term will only fit in that hole if it happens to live in the shared common prefix of these two contexts ($\emptyset,a$).
+As a consequence, a term will only fit in that hole if it happens to live in the shared common prefix of these two contexts ($\epsilon,\,a$).
 %
-Indeed, references to $x$ will not make sense in $\emptyset,a,y$ and vice-versa for $y$.
+Indeed, references to $x$ will not make sense in $\epsilon,a,y$ and vice-versa for $y$.
 
 
 Our elaborator proceeds in two steps.

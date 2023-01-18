@@ -1,3 +1,5 @@
+.PRECIOUS: build/ttc/*/%.ttm build/ttc/*/%.ttc Code/%.idr.tex
+
 CODE:=\
   Code/MiniVelo.tex \
   Code/MiniDeBruijn.tex \

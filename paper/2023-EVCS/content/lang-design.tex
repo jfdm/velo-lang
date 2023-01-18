@@ -8,11 +8,10 @@ With dependently typed languages, however, we can also capture
 the abstract syntax and its static semantics as an intrinsically
 scoped and typed \ac{edsl}
 directly within the host language~\cite{Augustsson1999edt}.
-%
-In this section we do not cover all of \Velo{} but a subset that covers the \ac{stlc} extended with natural numbers.
 
-%In the rest of this section, we detail the
-
+To keep the exposition concise, we focus on a core subset of the
+language. The interested reader can find the whole implementation
+in the accompanying material\todo{Add DOI}.
 
 \textbf{Types} are usually introduced using their context free grammar.
 %
@@ -20,8 +19,19 @@ We present it here on the left-hand side, it gives users the choice between
 two base types (\TyNat, and \TyBool) and a type former for function types
 (\TyFunc{\cdot}{\cdot}).
 %
-On the right hand side, we give its representation as an inductive
-type in \Idris{}.
+On the right hand side, we give their internal representation as an inductive
+type in \Idris{}
+\footnote{
+Throughout this article, the \Idris{} code snippets are
+automatically rendered using a semantic highlighter.
+%
+Keywords are typeset in \IdrisKeyword{bold},
+types in \IdrisType{blue},
+data constructors in \IdrisData{red},
+function definitions in \IdrisFunction{green},
+bound variables in \IdrisBound{purple},
+and comments in \IdrisComment{grey}.
+}.
 
 \begin{center}
 \begin{minipage}{0.45\textwidth}
@@ -36,7 +46,6 @@ type in \Idris{}.
 a context is either empty ($\epsilon$), or an existing context ($\Gamma$)
 extended on the right with a new type assignment (\ty{x}{t}) using a comma.
 %
-
 In \Idris{}, we will adopt a nameless representation and so we represent
 these contexts by using a \IdrisData{SnocList} of types
 (i.e.\ lists that grow on the right).
@@ -60,6 +69,10 @@ types~\cite{DBLP:journals/fac/Dybjer94}.
 Each rule will become a constructor for the family, and so every
 proof \inferenceRule{} will correspond to a term $t$ of type
 (\texttt{Term} $\Gamma$ $a$).
+%
+On the left hand side we present two judgements: context membership
+and a typing judgement, and on the right we have the corresponding
+inductive family declarations.
 
 \begin{center}
 \begin{minipage}{0.10\textwidth}
@@ -73,10 +86,11 @@ proof \inferenceRule{} will correspond to a term $t$ of type
 
 We leave the definition of \IdrisType{Elem} to the next section,
 focusing instead on \IdrisType{Term}.
-
+%
 The most basic of typing rules are axioms, they have no premise
 and are mapped to constructors with no argument.
-We use \Idris{} comments (\texttt{----}) to format our constructor's type in such
+We use \Idris{} comments (\IdrisComment{\KatlaDash{}\KatlaDash})
+to format our constructor's type in such
 a way that they resemble the corresponding inference rule.
 %
 Here we show the rule stating that $0$ is a natural number and
@@ -109,10 +123,12 @@ $a$ in said context.
 \end{center}
 
 Next, we have typing rules with a single premise which is a subderivation.
-They are mapped to constructor with a single subterm of the inductive family
+They are mapped to constructors with a single subterm of the inductive family
 representing the subderivation.
 %
-Here we show the typing rule for successor.
+Here we show the typing rule for successor: provided that we are given
+a natural number in a given context, its successor also is a natural
+number in the same context.
 
 \begin{center}
 \begin{minipage}{0.45\textwidth}
@@ -131,7 +147,7 @@ the function has a function type, and the argument has a type matching
 the function's domain, the application has a type corresponding to the
 function's codomain.
 Note that the context $\Gamma$ is the same across the whole rule and,
-correspondingly, the same \texttt{ctxt} is being referenced everywhere.
+correspondingly, the same \IdrisBound{ctxt} is being referenced everywhere.
 
 
 \begin{center}
@@ -159,9 +175,10 @@ of type $b$ in a context extended with a new variable of type $a$.
 Using this intrinsically typed representation, we can readily represent
 entire typing derivations.
 %
-The following example shows that \IdrisFunction{Plus2} is an internal
-representation of the fact that we can demonstrate that the term
-$\exprLam{\exprInc{\exprInc{x}}}$ is assigned type ($\TyFunc{\TyNat}{\TyNat}$).
+The following example presents the internal representation
+\IdrisFunction{Plus2} of the derivation proving that
+$\exprLam{\exprInc{\exprInc{x}}}$ can be
+assigned the type ($\TyFunc{\TyNat}{\TyNat}$).
 
 \begin{center}
 \begin{minipage}{0.45\textwidth}
@@ -177,8 +194,10 @@ $\exprLam{\exprInc{\exprInc{x}}}$ is assigned type ($\TyFunc{\TyNat}{\TyNat}$).
 By using \IdrisType{Term} as an Intermediate Representation in our compiler
 we will have made an entire class of invalid programs unrepresentable.
 %
-Indeed, trying to write an ill scoped or an ill typed leads to static errors
-as demonstrated by the \IdrisKeyword{failing} blocks below.
+Indeed, trying to write an ill scoped or an ill typed program leads to a
+static error as demonstrated by the \IdrisKeyword{failing} blocks
+below\footnote{Failing blocks are only accepted by \Idris{} if checking
+their content yields an error matching the provided string.}.
 %
 In this first example we try to refer to a variable in an empty context.
 Idris 2 correctly complains that this is not possible.
@@ -188,7 +207,8 @@ Idris 2 correctly complains that this is not possible.
 \end{center}
 
 In this second example we try to type the identity function as a function
-from \TyNat to \TyBool. This is indeed statically rejected as nonsensical.
+from \TyNat to \TyBool. This is statically rejected as nonsensical:
+\IdrisData{TyNat} and \IdrisData{TyBool} are distinct constructors!
 
 \begin{center}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{IllTyped}
@@ -196,9 +216,14 @@ from \TyNat to \TyBool. This is indeed statically rejected as nonsensical.
 
 
 \noindent
-Using such intrinsically typed \acp{edsl} we can statically verify for free
-that our languages are well-structured and that any transformation (model-to-model)
-or interpretation (model-to-host) respects the language's static semantics.
+Using such intrinsically typed \acp{edsl} we can statically enforce that
+our elaborators do check that the raw terms obtained by parsing user inputs
+are well scoped and well typed.
+%
+Writing our compiler passes (model-to-model transformations) and
+evaluation engine (model-to-host transformation) using these
+invariant-rich \acp{ir} additionally ensures that each step respects
+the language's static semantics.
 %
 In fact we will describe in \Cref{sec:semantics} how we can use our \acp{edsl}
 to both verify our static semantics whilst describing our dynamic semantics.
