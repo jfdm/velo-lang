@@ -25,7 +25,9 @@ and Coq~\cite{the_coq_development_team_2022_5846982}
 have been widely used to formalise \acp{dsl}, and study their
 meta-theoretical properties.
 %
-Efforts range from
+Dependent types allow types to depend on values and provide an expressive environment in which to reason about, and write, our software programs.
+%
+Efforts using dependently-typed languages range from
 studying specific core calculi~\cite{10.1145/3093333.3009866,DBLP:conf/cpp/RouvoetPKV20,DBLP:conf/mpc/ChapmanKNW19}
 to building generic reasoning frameworks~\cite{DBLP:conf/cpp/StarkSK19,DBLP:journals/jfp/AllaisACMM21}.
 %
@@ -50,7 +52,7 @@ We address both the core criteria and some optional extensions
 highlighted by the language workbench challenge~\cite{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13} for what constitutes a language workbench.
 %
 %
-Although not all of the optional criteria required for a language workbench are met by dependently typed languages, we are convinced that with some additional engineering (taking advantage of existing work, for example Quickchick~\cite{DBLP:journals/pacmpl/LampropoulosPP18}) more optional criteria can be satisfied.
+Although not all of the optional criteria for a language workbench are met by dependently typed languages, we are convinced that with some additional engineering (taking advantage of existing work, for example Quickchick~\cite{DBLP:journals/pacmpl/LampropoulosPP18}) more optional criteria can be satisfied.
 
 
 Another key tenet in language workbenches, such as Spoofax, is the \emph{ease} with which languages can be created.
@@ -59,6 +61,7 @@ To that same degree, we have also sought to develop a series of reusable modules
 %
 Thereby reducing the \emph{boilerplate} required when creating \acp{edsl} in \Idris{}.
 
+Although we have made effort to make dependently-typed programming accessible in our presentation, more introductory material is available for the interested reader~\cite{plfa22.08,brady17:_type_driven_devel_idris}.
 
 %%% Local Variables:
 %%% mode: latex

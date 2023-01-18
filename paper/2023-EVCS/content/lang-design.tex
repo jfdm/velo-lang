@@ -1,4 +1,3 @@
-
 We begin our discussion by detailing the key design rationale on
 realising the static semantics of \Velo{} within \Idris{}.
 
@@ -10,7 +9,9 @@ the abstract syntax and its static semantics as an intrinsically
 scoped and typed \ac{edsl}
 directly within the host language~\cite{Augustsson1999edt}.
 %
-In the rest of this section, we detail the
+In this section we do not cover all of \Velo{} but a subset that covers the \ac{stlc} extended with natural numbers.
+
+%In the rest of this section, we detail the
 
 
 \textbf{Types} are usually introduced using their context free grammar.
@@ -20,40 +21,47 @@ two base types (\TyNat, and \TyBool) and a type former for function types
 (\TyFunc{\cdot}{\cdot}).
 %
 On the right hand side, we give its representation as an inductive
-type in Idris 2.
+type in \Idris{}.
 
+\begin{center}
 \begin{minipage}{0.45\textwidth}
 \syntaxtypes
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{TyDef}
 \end{minipage}
+\end{center}
 
 \textbf{Contexts} can be similarly given by a context free grammar:
 a context is either empty ($\epsilon$), or an existing context ($\Gamma$)
 extended on the right with a new type assignment (\ty{x}{t}) using a comma.
 %
-In Idris 2, we will adopt a nameless representation and so we represent
-these contexts by using a \IdrisType{SnocList} of types
-(i.e. lists that grow on the right).
 
+In \Idris{}, we will adopt a nameless representation and so we represent
+these contexts by using a \IdrisData{SnocList} of types
+(i.e.\ lists that grow on the right).
+
+
+\begin{center}
 \begin{minipage}{0.35\textwidth}
 \syntaxcontexts
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{SnocListDef}
 \end{minipage}
+\end{center}
 
 \todo{play with spaces, reread descriptions}
 
 \textbf{Typing Judgements} are given by relations, and encoded in
-Idris 2 using inductive families, a generalisation of inductive
+\Idris{} using inductive families, a generalisation of inductive
 types~\cite{DBLP:journals/fac/Dybjer94}.
 %
 Each rule will become a constructor for the family, and so every
 proof \inferenceRule{} will correspond to a term $t$ of type
 (\texttt{Term} $\Gamma$ $a$).
 
+\begin{center}
 \begin{minipage}{0.10\textwidth}
 \varRule
 \inferenceRule
@@ -61,24 +69,27 @@ proof \inferenceRule{} will correspond to a term $t$ of type
 \begin{minipage}{0.80\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{ElemTermDecl}
 \end{minipage}
+\end{center}
 
 We leave the definition of \IdrisType{Elem} to the next section,
 focusing instead on \IdrisType{Term}.
 
-The most basic of typing rules are axioms. They have no premise
-and are mapped to constructors with no argument. We use Idris 2
-comments (\texttt{----}) to format our constructor's type in such
+The most basic of typing rules are axioms, they have no premise
+and are mapped to constructors with no argument.
+We use \Idris{} comments (\texttt{----}) to format our constructor's type in such
 a way that they resemble the corresponding inference rule.
 %
 Here we show the rule stating that $0$ is a natural number and
 its translation as the \IdrisData{Zero} constructor.
 
+\begin{center}
 \begin{minipage}{0.45\textwidth}
 \inferenceZero
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceZero}
 \end{minipage}
+\end{center}
 
 Then come typing rules with a single premise which is not a subderivation
 of the relation itself.
@@ -88,12 +99,14 @@ Here we show the typing rule for variables: given a proof that we have a
 variable of type $a$ somewhere in the context, we can build a term of type
 $a$ in said context.
 
+\begin{center}
 \begin{minipage}{0.45\textwidth}
 \inferenceVar
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceVar}
 \end{minipage}
+\end{center}
 
 Next, we have typing rules with a single premise which is a subderivation.
 They are mapped to constructor with a single subterm of the inductive family
@@ -101,12 +114,14 @@ representing the subderivation.
 %
 Here we show the typing rule for successor.
 
+\begin{center}
 \begin{minipage}{0.45\textwidth}
 \inferenceInc
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceInc}
 \end{minipage}
+\end{center}
 
 Similarly, rules with two premises are translated to constructors
 with two subterms, one for each subderivation.
@@ -118,23 +133,28 @@ function's codomain.
 Note that the context $\Gamma$ is the same across the whole rule and,
 correspondingly, the same \texttt{ctxt} is being referenced everywhere.
 
+
+\begin{center}
 \begin{minipage}{0.35\textwidth}
 \inferenceApp
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceApp}
 \end{minipage}
+\end{center}
 
 Finally, we have a rule where the premise's context has been extended:
 a function of type (\TyFunc{a}{b}) can be introduced by building a term
 of type $b$ in a context extended with a new variable of type $a$.
 
+\begin{center}
 \begin{minipage}{0.35\textwidth}
 \inferenceFunc
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceFunc}
 \end{minipage}
+\end{center}
 
 Using this intrinsically typed representation, we can readily represent
 entire typing derivations.

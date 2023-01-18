@@ -20,9 +20,20 @@ All builtin operators (from primitive operations on builtin types to function
 application itself) are represented using a single \IdrisData{Call} constructor
 which takes an operation and a type-indexed list of subterms.
 
+
 \ExecuteMetaData[Code/MiniCompact.idr.tex]{TermDef}
 
+Here \IdrisType{All} is a list quantifier that supports type-level collection of values that satisfy a supplied predicate.
+In practise, our use of \IdrisType{All} supports collection of differently typed terms, all indexed by the same typing context.
+
+\begin{Verbatim}
+data All : (pred : type -> Type) -> (values : List type) -> Type where
+  Nil : All pred Nil
+  (::) : (hd : pred x) -> (tail : All pred xs) -> All pred (x::xs)
+\end{Verbatim}
+
 The primitive operations can now be described in a single datatype \IdrisData{Prim} which lists the primitive operation's arguments and return type.
+
 \begin{comment}
 \IdrisData{Zero}---which takes no argument and returns a term of type \IdrisData{TyNat};
 %

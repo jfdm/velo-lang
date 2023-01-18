@@ -41,8 +41,7 @@ data Redux : (this,that : Term metas ctxt type) -> Type where
                                  (Single.subst var body)
 \end{Verbatim}
 
-As can be seen above, our setting enforces call-by-value: $(0 + r)$
-only reduces to $r$ if $r$ is already known to be a value.
+As can be seen above, our setting enforces call-by-value: $(0 + r)$, as described by the rule \IdrisData{ReduceAddZW} only reduces to $r$ if $r$ is already known to be a value.
 %
 Furthermore, our algebraic design (\Cref{sec:design:constants}) allows
 us to easily enforce a left-to-right evaluation order by having a generic
