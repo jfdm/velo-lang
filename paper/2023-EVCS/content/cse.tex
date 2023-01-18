@@ -25,7 +25,8 @@ Indeed a variable $v$ bound in $\Gamma$ will, for instance, be
 represented by the \DeBruijn{} index ($1+v$) in $\Gamma,\, \ty{x}{\sigma}$
 but by the index ($2+v$) in $\Gamma,\, \ty{a}{\tau},\, \ty{b}{\nu}$.
 
-If only terms were indexed by their exact \emph{support}!\jfdm{Is the technical term \emph{support} sufficiently well-known to not explain?}
+If only terms were indexed by their exact \emph{support}
+(i.e. a context restricted to the variables actually used in the term)!
 %
 We would not care about additional yet irrelevant variables that happen to be in scope.
 %
@@ -43,20 +44,33 @@ By the time we reach a variable node, a single bound variable remains in scope:
 %
 precisely the one being referred to.
 
-If we think of thinnings as sequences of 0/1 bits, stating whether a variable is kept or dropped, and admitting that such sequences can be represented as a list of either $\bullet$ (1) or $\circ$ (0).
-Consider, for example, the $S$ combinator ($\lambda g. \lambda f. \lambda x. g x (f x)$) which is represented as follows in co-\DeBruijn{} notation (diagram taken from~\cite{MANUAL:draft/Allais22}).
+This process of throwing unused variables away is reified using thinnings
+i.e. renamings that are injective, and order preserving.
+%
+We can think of thinnings as sequences of 0/1 bits, stating whether each variable
+is kept or dropped.
+
+Below, we give a graphical presentation (taken from~\cite{MANUAL:draft/Allais22})
+of the $S$ combinator (the lambda term $\lambda g. \lambda f. \lambda x. g x (f x)$)
+in co-\DeBruijn{} notation.
+%
+In it we represent thinnings (i.e. lists of bits) as lists of either
+$\bullet$ (1) or $\circ$ (0).
 
 \begin{center}
   \codebruijnexamplegraph{}
 \end{center}
 
-The first three $\lambda$ abstractions only use $\bullet$ in their thinnings because all of $g$, $f$, and $x$ do appear in the body of the combinator.
+The first three $\lambda$ abstractions only use $\bullet$ in their
+thinnings because all of $g$, $f$, and $x$ do appear in the body of the combinator.
 %
-The first application node then splits the context into two: the first subterm ($g x$) drops $f$ while the second ($f x$) gets rid of $g$.
+The first application node then splits the context into two:
+the first subterm ($g x$) drops $f$
+while the second ($f x$) gets rid of $g$.
 %
 Further application nodes select the one variable still in scope for each leaf subterm: $g$, $x$, $f$, and $x$.
 
-Using a co-\DeBruijn{} representation, we can easily identify shared subterms:
+Using a co-\DeBruijn{} representation, we can identify shared subterms:
 %
 they need to not be mentioning any of the most local variables and be syntactically equal.
 %
@@ -85,7 +99,7 @@ in (add (add q p) (add p q))
 
 This pass relies on the ability to have a compact representation of thinnings
 (as the co-\DeBruijn{} representation makes heavy use of them),
-and additionnally the existence of a quick equality test for them.
+and additionally the existence of a cheap equality test for them.
 %
 This is not the case in the implementation we include in \Velo{} but
 it is a solved problem~\cite{MANUAL:draft/Allais22}.

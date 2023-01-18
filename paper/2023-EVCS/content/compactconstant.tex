@@ -10,11 +10,11 @@ The definition of the simplifying traversal contains much duplicated code due to
 %
 all the binary operations are separate constructors, whose subterms need to be structurally simplified before we can decide whether a rule applies.
 %
-The correction proof has just as much duplication because it needs to follow the structure of the call graph of the function it wants to see reduce.
+The correction proof has just as much duplication because it needs to follow the structure of the call graph of the function it wants to see reduced.
 %
 The only saving grace here is that Coq's tactics language lets users write scripts that apply to many similar goals thus avoiding duplication in the source file.
 
-In \Velo{}, we structured our core language's representation in an algebraic
+In \Velo{}, we structure our core language's representation in an algebraic
 manner so that this duplication is never needed.
 %
 All builtin operators (from primitive operations on builtin types to function

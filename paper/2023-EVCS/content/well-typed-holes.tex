@@ -5,11 +5,15 @@ Holes are a special kind of placeholder that programmers can use for parts of th
 %
 In a typed language, each hole will be assigned a type based on the context it is used in.
 
-\emph{Type-Driven Programming}~\cite{DBLP:journals/pacmpl/OmarVCH19} is a practice by which the user enters into a dialogue \emph{with} the compiler to interactively build the program.
+\emph{Type-Driven Development}~\cite{DBLP:journals/pacmpl/OmarVCH19}
+is a practice by which the user enters into a dialogue
+\emph{with} the compiler to interactively build the program.
+%
 We can enable type-driven programming in part by providing special language support for holes and operations on them.
 Such operations will include the ability to inspect, refine, compute with, and instantiate (with an adequately typed term) holes.
 %
-Barebones language support for type-driven programming should at least include the ability to:
+We believe that barebones language support for type-driven development
+should at least include the ability to:
 %
 (1) inspect the type of a hole and the local context it appears in;
 %
@@ -20,15 +24,15 @@ and as well
 (3) safely evaluate programs that still contain holes.
 %
 \Velo{} provides all three.
-%
-Our treatment of evaluation and instantiation are fairly standard, but our elaboration process is more interesting.
 
 \Idris{} elaborates holes as it encounters them by turning them into
 global declarations with no associated definition.
 %
 Because of this design choice users cannot mention the same hole explicitly in different places to state their intention that these yet unwritten terms ought to be the same.
 %
-Users can refer to the hole's solution by its name, but that hole is still very much placed in one specific position and it is from that position that \Idris{} infers its context.
+Users can refer to the hole's solution by its name,
+but that hole is placed in one specific position
+and it is from that position that \Idris{} infers its context.
 
 In \Velo{}, however, we allow holes to be mentioned arbitrarily many times in
 arbitrarily different local contexts.

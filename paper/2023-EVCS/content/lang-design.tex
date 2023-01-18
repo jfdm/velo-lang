@@ -123,7 +123,7 @@ $a$ in said context.
 \end{center}
 
 Next, we have typing rules with a single premise which is a subderivation.
-They are mapped to constructors with a single subterm of the inductive family
+They are mapped to constructors with a single argument of the inductive family
 representing the subderivation.
 %
 Here we show the typing rule for successor: provided that we are given
@@ -140,14 +140,14 @@ number in the same context.
 \end{center}
 
 Similarly, rules with two premises are translated to constructors
-with two subterms, one for each subderivation.
+with two arguments, one for each subderivation.
 %
 Here we present the typing rule for application nodes: provided that
 the function has a function type, and the argument has a type matching
 the function's domain, the application has a type corresponding to the
 function's codomain.
 Note that the context $\Gamma$ is the same across the whole rule and
-so the same \IdrisBound{ctxt} is used everywhere.
+so the same \IdrisBound{gamma} is used everywhere.
 
 
 \begin{center}
@@ -181,18 +181,19 @@ $\exprLam{\exprInc{\exprInc{x}}}$ can be
 assigned the type ($\TyFunc{\TyNat}{\TyNat}$).
 
 \begin{center}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \infer
   {\infer{\vdots}{\epsilon\,, \ty{x}{\TyNat} \vdash \ty{\exprInc{\exprInc{x}}}{\TyNat}}}
   {\epsilon \vdash \ty{\exprLam{\exprInc{\exprInc{x}}}}{\TyFunc{\TyNat}{\TyNat}}}
 \end{minipage}\hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{Plus2Def}
 \end{minipage}
 \end{center}
 
 By using \IdrisType{Term} as an \ac{ir} in our compiler
-we will have made an entire class of invalid programs unrepresentable.
+we have made entire classes of invalid programs unrepresentable:
+it is impossible to form an ill scoped or ill typed term.
 %
 Indeed, trying to write an ill scoped or an ill typed program leads to a
 static error as demonstrated by the following \IdrisKeyword{failing} blocks\footnote{\Idris{} only accepts failing blocks if checking

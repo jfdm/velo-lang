@@ -1,6 +1,8 @@
 The design behind \Velo{} is purposefully unsurprising:
 %
-it is \emph{just} the \ac{stlc} extended with let-bindings, booleans and their conjunction, and natural numbers and their addition.
+it is the \ac{stlc} extended with let-bindings,
+booleans and their conjunction,
+and natural numbers and their addition.
 %
 To promote the idea of interactive editing \Velo{} also supports well-typed holes.
 %
@@ -30,13 +32,16 @@ double : Nat -> Nat
 
 \end{center}
 
-The \emph{featherweight} language design of \Velo{} helps us showcase better \emph{how} we can use dependently typed languages as language workbenches~\cite{DBLP:journals/toplas/IgarashiPW01}.
+The featherweight language design of \Velo{} helps us
+showcase better how we can use dependently typed languages
+as language workbenches~\cite{DBLP:journals/toplas/IgarashiPW01}.
 %
-Regardless of language complexity, \Velo{} is nonetheless a \emph{complete} language with a standard compiler pipeline, and \acs*{repl}.
+Regardless of language complexity, \Velo{} is nonetheless a
+complete language with a standard compiler pipeline, and \acs*{repl}.
 %
 A \ac{dsl} captures the language's concrete syntax, and a parser turns \ac{dsl} instances into raw unchecked terms.
 %
-Bidirectional type checking keeps type annotations to a minimun in the concrete syntax, and helps to better elaborate raw un-typed terms into a set of well-typed \acp{ir}:
+Bidirectional type checking keeps type annotations to a minimum in the concrete syntax, and helps to better elaborate raw un-typed terms into a set of well-typed \acp{ir}:
 %
 \IdrisType{Holey} to support well-scoped typed holes;
 %

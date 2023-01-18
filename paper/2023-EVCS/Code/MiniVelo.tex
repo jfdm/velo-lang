@@ -25,14 +25,14 @@ data SnocList a = Lin
 
 %<*ElemTermDecl>
 \begin{code}
-data Elem : (ctxt : SnocList a) -> (type : a) -> Type
-data Term : (ctxt : SnocList Ty) -> (type : Ty) -> Type
+data Elem : (gamma : SnocList ty) -> (a : ty) -> Type
+data Term : (gamma : SnocList Ty) -> (a : Ty) -> Type
 \end{code}
 %</ElemTermDecl>
 
 %<*ElemDecl>
 \begin{code}
-data Elem : (ctxt : SnocList a) -> (type : a) -> Type
+data Elem : (gamma : SnocList ty) -> (a : ty) -> Type
 \end{code}
 %</ElemDecl>
 \begin{code}
@@ -41,64 +41,64 @@ data Elem : (ctxt : SnocList a) -> (type : a) -> Type
 %<*varZero>
 \begin{code}
   Here : ----------------------
-          Elem (ctxt :< ty) ty
+          Elem (gamma :< ty) ty
 \end{code}
 %</varZero>
 
 \end{code}
 %<*varSuc>
 \begin{code}
-  There :  Elem ctxt ty ->
+  There :  Elem gamma ty ->
           ---------------------
-           Elem (ctxt :< _) ty
+           Elem (gamma :< _) ty
 \end{code}
 %</varSuc>
 
 \begin{code}
-data Term : (ctxt : SnocList Ty) -> (type : Ty) -> Type where
+data Term : (gamma : SnocList Ty) -> (type : Ty) -> Type where
 \end{code}
 
 %<*inferenceZero>
 \begin{code}
   Zero : ------------------
-          Term ctxt TyNat
+          Term gamma TyNat
 \end{code}
 %</inferenceZero>
 
 
 %<*inferenceVar>
 \begin{code}
-  Var :  Elem ctxt a ->
+  Var :  Elem gamma a ->
         --------------
-         Term ctxt a
+         Term gamma a
 \end{code}
 %</inferenceVar>
 
 
 %<*inferenceInc>
 \begin{code}
-  Inc :  Term ctxt TyNat ->
+  Inc :  Term gamma TyNat ->
         ------------------
-         Term ctxt TyNat
+         Term gamma TyNat
 \end{code}
 %</inferenceInc>
 
 
 %<*inferenceApp>
 \begin{code}
-  App :  Term ctxt (TyArr a b) ->
-         Term ctxt a ->
+  App :  Term gamma (TyArr a b) ->
+         Term gamma a ->
         ------------------------
-         Term ctxt b
+         Term gamma b
 \end{code}
 %</inferenceApp>
 
 
 %<*inferenceFunc>
 \begin{code}
-  Func :  Term (ctxt :< a) b ->
+  Func :  Term (gamma :< a) b ->
          ------------------------
-          Term ctxt (TyArr a b)
+          Term gamma (TyArr a b)
 \end{code}
 %</inferenceFunc>
 
@@ -112,7 +112,7 @@ Plus2 = Func (Inc (Inc (Var Here)))
 
 %<*IllScoped>
 \begin{code}
-failing "Mismatch between: ?ctxt :< TyNat and [<]."
+failing "Mismatch between: ?gamma :< TyNat and [<]."
 
   Ouch : Term [<] TyNat
   Ouch = Var Here
