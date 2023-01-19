@@ -1,0 +1,113 @@
+\documentclass[UKenglish,final,a4paper,oneside]{scrlttr2}
+
+\usepackage[protrusion=true, expansion=true]{microtype}
+\usepackage{isodate}
+\usepackage{csquotes}
+\usepackage[utf8]{inputenc}
+\usepackage{babel}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{relsize}
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage{fontawesome}
+\usepackage{xspace}
+
+\colorlet{mycolor}{teal}
+
+\hypersetup{%
+   colorlinks=true
+  ,linkcolor=mycolor
+  ,urlcolor=mycolor
+  ,citecolor=mycolor
+  }
+
+\usepackage[T1]{fontenc}
+
+\setkomavar{signature}{%
+Jan de Muijnck-Hughes, Guillaume Allais, and Edwin Brady.
+}
+
+\renewcommand*{\raggedsignature}{\raggedright}
+\setkomavar*{enclseparator}{\textbf{\textsf{\textcolor{mycolor}{Enclosed}}}}
+
+\makeatletter
+\@setplength{sigindent}{\parindent}
+\@setplength{toaddrvpos}{2cm}
+\@setplength{locvpos}{2cm}
+ \@setplength{refvpos}{1.5in}
+\@setplength{refvpos}{\useplength{toaddrvpos}}
+\@addtoplength{refvpos}{0.4\useplength{toaddrheight}}%
+\@setplength{sigbeforevskip}{0.2em}
+\@setplength{subjectbeforevskip}{0.5em}
+\@setplength{subjectaftervskip}{0.5em}
+\makeatother
+
+\addtokomafont{fromname}{\LARGE}
+\addtokomafont{fromaddress}{\sffamily\bfseries\color{gray}}
+\addtokomafont{subject}{\sffamily\color{mycolor}}
+\addtokomafont{toname}{\sffamily\color{mycolor}}
+\addtokomafont{toaddress}{\sffamily}
+
+\KOMAoptions{%
+  fromphone=false,
+  fromfax=false,
+  fromemail=false,
+  subject=afteropening,
+  foldmarks=false,
+  fromalign=right,
+  backaddress=false,
+  fromlogo=off,
+  firstfoot=off,
+  addrfield=topaligned,
+  parskip=half-,
+  pagenumber=off
+}
+\linespread{1.025}
+
+%% -- [ Begins Here ]
+
+%\setkomavar{yourref}{}
+\setkomavar{date}{\origdate\printdate{2023-01-19}}
+
+
+\begin{document}
+
+\begin{letter}[fontsize=11pt]%
+  {%
+    Programme Committee of the Eelco Visser Commemorative Symposium 2023
+  }
+  \setkomavar{subject}{Revisions to \enquote{Type Theory as a Language Workbench}}
+
+  \opening{To whom it may concern;}
+
+  Please find enclosed our revised manuscript for the Eelco Visser Commemorative Symposium 2023.
+
+  Our major changes sought to address the issue of accessibility as raised by the reviewer.
+  We detail the list of major changes below:
+
+  \begin{enumerate}
+    \item Added references to introductory texts, namely `Type-Driven Development in Idris 2'
+       and `Programming Languages Foundations in Agda', to provide readers with access to information on dependently typed programming and its use for reasoning about programming languages;
+     \item Revamped Section 3 to present side-by-side, and introduce, our language's mathematical formulation with the encoding as intrinsically scoped and typed terms in Idris 2, this will provide those not familiar with dependent types but familiar with programming language theory a reference point;
+     \item Added (counter)examples of well scoped and typed terms in the core language to highlight the benefits of the encoding;
+
+     \item Reduced the introductory example language in Section 3 to the STLC with natural numbers, so that all examples relating to the core intermediate representations are self-contained;
+
+     \item Added semantic highlighting to all Idris 2 code snippets to provide more meaning behind the presented Idris 2 code;
+
+     \item Provided full definitions and explanations for the \texttt{Elem}, \texttt{SnocList}, and \texttt{All} datatypes, and renamed \texttt{All} to \texttt{Terms} to better the narrative;
+  \end{enumerate}
+
+  We hope that the revisions are satisfactory for acceptance and await the committee's decision on final acceptance.
+
+\closing{Sincerely,}
+\encl{Amended paper}
+\end{letter}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
