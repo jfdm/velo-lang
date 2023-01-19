@@ -1,5 +1,11 @@
 #!/bin/bash -eux
 
+cat >>$HOME/.bashrc <<'EOF'
+export PATH=$HOME/.nix-profile/bin:$PATH
+EOF
+source $HOME/.bashrc
+
+
 echo "## Checking installation"
 
 which idris2
@@ -17,7 +23,7 @@ mv /tmp/velo "$HOME/velo"
 
 echo "## Testing Artifact"
 
-cd "$HOME/velo"
+cd "velo"
 
 make velo
 make velo-test-run

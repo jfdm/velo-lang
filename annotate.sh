@@ -21,7 +21,7 @@ find src -type f -iname "*.idr" -print0 |\
         FILE_LOCAL=${file#src/} # remove prefix
         FILE_ttm=${FILE_LOCAL%idr}ttm
         FILE_html=${FILE_LOCAL%idr}html
-        katla_run html "./${file}" "./build/ttc/${FILE_ttm}" "./build/html/${FILE_html}"
+        katla_run html "./${file}" ./build/ttc/*/"${FILE_ttm}" "./build/html/${FILE_html}"
     done
 
 # -- [ EOF ]

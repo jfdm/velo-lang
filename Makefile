@@ -51,25 +51,31 @@ ${PROJECT}-bench: ${PROJECT} ${PROJECT}-test-build
 
 #	$(HYPERFINE) --warmup 10 '${MAKE} ${PROJECT}-test-run'
 
-# [ Archive & Artefact ]
+# [ Artefact ]
 
-.PHONY: archive
+.PHONY: artefact
 
-archive:
+artefact: clobber velo doc
+
+# The Source Code Archive
 	git archive \
 	  --prefix=velo/ \
 	  --format=tar.gz \
 	  HEAD \
-	  src tests/ \
-	  CONTRIBUTORS COPYRIGHT LICENSE README.md emacs > artefact/velo.tar.gz
+	  > artefact/velo.tar.gz
 
+# Generate annotated sources
+	bash annotate.sh
+	tar -zcvf artefact/velo_html.tar.gz ${BUILDDIR}/html/
 
-artefact: ${PROJECT} archive doc
-	bash annotate.sh # generate annotated sources
-	tar -zcvf artefact/velo_html.tar.gz ${BUILDDIR}/html/ # annotated source
-	tar -zcvf artefact/velo_doc.tar.gz ${BUILDDIR}/docs/ # include docs
+# Generate IdrisDoc
+	tar -zcvf artefact/velo_doc.tar.gz ${BUILDDIR}/docs/
+
+# The Paper itself
 	${MAKE} -C paper/2023-EVCS paper.pdf
 	cp paper/2023-EVCS/__build/paper.pdf artefact/velo.pdf
+
+# The Artefact
 	${MAKE} -C artefact artefact
 
 # [ Housekeeping ]
