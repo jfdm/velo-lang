@@ -20,7 +20,7 @@ DEPENDS:=\
 
 all: paper.pdf
 
-build/ttc/*/%.ttm build/ttc/*/%.ttc: Code/%.tex
+build/ttc/*/%.ttm build/ttc/*/%.ttc: Code/%.idr
 	idris2 -c $^
 
 Code/%.idr.tex: Code/%.tex build/ttc/*/%.ttm build/ttc/*/%.ttc
