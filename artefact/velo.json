@@ -1,0 +1,38 @@
+{
+    "variables": {
+        "source_vm": "{{env `SOURCE_VM`}}"
+    },
+
+  "builders": [
+    {
+      "headless": true,
+      "shutdown_command": "echo 'idris-playground' | sudo -S poweroff",
+        "source_path": "{{user `source_vm`}}",
+      "ssh_password": "idris-playground",
+      "ssh_username": "idris-playground",
+      "type": "virtualbox-ovf"
+    }
+  ],
+  "post-processors": [
+    {
+      "compression_level": "8",
+      "keep_input_artifact": true,
+      "output": "output/velo.box",
+      "type": "vagrant"
+    }
+  ],
+  "provisioners": [
+    {
+      "destination": "/tmp/velo.tar.gz",
+        "source": "velo.tar.gz",
+      "type": "file"
+    },
+    {
+      "execute_command": "{{.Vars}} bash '{{.Path}}'",
+      "expect_disconnect": true,
+      "script": "scripts/load-code.sh",
+      "start_retry_timeout": "30m",
+      "type": "shell"
+    }
+  ]
+}

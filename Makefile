@@ -6,16 +6,20 @@
 PROJECT=velo
 IDRIS2=idris2
 
-TARGETDIR = ${CURDIR}/build/exec
+BUILDDIR = ${CURDIR}/build
+TARGETDIR = ${BUILDDIR}/exec
 TARGET = ${TARGETDIR}/${PROJECT}
 
 # [ Core Project Definition ]
 
-.PHONY: ${PROJECT} ${PROJECT}-test-build ${PROJECT}-test-run ${PROJECT}-test-run-re ${PROJECT}-test-update \
+.PHONY: ${PROJECT} doc ${PROJECT}-test-build ${PROJECT}-test-run ${PROJECT}-test-run-re ${PROJECT}-test-update \
        # ${PROJECT}-bench
 
 velo:
 	$(IDRIS2) --build ${PROJECT}.ipkg
+
+doc:
+	$(IDRIS2) --mkdoc ${PROJECT}.ipkg
 
 # To be activated once frontend is completed.
 
@@ -47,6 +51,26 @@ ${PROJECT}-bench: ${PROJECT} ${PROJECT}-test-build
 
 #	$(HYPERFINE) --warmup 10 '${MAKE} ${PROJECT}-test-run'
 
+# [ Archive & Artefact ]
+
+.PHONY: archive
+
+archive:
+	git archive \
+	  --prefix=velo/ \
+	  --format=tar.gz \
+	  HEAD \
+	  src tests/ \
+	  CONTRIBUTORS COPYRIGHT LICENSE README.md emacs > artefact/velo.tar.gz
+
+
+artefact: ${PROJECT} archive doc
+	bash annotate.sh # generate annotated sources
+	tar -zcvf artefact/velo_html.tar.gz ${BUILDDIR}/html/ # annotated source
+	tar -zcvf artefact/velo_doc.tar.gz ${BUILDDIR}/docs/ # include docs
+	${MAKE} -C paper/2023-EVCS paper.pdf
+	cp paper/2023-EVCS/__build/paper.pdf artefact/velo.pdf
+	${MAKE} -C artefact artefact
 
 # [ Housekeeping ]
 
@@ -61,5 +85,6 @@ clobber: clean
 	$(IDRIS2) --clean ${PROJECT}.ipkg
 	${MAKE} -C tests clobber
 	${RM} -rf build/
+	${RM} artefact/*.tar.gz
 
 # -- [ EOF ]
