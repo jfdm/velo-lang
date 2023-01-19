@@ -9,9 +9,7 @@ The weakest supported core criteria, unfortunately, is that for \emph{editor} su
 %
 Languages created through \Idris{} do not get an editor, they are free form languages which require their parsers and elaborators be hand written.
 This can change with future investigation.
-\Idris{} has support for elaborator reflection
-% ~\cite{DBLP:conf/icfp/ChristiansenB16} -- removed due to restrictions on bibliography.
-which provides a vehicle through which deriving parsers and elaborators can happen.
+\Idris{} has support for elaborator reflection~\cite{DBLP:conf/icfp/ChristiansenB16} which provides a vehicle through which deriving parsers and elaborators can happen.
 
 
 There are, however, more criteria from the language workbench feature model to consider:
@@ -54,7 +52,9 @@ This is a hard problem:
 %
 One has to not only combine their semantics but also the remainder of the workbench tooling.
 %
-The \emph{Effects} library~\cite{DBLP:conf/icfp/Brady13} provides clues as to how we can compose \acp{dsl} horizontally but not vertically.
+The \emph{language fragments} approach~\cite{10.1145/3563355} does provide a solution to language composability for intrinsically typed definitional interpreters, but this does not extend to workbench tooling.
+How the language fragments approach applied to our approach to realising semantics (based on inductive families) and also to creating composable workbench tooling is an open area of investigation.
+%The \emph{Effects} library~\cite{DBLP:conf/icfp/Brady13} provides clues as to how we can compose \acp{dsl} horizontally but not vertically .
 
 
 We strongly believe that with future engineering we can satisfy these missing criteria,
