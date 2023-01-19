@@ -2,7 +2,8 @@
 \label{sec:design:deBruijn}
 
 A common strategy for implementing well-scoped terms is to use typed
-\emph{\DeBruijn{}} indices~\cite{MANUAL:journals/math/debruijn72}, which are easily realised as an inductive family~\cite{DBLP:journals/fac/Dybjer94}
+\emph{\DeBruijn{}} indices~\cite{MANUAL:journals/math/debruijn72},
+which are easily realised as an inductive family~\cite{DBLP:journals/fac/Dybjer94}
 indicating where in the type-level context the variable is bound.
 
 Concretely, we index the \IdrisType{Elem} family by a context
@@ -52,7 +53,7 @@ every \IdrisType{Elem} proof is linear in the size of the \DeBruijn{}
 index that it represents.
 %
 To improve the runtime efficiency of the representation we instead opt to
-model \DeBruijn{} indices as natural numbers, which \Idris{} will compile to
+model \DeBruijn{} indices as natural numbers, which \Idris{} compiles to
 GMP-style unbounded integers.
 %
 Further, we need to additionally define an \IdrisType{AtIndex} family to ensure that

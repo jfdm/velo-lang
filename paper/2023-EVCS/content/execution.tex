@@ -39,7 +39,9 @@ is therefore allowed to take a step.
 
 \ExecuteMetaData[Code/MiniExecute.idr.tex]{ReducesDef}
 
-We differ, however, from standard approaches by genericsing our proofs of progress such that the boilerplate for computing the reflexive transitive closure when reducing terms is tidied away in a shareable module.
+We differ, however, from standard approaches by making our proofs of progress generic
+such that the boilerplate for computing the reflexive transitive closure
+when reducing terms is tidied away in a shareable module.
 %
 Our top-level progress definition is thus parameterised by reduction and value definitions:
 
@@ -52,7 +54,9 @@ reflexive-transitive closure):
 
 \ExecuteMetaData[Code/MiniExecute.idr.tex]{ResultDef}
 
-The benefit of our approach is that language designers need only to provide details of what reductions are, and how to compute a single reduction, the rest comes for free.
+The benefit of our approach is that language designers need only provide details of
+what reductions are,
+and how to compute a single reduction, the rest comes for free.
 %
 Moreover, with the result of evaluation we also get the list of reduction steps made that can, optionally, be printed to show a trace of execution.
 

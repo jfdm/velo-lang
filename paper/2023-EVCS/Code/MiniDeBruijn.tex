@@ -6,8 +6,8 @@ module Code.MiniDeBruijn
 \begin{code}
 data AtIndex : (ty : kind) -> (ctxt : SnocList kind) ->
                (idx : Nat) -> Type where
-  Here : AtIndex ty (ctxt :< ty) Z
-  There : AtIndex ty ctxt idx -> AtIndex ty (ctxt :< _) (S idx)
+  Here : AtIndex ty (ctxt :< ty) 0
+  There : AtIndex ty ctxt idx -> AtIndex ty (ctxt :< _) (1 + idx)
 \end{code}
 %</AtIndexDef>
 
