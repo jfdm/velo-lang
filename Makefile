@@ -66,10 +66,10 @@ artefact: clobber velo doc
 
 # Generate annotated sources
 	bash annotate.sh
-	tar -zcvf artefact/velo_html.tar.gz ${BUILDDIR}/html/
+	tar -zcvf artefact/velo_html.tar.gz build/html/
 
 # Generate IdrisDoc
-	tar -zcvf artefact/velo_doc.tar.gz ${BUILDDIR}/docs/
+	tar -zcvf artefact/velo_doc.tar.gz build/docs/
 
 # The Paper itself
 	${MAKE} -C paper/2023-EVCS paper.pdf

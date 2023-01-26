@@ -8,7 +8,7 @@ We argue yes!
 
 We have developed an exemplar DSL called Velo that showcases not only dependently typed techniques to realise and manipulate _Intermediate Representations_ (IRs), but that dependently typed languages make fine language workbenches.
 Velo is a simple verified language with well-typed holes and comes with a complete compiler pipeline: parser, elaborator, REPL, evaluator, and compiler passes.
-Specifically, our paper describes our design choices for well-typed \acs*{ir} design that includes support for well-typed holes, how common sub-expression elimination is achieved in a well-typed setting, and how the mechanised type-soundness proof for Velo is the source of the evaluator.
+Specifically, our paper describes our design choices for well-typed IR design that includes support for well-typed holes, how common sub-expression elimination is achieved in a well-typed setting, and how the mechanised type-soundness proof for Velo is the source of the evaluator.
 
 This artefact presents our implementation of Velo (as realised in Idris2), and the test suite used.
 
