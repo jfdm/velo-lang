@@ -54,7 +54,13 @@ extended on the right with a new type assignment (\ty{x}{t}) using a comma.
 In \Idris{}, we will adopt a nameless representation and so we represent
 these contexts by using a \IdrisData{SnocList} of types
 (i.e.\ lists that grow on the right).
-
+%
+Note that the \Idris{} compiler automatically supports sugar for lists and
+snoc lists: \IdrisData{[1,2,3]} represents a list counting up from
+\IdrisData{1} to \IdrisData{3} while \IdrisData{[<1,2,3]} is its snoc list
+pendant counting down.
+%
+In particular \IdrisData{[<]} denotes the empty snoc list also known as \IdrisData{Lin}.
 
 \begin{center}
 \begin{minipage}{0.35\textwidth}
