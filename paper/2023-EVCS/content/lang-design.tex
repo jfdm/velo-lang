@@ -20,7 +20,7 @@ two base types (\TyNat, and \TyBool) and a type former for function types
 (\TyFunc{\cdot}{\cdot}).
 %
 On the right hand side, we give their internal representation as an inductive
-type in \Idris{}
+type in \Idris{}.%
 \footnote{
 Throughout this article, the \Idris{} code snippets are
 automatically rendered using a semantic highlighter.
@@ -31,7 +31,7 @@ data constructors in \IdrisData{red},
 function definitions in \IdrisFunction{green},
 bound variables in \IdrisBound{purple},
 and comments in \IdrisComment{grey}.
-}.
+}
 
 \begin{center}
 \begin{minipage}{0.45\textwidth}
@@ -196,8 +196,9 @@ we have made entire classes of invalid programs unrepresentable:
 it is impossible to form an ill scoped or ill typed term.
 %
 Indeed, trying to write an ill scoped or an ill typed program leads to a
-static error as demonstrated by the following \IdrisKeyword{failing} blocks\footnote{\Idris{} only accepts failing blocks if checking
-their content yields an error matching the given string.}.
+static error as demonstrated by the following \IdrisKeyword{failing} blocks.%
+\footnote{\Idris{} only accepts failing blocks if checking
+their content yields an error matching the given string.}
 %
 In this first example we try to refer to a variable in an empty context.
 \Idris{} correctly complains that this is not possible.
