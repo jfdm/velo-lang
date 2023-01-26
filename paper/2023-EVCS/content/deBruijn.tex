@@ -10,14 +10,14 @@ Concretely, we index the \IdrisType{Elem} family by a context
 (once again represented as a \IdrisType{SnocList} of kinds) and
 the kind of the variable it represents.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.10\textwidth}
 \varRule
 \end{minipage}\hfill
 \begin{minipage}{0.80\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{ElemDecl}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 We then match each context membership inference rule to a constructor.
 %
@@ -25,25 +25,25 @@ The \IdrisData{Here} constructor indicates that the variable of interest is
 the most local one in scope (note the non-linear occurence of (\ty{x}{a}) on
 the left hand side, and correspondingly of \IdrisBound{ty} on the right).
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.35\textwidth}
   \varZero
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{varZero}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 The \IdrisData{There} constructor skips past the most local variable to look for the variable of interest deeper in the context.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.35\textwidth}
   \varSuc
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{varSuc}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 
 Whilst a valid definition, this approach unfortunately does not scale to

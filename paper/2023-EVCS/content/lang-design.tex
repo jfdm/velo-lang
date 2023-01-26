@@ -38,14 +38,14 @@ bound variables in \IdrisBound{purple},
 and comments in \IdrisComment{grey}.
 }
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.45\textwidth}
 \syntaxtypes
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{TyDef}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 \textbf{Contexts} can be similarly given by a context free grammar:
 a context is either empty ($\epsilon$), or an existing context ($\Gamma$)
@@ -62,14 +62,14 @@ pendant counting down.
 %
 In particular \IdrisData{[<]} denotes the empty snoc list also known as \IdrisData{Lin}.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.35\textwidth}
 \syntaxcontexts
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{SnocListDef}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 \todo{play with spaces, reread descriptions}
 
@@ -85,7 +85,7 @@ On the left hand side we present two judgements: context membership
 and a typing judgement, and on the right we have the corresponding
 inductive family declarations.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.10\textwidth}
 \varRule
 \inferenceRule
@@ -93,7 +93,7 @@ inductive family declarations.
 \begin{minipage}{0.80\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{ElemTermDecl}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 We leave the definition of \IdrisType{Elem} to the next section,
 focusing instead on \IdrisType{Term}.
@@ -107,14 +107,14 @@ a way that they resemble the corresponding inference rule.
 Here we show the rule stating that $0$ is a natural number and
 its translation as the \IdrisData{Zero} constructor.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.45\textwidth}
 \inferenceZero
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceZero}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 Then come typing rules with a single premise which is not a subderivation
 of the relation itself.
@@ -124,14 +124,14 @@ Here we show the typing rule for variables: given a proof that we have a
 variable of type $a$ somewhere in the context, we can build a term of type
 $a$ in said context.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.45\textwidth}
 \inferenceVar
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceVar}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 Next, we have typing rules with a single premise which is a subderivation.
 They are mapped to constructors with a single argument of the inductive family
@@ -141,14 +141,14 @@ Here we show the typing rule for successor: provided that we are given
 a natural number in a given context, its successor is also a natural
 number in the same context.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.45\textwidth}
 \inferenceInc
 \end{minipage}\hfill
 \begin{minipage}{0.45\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceInc}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 Similarly, rules with two premises are translated to constructors
 with two arguments, one for each subderivation.
@@ -161,27 +161,27 @@ Note that the context $\Gamma$ is the same across the whole rule and
 so the same \IdrisBound{gamma} is used everywhere.
 
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.35\textwidth}
 \inferenceApp
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceApp}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 Finally, we have a rule where the premise's context has been extended:
 a function of type (\TyFunc{a}{b}) is built by providing a term
 of type $b$ defined in a context extended with a new variable of type $a$.
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.35\textwidth}
 \inferenceFunc
 \end{minipage}\hfill
 \begin{minipage}{0.55\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{inferenceFunc}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 Using this intrinsically typed representation, we can readily represent
 entire typing derivations.
@@ -193,7 +193,7 @@ presents the internal representation
 $\exprLam{\exprInc{\exprInc{x}}}$ can be
 assigned the type ($\TyFunc{\TyNat}{\TyNat}$).
 
-\begin{center}
+\begin{centertight}
 \begin{minipage}{0.4\textwidth}
 \infer
   {\infer{\vdots}{\epsilon\,, \ty{x}{\TyNat} \vdash \ty{\exprInc{\exprInc{x}}}{\TyNat}}}
@@ -202,7 +202,7 @@ assigned the type ($\TyFunc{\TyNat}{\TyNat}$).
 \begin{minipage}{0.5\textwidth}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{Plus2Def}
 \end{minipage}
-\end{center}
+\end{centertight}
 
 By using \IdrisType{Term} as an \ac{ir} in our compiler
 we have made entire classes of invalid programs unrepresentable:
@@ -216,18 +216,13 @@ their content yields an error matching the given string.}
 In this first example we try to refer to a variable in an empty context.
 \Idris{} correctly complains that this is not possible.
 
-\begin{center}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{IllScoped}
-\end{center}
 
 In this second example we try to type the identity function as a function
 from \TyNat to \TyBool. This is statically rejected as nonsensical:
 \IdrisData{TyNat} and \IdrisData{TyBool} are distinct constructors!
 
-\begin{center}
 \ExecuteMetaData[Code/MiniVelo.idr.tex]{IllTyped}
-\end{center}
-
 
 \noindent
 Using such intrinsically typed \acp{edsl} we can statically enforce that

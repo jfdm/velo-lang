@@ -61,6 +61,9 @@
 
 \relatedversion{}
 
+\supplementdetails[
+subcategory={Artifact}
+]{Software}{TODO}
 % \supplement{}
 % optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
 % \supplementdetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93, subcategory={Description, Subcategory}, swhid={Software Heritage Identifier}]{General Classification (e.g. Software, Dataset, Model, ...)}{URL to related version}
@@ -159,6 +162,12 @@
     ,frame=lines
   }
 
+  % Does not work for Verbatim things, or grahpics.
+\NewEnviron{centertight}[1][0.5em]
+{\vspace{#1}
+ {\centering\BODY}
+ \vspace{#1}
+}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "paper"
