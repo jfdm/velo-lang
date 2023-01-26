@@ -4,10 +4,15 @@ realising the static semantics of \Velo{} within \Idris{}.
 We have opted to give \Velo{} an external concrete syntax (a \ac{dsl})
 in which users can write their programs.
 %
-With dependently typed languages, however, we can also capture
+With dependently typed languages we can also capture
 the abstract syntax and its static semantics as an intrinsically
 scoped and typed \ac{edsl}
 directly within the host language~\cite{Augustsson1999edt}.
+%
+That is to say that the data structure is designed in such a way that
+we can only represent well scoped and well typed terms and, correspondingly,
+that our scope- and type- checking passes are guaranteed to have rejected
+invalid user inputs.
 %
 To keep the exposition concise, we focus on a core subset of the
 language. The interested reader can find the whole definition
