@@ -186,7 +186,9 @@ of type $b$ defined in a context extended with a new variable of type $a$.
 Using this intrinsically typed representation, we can readily represent
 entire typing derivations.
 %
-The following example presents the internal representation
+The following example\footnote{\IdrisData{Here} will be defined in
+Section~\ref{sec:design:deBruijn} as a constructor for the \IdrisType{Elem} family.}
+presents the internal representation
 \IdrisFunction{Plus2} of the derivation proving that
 $\exprLam{\exprInc{\exprInc{x}}}$ can be
 assigned the type ($\TyFunc{\TyNat}{\TyNat}$).
