@@ -4,7 +4,6 @@
 
 A tiny language to explore efficient verified implementations of functional languages in Idris2.
 
-
 ## Artefact
 
 We also include scripts to generate a reproducible artefact.
@@ -12,6 +11,8 @@ We also include scripts to generate a reproducible artefact.
 Please consult the following project to generate the base virtual box image required, and how we approach the building of the artefact.
 
 https://github.com/jfdm/packer-idris
+
+You will also need to have working installations of [Katla](https://github.com/idris-community/katla) to facilitate source code highlighting.
 
 Once you have generated the image you can generate the artefact as follows:
 
@@ -26,3 +27,6 @@ This will generate in `artefact` the following files:
 3. `velo_doc.tar.gz` :: A copy of the IdrisDoc for the coding project;
 4. `velo_html.tar.gz` :: A copy of the katla generated html showing semantically highlighted code;
 4. `velo.pdf` :: A copy of the submitted paper;
+
+
+<!-- EOF -->

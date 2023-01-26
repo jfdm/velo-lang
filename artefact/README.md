@@ -1,12 +1,20 @@
 # Type-Theory as a Language Workbench
 
-<!-- TODO Add blurb -->
+Language Workbenches offer language designers an expressive environment in which to create their _Domain Specific Languages_ (DSLs).
+Similarly, research into mechanised meta-theory has shown how dependently typed languages provide expressive environments to formalise and study DSLs and their meta-theoretical properties.
+But can we claim that dependently typed languages qualify as language workbenches?
+We argue yes!
 
-This artefact comprises of the proof-of-concept language (as realised in Idris2), and the test suite used.
+
+We have developed an exemplar DSL called Velo that showcases not only dependently typed techniques to realise and manipulate _Intermediate Representations_ (IRs), but that dependently typed languages make fine language workbenches.
+Velo is a simple verified language with well-typed holes and comes with a complete compiler pipeline: parser, elaborator, REPL, evaluator, and compiler passes.
+Specifically, our paper describes our design choices for well-typed \acs*{ir} design that includes support for well-typed holes, how common sub-expression elimination is achieved in a well-typed setting, and how the mechanised type-soundness proof for Velo is the source of the evaluator.
+
+This artefact presents our implementation of Velo (as realised in Idris2), and the test suite used.
 
 ## Manifest
 
-The artefact is approx. 300M in size.
+The artefact is approx. 400MB in size.
 
 Specifically the obtained archive contains the following:
 
@@ -14,13 +22,15 @@ Specifically the obtained archive contains the following:
 2. `velo.tar.gz` :: A copy of Velo's source code, and generated IdrisDoc;
 3. `velo_doc.tar.gz` :: A copy of the IdrisDoc for the coding project;
 4. `velo_html.tar.gz` :: A copy of the katla generated html showing semantically highlighted code;
-4. `velo.pdf` :: A copy of the submitted paper;
+4. `velo.pdf` :: A copy of the submitted paper as an ePrint;
 
 ## About the Submission
 
-Our paper describes the realisation of LightClick as both an *Embedded Domain Specific Language* (EDSL) and *Domain Specific Language* (DSL) in Idris2.
+Our paper describes the realisation of LightClick as both an *Embedded Domain Specific Language* (EDSL) and DSL in Idris2.
 We follow standard constructions and idioms for working with the Idris family of languages and present a self-contained coding project.
-Instructions are provided in `INSTALL.org` to build/test the project, together with information on how to obtain Idris2 and the version required.
+Instructions are provided in `INSTALL.md` to build/test the project, together with information on how to obtain Idris2 and the version required.
+
+We also provide a simple emacs mode for working with Velo programs, instructions to build the artefact, and raw copies of the submitted paper.
 
 ## Mechanisation
 
@@ -30,15 +40,34 @@ The source code is divided into three main module hierarchies:
 
 The module `Toolkit` contains helper code and constructs required for developing Velo.
 
+Of interest is the sub-modules `CoDeBruijn` and `DeBruijn` that provide library support (renaming, substitution, binding, contexts for typing and evaluation, progress, and evaluation) for building verified compilers for DSLs that we use for Velo.
+
 ### Velo
 
-+ `Velo.Terms`
+The module `Velo` captures our implementation.
+Of specific interest are the modules:
 
-  + ...
++ `Velo.IR` contains are definitions and helper functions for each IR in the Velo pipeline, and our types are defined in `Velo.Types`.
 
-+
++ `Velo.Elaborator` and `Velo.Unelaboration` that elaborates between inputting IR (`AST`) and core IR (`Term`).
 
-### Exemplars
++ Evaluation of terms to values is detailed across `Velo.Values`, `Velo.Semantics`
+
++ Our compiler passes are captured in `Velo.Pass`.
+
++ `Velo.Pipeline` & `Velo.REPL` provide the core compiler pipeline and interactive command prompt, where `Velo.Core` (and `Velo.Error`) detail the core computation contexts and erros.
+
++ `Velo.Commands` & `Velo.Options` defines commands for user interaction.
+
++ `Velo.Trace` details pretty printing of terms.
+
++ Parsing support is presented in `Velo.Parser`, `Velo.Lexer`
+
+### PoC
+
+`PoC` contains proof of concept code that we developed prior to folding the ideas into `Velo`.
+
+## Exemplars
 
 We provide a test suite containing sample Velo code.
 
