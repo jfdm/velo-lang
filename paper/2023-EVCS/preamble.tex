@@ -159,6 +159,12 @@
     ,frame=lines
   }
 
+  % Does not work for Verbatim things, or grahpics.
+\NewEnviron{centertight}[1][0.5em]
+{\vspace{#1}
+ {\centering\BODY}
+ \vspace{#1}
+}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "paper"
