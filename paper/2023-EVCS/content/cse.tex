@@ -15,7 +15,7 @@ In the following example for instance, we would like to let-bind $t$ before the 
   \cseexamplegraph{}
 \end{center}
 
-One of the challenges of \ac{cse}, as exemplified above, is that the term of interest may be burried deep inside separate contexts.
+One of the challenges of \ac{cse}, as exemplified above, is that the term of interest may be buried deep inside separate contexts.
 %
 In our intrinsically scoped representation, $t$ in scope
 $\Gamma,\, \ty{x}{\sigma}$ is potentially not actually
@@ -74,7 +74,7 @@ Using a co-\DeBruijn{} representation, we can identify shared subterms:
 %
 they need to not be mentioning any of the most local variables and be syntactically equal.
 %
-Our pass succesfully transforms the program on the left-hand side to the one
+Our pass successfully transforms the program on the left-hand side to the one
 on the right-hand side where the repeated expressions \texttt{(add m n)}
 and \texttt{(add n m)} have been let-bound.
 
