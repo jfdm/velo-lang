@@ -1,0 +1,340 @@
+% ------------------------------------------------------------- [ gla-tikz.sty ]
+% Module    : gla-tikz.sty
+% Copyright : (c) Jan de Muijnck-Hughes
+% License   : see LICENSE
+% Version   : v2016.03.09
+% ---------------------------------------------------------------------- [ EOH ]
+%%
+%% Useful aides for doing tikz diagrams.
+%%
+% ------------------------------------------------------------------------- [  ]
+\ProvidesPackage{gla-tikz}
+
+\RequirePackage{gla-colours}
+\RequirePackage{tikz}
+
+%% --------------------------------------------------------------- [ Libraries ]
+
+\usetikzlibrary{shapes.symbols}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.arrows}
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{trees}
+\usetikzlibrary{scopes}
+\usetikzlibrary{arrows}
+\usetikzlibrary{matrix}
+\usetikzlibrary{chains}
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
+
+% ------------------------------------------------------------------- [ Layers ]
+
+\pgfdeclarelayer{background layer}
+\pgfdeclarelayer{foreground layer}
+\pgfsetlayers{background layer,main,foreground layer}
+
+
+%% ----------------------------------------------------------------- [ Colours ]
+
+%% White
+\tikzstyle{WhiteBody} = [%
+    fill=white
+  , draw=black
+  , font=\sffamily
+  , text=black
+  ]
+
+\tikzstyle{BlackTitle} = [%
+    rounded corners
+  , font=\bfseries\sffamily
+  , text=white
+  , fill=black
+  ]
+
+%% Grey
+\tikzstyle{GrayBody} = [%
+    fill=gla-slate!30
+  , draw=black
+  , font=\sffamily\color{black}
+  ]
+
+\tikzstyle{GrayTitle} = [%
+    rounded corners
+  , font=\bfseries\sffamily
+  , text=white
+  , fill=black
+  ]
+
+%% Burgundy
+\tikzstyle{BurgundyBody} = [%
+    draw=gla-burgundy
+  , fill=gla-burgundy!30
+  , font=\sffamily\color{gla-burgundy}
+  ]
+
+\tikzstyle{BurgundyTitle} = [%
+    rounded corners
+  , font=\bfseries\sffamily
+  , text=white
+  , fill=gla-burgundy
+  ]
+
+%% Purple
+\tikzstyle{PurpleBody} = [%
+    draw=gla-heather
+  , fill=gla-heather!20
+  , font=\sffamily\color{gla-heather}
+  ]
+
+\tikzstyle{PurpleTitle} = [%
+    rounded corners
+  , font=\bfseries\sffamily
+  , text=white
+  , fill=gla-heather
+  ]
+
+%% Blue
+\tikzstyle{BlueBody} = [%
+    fill=gla-blue!20
+  , draw=gla-blue
+  , font=\sffamily\color{gla-blue}
+  ]
+
+\tikzstyle{BlueTitle} = [%
+    rounded corners
+  , font=\bfseries\sffamily
+  , text=white
+  , fill=gla-blue
+  ]
+
+%% Orange
+\tikzstyle{OrangeBody} = [%
+    fill=gla-pumpkin!20
+  , draw=gla-pumpkin!60!black
+  , font=\sffamily\color{gla-pumpkin!60!black}
+  ]
+
+\tikzstyle{OrangeTitle} = [%
+    rounded corners
+  , font=\bfseries\sffamily
+  , text=white
+  , fill=gla-pumpkin!60!black
+  ]
+
+%% Green
+\tikzstyle{GreenBody} = [%
+    fill=gla-forest!20
+  , draw=gla-forest
+  , font=\sffamily\color{gla-forest}
+  ]
+
+\tikzstyle{GreenTitle} = [%
+    rounded corners
+  , font=\bfseries\sffamily
+  , text=white
+  , fill=gla-forest
+  ]
+
+% ----------------------------------------------------------- [ Paths & Labels ]
+
+%% Path
+\tikzstyle{SmallLabel} = [font=\sffamily\small]
+\tikzstyle{ThickLine}  = [->, ultra thick]
+\tikzstyle{Label}      = [font=\footnotesize]
+
+% ----------------------------------------------------------- [ Shapes & Nodes ]
+
+\tikzstyle{BaseMatrix} = [%
+    nodes in empty cells,
+    column sep = 5pt, row sep=5pt
+]
+
+%% Styles for Matrices
+\tikzstyle{BasicMatrix} = [%
+    BaseMatrix, matrix of nodes
+  ]
+
+
+\tikzstyle{BasicMathMatrix} = [%
+    BaseMatrix, matrix of math nodes
+  ]
+
+%% Rectangle Styles
+
+\tikzstyle{BasicBox} = [%
+    rectangle
+  , rounded corners
+  , minimum width = 5mm
+  , minimum height = 5mm
+  , very thick
+  , text centered
+  ]
+
+\tikzstyle{Box} = [%
+    BasicBox
+  , minimum width = 10mm
+  , minimum height = 5mm
+  , inner xsep = 5pt
+  , inner ysep = 10pt
+  , text width = 20mm
+  ]
+
+\tikzstyle{BorderBox} = [%
+    BasicBox
+  , draw
+  , very thick
+  , inner sep = 10pt
+  , inner ysep = 15pt
+  ]
+
+\tikzstyle{LargeBorderBox} = [%
+    BasicBox
+  , dotted
+  , very thick
+  , inner xsep = 20pt
+  , inner ysep = 25pt
+  ]
+
+\tikzstyle{BoundingBox} = [%
+    PicFrame
+  , dotted
+  , inner sep=10pt
+  , inner ysep=15pt
+  ]
+
+%% Frames
+
+\tikzstyle{Frame} = [%
+    rectangle
+  , minimum width = 10mm
+  , minimum height = 15mm
+  ]
+
+\tikzstyle{PicFrame} = [%
+    BasicBox
+  , minimum width = 20mm
+  , minimum height = 15mm
+  , text width = 25mm
+  , inner xsep = 5pt
+  ]
+
+%% Circles
+
+\tikzstyle{BasicCircle} = [%
+    circle
+  , minimum width = 5mm
+  , minimum height = 5mm
+  , very thick
+  , text centered
+  ]
+
+
+%% Cylinders
+\tikzstyle{DB} = [%
+    cylinder
+  , very thick
+  , text centered
+  , aspect=0.25
+  , shape border rotate=90
+  , minimum height=15mm
+  , minimum width=10mm
+  ]
+
+%% Triangles
+\tikzstyle{EqTriangle} = [%
+    rounded corners
+  , very thick
+  , isosceles triangle
+  , minimum height = 3mm
+  , minimum width = 3mm
+  , isosceles triangle apex angle = 90
+  , isosceles triangle stretches
+  , rotate = 45
+  ]
+
+% -------------------------------------------------------- [ Better Rectangles ]
+
+% The current anchors for rectangles are great but not sufficient. The
+% following code adapted from the below sources adds more cardinal
+% points as anchors.
+
+% https://tex.stackexchange.com/questions/164409/add-more-anchors-to-standard-tikz-nodes-with-tikz-3-0
+% https://tex.stackexchange.com/questions/14769/add-more-anchors-to-standard-tikz-nodes
+
+\long\def\pgfshapeaddanchor#1#2{%
+{%
+  \def\pgf@sm@shape@name{#1}%
+  \let\anchor=\pgf@sh@anchor%
+  #2}%
+}
+
+\pgfshapeaddanchor{rectangle}{%
+
+  \anchor{west south west}{%
+    \pgf@process{\northeast}%
+    \pgf@ya=.5\pgf@y%
+    \pgf@process{\southwest}%
+    \pgf@y=1.5\pgf@y%
+    \advance\pgf@y by \pgf@ya%
+    \pgf@y=.5\pgf@y%
+  }%
+  \anchor{west north west}{%
+    \pgf@process{\northeast}%
+    \pgf@ya=1.5\pgf@y%
+    \pgf@process{\southwest}%
+    \pgf@y=.5\pgf@y%
+    \advance\pgf@y by \pgf@ya%
+    \pgf@y=.5\pgf@y%
+  }%
+  \anchor{east north east}{%
+    \pgf@process{\southwest}%
+    \pgf@ya=.5\pgf@y%
+    \pgf@process{\northeast}%
+    \pgf@y=1.5\pgf@y%
+    \advance\pgf@y by \pgf@ya%
+    \pgf@y=.5\pgf@y%
+  }%
+  \anchor{east south east}{%
+    \pgf@process{\southwest}%
+    \pgf@ya=1.5\pgf@y%
+    \pgf@process{\northeast}%
+    \pgf@y=.5\pgf@y%
+    \advance\pgf@y by \pgf@ya%
+    \pgf@y=.5\pgf@y%
+  }%
+  \anchor{north north west}{%
+    \pgf@process{\southwest}%
+    \pgf@xa=1.5\pgf@x%
+    \pgf@process{\northeast}%
+    \pgf@x=.5\pgf@x%
+    \advance\pgf@x by \pgf@xa%
+    \pgf@x=.5\pgf@x%
+  }%
+  \anchor{north north east}{%
+    \pgf@process{\southwest}%
+    \pgf@xa=.5\pgf@x%
+    \pgf@process{\northeast}%
+    \pgf@x=1.5\pgf@x%
+    \advance\pgf@x by \pgf@xa%
+    \pgf@x=.5\pgf@x%
+  }%
+  \anchor{south south west}{%
+    \pgf@process{\northeast}%
+    \pgf@xa=.5\pgf@x%
+    \pgf@process{\southwest}%
+    \pgf@x=1.5\pgf@x%
+    \advance\pgf@x by \pgf@xa%
+    \pgf@x=.5\pgf@x%
+  }%
+  \anchor{south south east}{%
+    \pgf@process{\northeast}%
+    \pgf@xa=1.5\pgf@x%
+    \pgf@process{\southwest}%
+    \pgf@x=.5\pgf@x%
+    \advance\pgf@x by \pgf@xa%
+    \pgf@x=.5\pgf@x%
+  }%
+}
+% ---------------------------------------------------------------------- [ EOS ]
+\endinput
+% ---------------------------------------------------------------------- [ EOF ]

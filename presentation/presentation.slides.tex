@@ -1,0 +1,171 @@
+\documentclass[pdftex,british,final,infofoot, aspectratio=169]{slidedeck}
+
+\usepackage{gla-tikz}
+\makeatletter
+
+% larger fonts
+\newcommand\HUGE{\@setfontsize\Huge{50}{60}}
+
+% For tikz matrices in beamer
+\global\let\tikz@ensure@dollar@catcode=\relax
+\makeatother
+
+
+\title{Type-Theory as a Language Workbench}
+\author[Jan de Muijnck-Hughes \and Guillaume Allais \and Edwin Brady]{\underline{Jan de Muijnck-Hughes} \and Guillaume Allais \and Edwin Brady}
+\titlegraphic
+{%
+  \includegraphics[keepaspectratio,scale=0.8]{gla}
+  \hfill
+  \includegraphics[keepaspectratio,scale=1.8]{sta}%
+}
+
+\date[EVCS '23]{\origdate\printdate{2023-04-05}}
+
+%\bibliography{biblio.bib}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]{A Quest: Implement a Simple Language}
+  \begin{columns}
+    \begin{column}{0.2\textwidth}
+      \centering
+      \HUGE\faUserTie
+      \\
+      \Huge\noticeBF{Master}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+\begin{Verbatim}
+   let b = false
+in let double
+         = (fun x : nat => (add x x))
+in let x = (double ?hole)
+in         (double ?hole)
+\end{Verbatim}
+
+        \begin{block}{Velo}
+          \begin{multicols}{2}
+            \begin{itemize}
+            \item STLC
+            \item Let-Bindings
+            \item Booleans
+            \item Natural Numbers
+            \end{itemize}
+          \end{multicols}
+        \end{block}
+
+    \end{column}
+    \begin{column}{0.2\textwidth}
+      \centering
+      \HUGE\faUserNinja
+      \\
+      \Huge\noticeBF{Novice}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Well\ldots}
+  \begin{columns}
+    \begin{column}{0.3\textwidth}
+      \begin{center}
+        \includegraphics[keepaspectratio,height=0.5\textheight]{visser}
+        \\
+        \Huge\noticeBF{The Expert}
+      \end{center}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{tikzpicture}
+        \node (c) {\includegraphics[width=\columnwidth,keepaspectratio]{spoofax}};
+        \node (d) [above = of c, OrangeTitle] {Description};
+        \node (i) [below = of c, OrangeTitle] {Implementation};
+
+        \foreach \s/\t in {d/c,c/i}{%
+          \draw [ThickLine] (\s) to (\t);
+        }
+      \end{tikzpicture}
+        \begin{center}
+
+        \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{A Language Workbench provides\ldots}
+
+  \begin{center}
+    \begin{tikzpicture}[ampersand replacement=\&]
+      \matrix [BasicMatrix, every node/.style={PicFrame,PurpleTitle}]
+      { Notation \& Semantics \& Editor Support\\
+        Validation \& Testing \& Composability \\
+      };
+
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Enter the Dragon}
+  \begin{columns}
+    \begin{column}{0.3\textwidth}
+      \begin{center}
+        \includegraphics[keepaspectratio,height=0.5\textheight]{edwin}
+        \\
+        \Huge\noticeBF{Man in Pub}
+      \end{center}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{tikzpicture}
+        \node (c) {\includegraphics[width=0.8\columnwidth,keepaspectratio]{idris}};
+        \node (d) [above = of c, OrangeTitle] {Description};
+        \node (i) [below = of c, OrangeTitle] {Implementation};
+
+        \foreach \s/\t in {d/c,c/i}{%
+          \draw [ThickLine] (\s) to (\t);
+        }
+      \end{tikzpicture}
+        \begin{center}
+
+        \end{center}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{A Dependently-Typed Language provides\ldots}
+
+  \begin{center}
+    \begin{tikzpicture}[ampersand replacement=\&]
+      \matrix [BasicMatrix, every node/.style={PicFrame,PurpleTitle}]
+      { Notation \& Semantics \& Editor Support\\
+        Validation \& Testing \& Composability \\
+      };
+
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+
+  \begin{center}
+    \huge\structure{Type Theory} \noticeBF{is a} \structure{Language Workbench}
+  \end{center}
+
+  \begin{center}
+    \url{https://github.com/jfdm/velo-lang}
+  \end{center}
+
+\end{frame}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
