@@ -1,8 +1,7 @@
 *.idr.tex
 cover-letter.pdf
 paper.*.synctex.gz
-paper.pdf
-paper.*.pdf
+presentation*.pdf
 *draft.pdf
 *blind.*.pdf
 *camera.pdf
@@ -21,6 +20,9 @@ sample-*.pdf
 *.cfg
 *.glo
 *.idx
+*.nav
+*.snm
+*.vrb
 *.toc
 *.ilg
 *.ind

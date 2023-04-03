@@ -1,4 +1,4 @@
-\documentclass[pdftex,british,final,infofoot, aspectratio=169]{slidedeck}
+\documentclass[pdftex,british,final,infofoot, biblio,aspectratio=169]{slidedeck}
 
 \usepackage{gla-tikz}
 \makeatletter
@@ -20,24 +20,30 @@
   \includegraphics[keepaspectratio,scale=1.8]{sta}%
 }
 
-\date[EVCS '23]{\origdate\printdate{2023-04-05}}
+\date[EVCS '23]
+{%
+  Eelco Visser Commemorative Symposium \\ Delft, \origdate\printdate{2023-04-05}%
+}
 
-%\bibliography{biblio.bib}
+\bibliography{biblio.bib}
 
 
 \begin{document}
 
 \maketitle
 
-\begin{frame}[fragile]{A Quest: Implement a Simple Language}
+\begin{frame}[fragile]{A Quest: Get on yer bike!}
   \begin{columns}
     \begin{column}{0.2\textwidth}
       \centering
-      \HUGE\faUserTie
+      \includegraphics[keepaspectratio,width=0.7\columnwidth]{master}
       \\
       \Huge\noticeBF{Master}
     \end{column}
     \begin{column}{0.5\textwidth}
+      \begin{center}
+        {\huge\noticeBF{V{\'e}lo}}
+      \end{center}
 \begin{Verbatim}
    let b = false
 in let double
@@ -46,13 +52,17 @@ in let x = (double ?hole)
 in         (double ?hole)
 \end{Verbatim}
 
-        \begin{block}{Velo}
+        \begin{block}{}
+          The \structure{Simply-Typed Lambda Calculus} with\ldots
+          \vspace{-1em}
           \begin{multicols}{2}
             \begin{itemize}
-            \item STLC
             \item Let-Bindings
             \item Booleans
             \item Natural Numbers
+            \item Typed Holes
+            \item Elaboration
+            \item Optimisations
             \end{itemize}
           \end{multicols}
         \end{block}
@@ -60,7 +70,7 @@ in         (double ?hole)
     \end{column}
     \begin{column}{0.2\textwidth}
       \centering
-      \HUGE\faUserNinja
+      \includegraphics[keepaspectratio,width=0.7\columnwidth]{novice}
       \\
       \Huge\noticeBF{Novice}
     \end{column}
@@ -69,7 +79,8 @@ in         (double ?hole)
 \end{frame}
 
 \begin{frame}
-  \frametitle{Well\ldots}
+  \frametitle{Well\ldots Have you heard of Language Workbenches?}
+  \framesubtitle{\url{https://spoofax.dev/}}
   \begin{columns}
     \begin{column}{0.3\textwidth}
       \begin{center}
@@ -97,7 +108,7 @@ in         (double ?hole)
 
 \begin{frame}
   \frametitle{A Language Workbench provides\ldots}
-
+  \framesubtitle{\citetitle{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13}~\cite{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13}}
   \begin{center}
     \begin{tikzpicture}[ampersand replacement=\&]
       \matrix [BasicMatrix, every node/.style={PicFrame,PurpleTitle}]
@@ -111,6 +122,7 @@ in         (double ?hole)
 
 \begin{frame}
   \frametitle{Enter the Dragon}
+  \framesubtitle{\url{https://www.idris-lang.org/}}
   \begin{columns}
     \begin{column}{0.3\textwidth}
       \begin{center}
@@ -139,6 +151,7 @@ in         (double ?hole)
 
 \begin{frame}
   \frametitle{A Dependently-Typed Language provides\ldots}
+\framesubtitle{\citetitle{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13}~\cite{DBLP:conf/sle/ErdwegSVBBCGHKLKMPPSSSVVVWW13}}
 
   \begin{center}
     \begin{tikzpicture}[ampersand replacement=\&]
@@ -155,10 +168,10 @@ in         (double ?hole)
   \frametitle{}
 
   \begin{center}
-    \huge\structure{Type Theory} \noticeBF{is a} \structure{Language Workbench}
+    \Huge\structure{Type Theory} \noticeBF{is a} \structure{Language Workbench}
   \end{center}
-
-  \begin{center}
+  \vspace{2em}
+  \begin{center}\larger
     \url{https://github.com/jfdm/velo-lang}
   \end{center}
 
